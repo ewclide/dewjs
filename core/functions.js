@@ -11,32 +11,32 @@ function istype(value, type)
 		switch (type)
 		{
 			case "number":
-			if (typeof value == "number") return true;
-			else return false;
-			break;
+				if (typeof value == "number") return true;
+				else return false;
+				break;
 			case "string":
-			if (typeof value == "string") return true;
-			else return false;
-			break;
+				if (typeof value == "string") return true;
+				else return false;
+				break;
 			case "boolean":
-			if (typeof value == "boolean") return true;
-			else return false;
-			break;
+				if (typeof value == "boolean") return true;
+				else return false;
+				break;
 			case "array":
-			if (Array.isArray(value)) return true;
-			else return false;
-			break;
+				if (Array.isArray(value)) return true;
+				else return false;
+				break;
 			case "function":
-			if (typeof value == "function") return true;
-			else return false;
-			break;
+				if (typeof value == "function") return true;
+				else return false;
+				break;
 			case "dom":
-			if (value !== undefined && value.nodeType == 1) return true;
-			else return false;
-			break;
+				if (value !== undefined && value.nodeType == 1) return true;
+				else return false;
+				break;
 			default :
-			log.err('the type "' + type + '" is unknown!');
-			return false;
+				log.err('the type "' + type + '" is unknown!');
+				return false;
 		}
 	}
 	else

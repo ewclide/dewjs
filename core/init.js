@@ -38,17 +38,17 @@ export class Init
 	{
 		if (!this._errors.length)
 		{
-			var object, descriptor = {}, have = 0;
+			var object, desc = {}, have = 0;
 
-			options.write !== undefined ? ( have++, descriptor.write = options.write) : descriptor.write = true;
-			options.enumer  !== undefined ? ( have++, descriptor.enumer  = options.enumer)  : descriptor.enumer = true;
-			options.conf  !== undefined ? ( have++, descriptor.conf  = options.conf)  : descriptor.conf = true;
+			options.write  !== undefined ? ( have++, desc.write = options.write)  : desc.write = true;
+			options.enumer !== undefined ? ( have++, desc.enumer = options.enumer): desc.enumer = true;
+			options.conf   !== undefined ? ( have++, desc.conf  = options.conf)   : desc.conf = true;
 
 			if (options.root) object = options.root;
 			else object = this._object;
 
 			if (!have) object[name] = value;
-			else object.$define(name, descriptor);
+			else object.$define(name, desc);
 		}
 	}
 
@@ -90,7 +90,7 @@ export class Init
 
 			if (options.only)
 				!attr ? ( value = undefined, this._errors.push('empty required attribute of option "' + name + '"') )
-			: value = strconv(attr);
+				: value = strconv(attr);
 
 			else if (value == undefined && attr)
 				value = strconv(attr);

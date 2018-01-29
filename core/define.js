@@ -1,4 +1,4 @@
-Object.prototype.$define = function(fields, options = {})
+function define(fields, options = {})
 {
 	var desc = {
 		enumerable: options.enumer != undefined ? options.enumer : false,
@@ -37,6 +37,7 @@ Object.defineProperty(
 	{ 
 		enumerable: false,
 		configurable: false,
-		writable: false
+		writable: false,
+		value : define
 	}
 );

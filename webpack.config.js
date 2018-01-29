@@ -7,11 +7,11 @@ module.exports = {
 		path: path.resolve(__dirname, 'src'),
 		filename: 'epsilon.min.js'
 	},
-	// plugins: [
-	// 	new UglifyJsPlugin({
-	// 		include: /\.min\.js$/
-	// 	})
-	// ],
+	plugins: [
+		new UglifyJsPlugin({
+			include: /\.min\.js$/
+		})
+	],
 	module: {
 	  rules: [
 	    {

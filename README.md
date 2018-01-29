@@ -8,7 +8,7 @@
 > wrapper of Object.defineProperty method
 ### Agruments
 - **fields** - object of fields or string
-- **options** - "conf", "write", "enumer" as "configurable", "writable", "enumerable" or get, set
+- **options** - "conf", "write", "enumer", get, set and value
 ### Example
 ```js
     var Rabbit = {},
@@ -24,7 +24,7 @@
         get : function() { return this._length + " cm"; },
         set : function(value) { this._length = value; },
         conf : true,
-        length : 50
+        value : 50
     });
     
     Rabbit.jump("grass");
@@ -96,7 +96,7 @@
     log(block)
 ```
 ### Result
-    Object init error of "Block" class:
+    Object.$init error in "Block" constructor:
     - empty required option "height";
     
 ----------
