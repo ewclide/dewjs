@@ -1,4 +1,4 @@
-import './polyfill';
+﻿import './polyfill';
 import './define';
 import './object.define';
 import './array.define';

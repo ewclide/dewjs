@@ -104,7 +104,7 @@
 ## Object.$join
 ### Description
     this.$join(object)
-> Allows to join current object with other object (objects)
+> Allows to join current object to other object (objects)
 ### Example
 ```js
     var one = { a : "A", b : "B" },
@@ -120,8 +120,9 @@
 
 ## Object.$clone
 ### Description
-    this.$clone()
+    this.$clone([fullClone])
 > Allows to clone current object. Link to the prototype is stored.
+> Recieves one parameter wich allows to clone all sub objects
 ### Example
 ```js
     var one = { a : "A", b : "B" },
@@ -275,6 +276,8 @@
 
     log( istype(num, "string") );
 ```
+> Second argument also can accept the array of possibles types
+
 ### Result
     number string boolean array function dom object
     false

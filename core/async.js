@@ -9,8 +9,7 @@ export class Async
 			_async_fails   : superFunction(),
 			_async_data    : null,
 			_async_error   : null
-		},
-		{ write : true });
+		});
 	}
 
 	get on()

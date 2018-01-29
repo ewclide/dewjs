@@ -65,7 +65,7 @@ export class Binder
 				field : target.field,
 				modifier : modifier
 			}
-			);
+		);
 	}
 
 	_genGetSet(object, field, trigger)

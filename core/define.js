@@ -1,4 +1,4 @@
-function define(fields, options = {})
+﻿function define(fields, options = {})
 {
 	var desc = {
 		enumerable: options.enumer != undefined ? options.enumer : false,
