@@ -1,7 +1,7 @@
 ﻿import './polyfill';
 import './define';
-import './object.define';
-import './array.define';
+import './object-define';
+import './array-define';
 import './functions';
 
 import {Binder} from './binder';

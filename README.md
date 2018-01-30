@@ -155,18 +155,23 @@
 
 ## Array.$remove
 ### Description
-    array.$remove(options)
+    array.$remove
+    .index(index)
+    .value(index)
+    .first(index)
+    .last(index)
 > Allows to remove element from the array by index or by value;
 > Return removed element or false
 ### Example
 ```js
     var arr = ["value-1", "value-2", "value-3"];
 
-    arr.$remove({ index : 2 });
-    arr.$remove({ value : "value-1" });
+    arr.$remove.index(2);
+    arr.$remove.value("value-1");
 
     log(arr);
 ```
+> The argument also can accept the array of indexes, values
 ### Result
     ["value-2"]
 
@@ -194,9 +199,9 @@
 ## log
 ### Description
     log(arguments...)
-    log.time()
-    log.timeoff()
-    log.err(array || string)
+    .time()
+    .timeoff()
+    .err(array || string)
 > Convenient wrapper of console.
 > This function will save your time to debug code.
 > You can see more infomation about objects, print time execution or show errors in console.
