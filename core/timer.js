@@ -6,7 +6,7 @@ export class Timer
 
 		if (!options) options = {}
 
-			this.count = options.count || 0;
+		this.count = options.count || 0;
 		this.duration = options.duration || 0;
 		this.delay = options.delay || 0;
 		this.step = options.step || 0;
@@ -41,8 +41,8 @@ export class Timer
 
 		if (this.count) this.count--;
 
-		this._tick = bind.context(this._tick, this);
-		this._stepTick = bind.context(this._stepTick, this);
+		this._tick = $bind.context(this._tick, this);
+		this._stepTick = $bind.context(this._stepTick, this);
 	}
 
 	get on()

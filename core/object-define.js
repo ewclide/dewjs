@@ -33,7 +33,7 @@ Object.prototype.$define({
 
 function clone(object, full)
 {
-   function Clone(field)
+   function CloneObject(field)
    {
         for (field in object)
         {
@@ -42,7 +42,7 @@ function clone(object, full)
         }
    }
 
-   if ("__proto__" in object) Clone.prototype = object.__proto__;
+   if ("__proto__" in object) CloneObject.prototype = object.__proto__;
 
-   return new Clone();
+   return new CloneObject();
 }

@@ -21,18 +21,13 @@ Array.prototype.$define({
 	}
 });
 
-function removeIndex(array, index)
+function haveInArray(array, value)
 {
-	if (index < (array.length - 1) && index > 0)
-		return array.splice(index, 1);
-	else return false;
-}
+	for (var i = 0; i < array.length; i++)
+		if (array[i] == value) return true;
+		else continue;
 
-function removeValue(array, value)
-{
-	var index = array.indexOf(value);
-	if (index != -1) return array.splice(index, 1);
-	else return false;
+	return false;
 }
 
 Array.prototype.$define("$remove", {
@@ -43,33 +38,40 @@ Array.prototype.$define("$remove", {
 		return {
 			index : function(index)
 			{
-				if (Array.isArray(index))
+				var saved = [],
+					list = [];
+					list.$attach(index);
+
+				for (var i = 0; i < list.length; i++)
 				{
-					var result = [];
+					var indexDel = list[i];
 
-					result = index.map(function(i){
-						return removeIndex(self, i);
-					});
-
-					log("need check!")
-
-					return result;
+					if (indexDel < self.length && indexDel >= 0)
+					{
+						saved.push(self[indexDel]);
+						self[indexDel] = undefined;
+					}
 				}
-				else return removeIndex(self, index);
+
+				self.$remove.value();
+
+				return saved;
 			},
 			value : function(value)
 			{
-				if (Array.isArray(value))
+				var list = [];
+					list.$attach(value);
+
+				for (var i = 0; i < self.length; i++)
 				{
-					var result = [];
-
-					result = value.map(function(i){
-						return removeValue(self, i);
-					});
-
-					return result;
+					if (haveInArray(list, self[i]))
+					{
+						self.splice(i, 1);
+						i--;
+					}
 				}
-				else return removeValue(self, value);
+
+				return list;
 			},
 			first : function()
 			{

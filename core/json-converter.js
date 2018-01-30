@@ -103,7 +103,7 @@ export class JsonConverter
         var tokens = this._splitTokens(template);
 
         tokens.forEach(function(token){
-            template = template.replace("{" + token + "}", '<span style="color : red">unknown token: '+ token +'</span>');
+            template = template.replace("{" + token + "}", '<span style="color : red">{unknown token: '+ token +'}</span>');
         });
 
         return template;
@@ -144,7 +144,7 @@ export class JsonConverter
         if (json.content && json.template)
         {
             for (let field in json.content)
-                bind.change(
+                $bind.change(
                 	json.content,
                 	field,
                 	function(value){
@@ -160,16 +160,16 @@ export class JsonConverter
                 {
                     case "text":
                         if (json.bind.text)
-                            bind.change( json, "text", function(value){ json._doc.text(value); });
+                            $bind.change( json, "text", function(value){ json._doc.text(value); });
                         break;
                     case "html":
                         if (json.bind.html)
-                            bind.change( json, "html", function(value){ json._doc.html(value); });
+                            $bind.change( json, "html", function(value){ json._doc.html(value); });
                         break;
                     case "value":
                         if (json.bind.value)
                         {
-                            bind.change( json, "value", function(value){ json._doc.value(value); });
+                            $bind.change( json, "value", function(value){ json._doc.value(value); });
 
                             if ((json.tag == "input" && json.attrs.type == "text") || json.tag == "textarea")
                                 json._doc.event.attach({
@@ -184,7 +184,7 @@ export class JsonConverter
                     case "checked" : 
                         if (json.bind.checked)
                         {
-                            bind.change( json, "checked", function(value){ json._doc.checked(value); });
+                            $bind.change( json, "checked", function(value){ json._doc.checked(value); });
 
                             if (json.tag == "input" && (json.attrs.type == "checkbox" || json.attrs.type == "radio"))
                                 json._doc.event.attach({
@@ -199,7 +199,7 @@ export class JsonConverter
                     case "attrs":
                         if (json.bind.attrs)
                             for (let name in json.attrs)
-                                bind.change(
+                                $bind.change(
                                     json.attrs,
                                     name,
                                     function(value)
@@ -213,7 +213,7 @@ export class JsonConverter
                     case "css":
                         if (json.bind.css)
                             for (let name in json.css)
-                                bind.change(
+                                $bind.change(
                                     json.css,
                                     name,
                                     function(value)

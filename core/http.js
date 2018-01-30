@@ -1,5 +1,3 @@
-import {Async} from './async';
-
 export class HTTP
 {
 	constructor()
@@ -10,8 +8,8 @@ export class HTTP
 	get(path)
 	{
 		var self = this,
-		async = new Async(),
-		request = new XMLHttpRequest();
+			async = new $Async(),
+			request = new XMLHttpRequest();
 
 		request.open("GET", path, true);
 		request.send();
@@ -30,8 +28,8 @@ export class HTTP
 	post(data)
 	{
 		var self = this,
-		request,
-		formData;
+			request,
+			formData;
 
 		if (data)
 		{
@@ -51,7 +49,7 @@ export class HTTP
 					request.open("POST", path, true);
 					request.send(formData);
 
-					var async = new Async();
+					var async = new $Async();
 
 					request.onreadystatechange = function()
 					{

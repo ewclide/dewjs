@@ -34,6 +34,10 @@ function istype(value, type)
 				if (value !== undefined && value.nodeType == 1) return true;
 				else return false;
 				break;
+			case "docTool":
+				if (value.isDocTool) return true;
+				else return false;
+				break;
 			default :
 				log.err('the type "' + type + '" is unknown!');
 				return false;
@@ -47,6 +51,7 @@ function istype(value, type)
 		else if (Array.isArray(value)) return "array";
 		else if (typeof value == "function") return "function";
 		else if (value.nodeType == 1) return "dom";
+		else if (value.isDocTool) return "docTool";
 		else return "object";
 	}
 }

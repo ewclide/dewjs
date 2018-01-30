@@ -8,25 +8,20 @@ import {Binder} from './binder';
 import {Async} from './async';
 import {Timer} from './timer';
 import {HTTP} from './http';
-import {URL} from'./url';
+import {URLmanager} from'./url';
 import {StyleSheet} from './stylesheet';
 import {DOC} from './doc';
 
 window.$define({
-	bind    : new Binder,
-	http    : new HTTP,
-	url    	: new URL,
-	DOC     : DOC
+	$Async : Async,
+	$Timer : Timer,
+	$StyleSheet : StyleSheet
 });
 
-var Epsilon = {}
-
-Epsilon.$define({
-	Async   : Async,
-	Timer   : Timer,
-	StyleSheet : StyleSheet
+window.$define({
+	$bind  : new Binder,
+	$http  : new HTTP,
+	$url   : new URLmanager,
+	DOC    : DOC, // ? need thing about symbol $ in begin
 });
-
-window.Epsilon = Epsilon;
-window.EPS = Epsilon;
 

@@ -4,11 +4,12 @@
 
 ## Object.$define
 ### Description
-    this.$define(fields [, options])
+    this.$define(fields [, descriptor])
 > wrapper of Object.defineProperty method
 ### Agruments
 - **fields** - object of fields or string
-- **options** - "conf", "write", "enumer", get, set and value
+- **descriptor** - "conf", "write", "enumer", get, set and value
+> If use "get", "set" and "value" in descriptor then option "value" will be writed to the field as first value after defining. This can be usefully for creating hidden fields.
 ### Example
 ```js
     var Rabbit = {},
@@ -19,7 +20,8 @@
         jump : function(place) { log("jumping on " + place); },
         eat : function(food) { log("eating " + food); }
     });
-
+    
+    //adding the hidden field "_length" binded with the visible field "length"
     Snake.$define("length", {
         get : function() { return this._length + " cm"; },
         set : function(value) { this._length = value; },
@@ -39,7 +41,7 @@
 ## Object.$init
 ### Description
     this.$init(fields, data [, showErrors ])
-> This function allows to automate the initialization of object fields.
+> This function allows to automate the initialization of object fields.  
 > Used in constructor of class
 ### Arguments
 - **fields** - fields settings (see below on example). Required
@@ -121,8 +123,8 @@
 ## Object.$clone
 ### Description
     this.$clone([fullClone])
-> Allows to clone current object. Link to the prototype is stored.
-> Recieves one parameter wich allows to clone all sub objects
+> Allows to clone current object. Link to the prototype is stored.  
+> Recieves one parameter wich allows to clone all sub objects.
 ### Example
 ```js
     var one = { a : "A", b : "B" },
@@ -138,7 +140,7 @@
 ## Array.$have
 ### Description
     array.$have(value)
-> Allows to define the presence of value in the array.
+> Allows to define the presence of value in the array.  
 > Return false if array not have value or object with index of value;
 ### Example
 ```js
@@ -156,12 +158,13 @@
 ## Array.$remove
 ### Description
     array.$remove
+    
     .index(index)
-    .value(index)
-    .first(index)
-    .last(index)
-> Allows to remove element from the array by index or by value;
-> Return removed element or false
+    .value(value)
+    .first()
+    .last()
+> Allows to remove element from the array by index or by value.  
+> Return removed elements or false
 ### Example
 ```js
     var arr = ["value-1", "value-2", "value-3"];
@@ -180,7 +183,7 @@
 ## Array.$attach
 ### Description
     array.$attach(array)
-> Allows to attach array to the array.
+> Allows to attach array to the array.  
 > Unlike concat this function not return new array but modify current
 ### Example
 ```js
@@ -199,11 +202,12 @@
 ## log
 ### Description
     log(arguments...)
+    
     .time()
     .timeoff()
     .err(array || string)
 > Convenient wrapper of console.
-> This function will save your time to debug code.
+> This function will save your time to debug code.  
 > You can see more infomation about objects, print time execution or show errors in console.
 ### Example
 ```js  
@@ -232,10 +236,11 @@
 ## random
 ### Description
     random([min][, max])
-    random.key([length][, types])
-> This function allow to generate number or characters keys;
+    
+    .key([length][, types])
+> This function allow to generate number or characters keys.  
 > Default values of min is "0" and max is "9999999"
-### Provides types or character key:
+### Provides types of character key:
 - all
 - upper
 - lower
@@ -255,7 +260,7 @@
 
 ## istype
 ### Description
-    istype(value [, type]);
+    istype(value [, type])
 > Allows to check or get type of value.
 ### Provides types:
 - number
@@ -265,33 +270,31 @@
 - function
 - dom
 - object
+- docTool
 
 ### Examples
 ```js
     var num = 10,
         str = "string",
-        bool = true,
-        arr = [],
         fn = function(){},
-        elem = document.createElement("div"),
-        obj = {};
+        char = "245"
 
-    log( istype(num), istype(str), istype(bool), istype(arr),
-         istype(fn), istype(elem), istype(obj) );
-
+    log( istype(num), istype(str),  istype(fn) );
     log( istype(num, "string") );
+    log( istype(char, ["string", "number"]) );
 ```
 > Second argument also can accept the array of possibles types
 
 ### Result
-    number string boolean array function dom object
+    number string function
     false
+    true
 
 ----------
 
 ## strconv
 ### Description
-    strconv(value);
+    strconv(value)
 > This function transform string to other types
 ### Types:
 - number
@@ -318,13 +321,15 @@
 
 ----------
 
-## bind
+## $bind
 ### Description
-    bind.context(function, context);
-    bind.change(object, field, trigger);
-    bind.fields(options)
-> This function allow to bind conext, onchange function and two fields of the two objects.
-> **Modifier** - function wich transform value before writing to binded field
+    $bind
+    
+    .context(function, context)
+    .change(object, field, trigger)
+    .fields(options)
+> This function allow to bind conext, onchange function and two fields of the two objects.  
+> **Modifier** - function wich transform value before writing to binded field  
 > **Trigger** - function wich called always when value of field changes. Don't called when be initializing
 ### Options
 - **type** - "left", "right", "cross"
@@ -344,7 +349,7 @@
 - **left** - Changes of the left field will be writing this to the right field
 - **right** - Changes of the right field will be writing this to the left field
 - **cross** - Changes of any field will be writing his value to binded field
-> This function provide also multi binding.
+> This function provide also multi binding.  
 > For example, you can bind field of first object with field of second object and,
 > then you bind field of second (first) object with field of third object.
 > This manipulation will not broke the cross bind
@@ -353,7 +358,7 @@
     var left =  { field : 100 },
         right = { field : 100 };
         
-    bind.fields({
+    $bind.fields({
         type   : "left",
         left   : {
             object : left,
@@ -395,7 +400,7 @@
             log("value was changed to " + value)
         };
 
-    bind.change(some, "value", change);
+    $bind.change(some, "value", change);
 
     some.value = 200;
 ```
@@ -406,14 +411,89 @@
 
 ## superFunction
 ### Description
+    superFunction([function])
+    
+    .push(function)
+    .remove(function)
+>  New concept of function wich presents array and function in one.  
+>  Uses to create callback functions stack.
 ### Examples
-### Result
+```js
+var onchange = superFunction();
 
+    onchange.push(function(){
+        log("do something");
+    });
+    onchange.push(function(){
+        log("do sfter something");
+    });
+
+    onchange();
+```
+### Result
+    do something
+    do sfter something
 ----------
 
 # Classes:
 
-## Async
+## $Async
+### Description
+> Allows to organizate asynchronous code.  
+> One possible of Using is inheriting. After inherit child object acquire async methods and can interact with other async objects.  
+> Also you can create directly new async object and use in your code.
+### Fields
+- completed - return true if object was completed
+- failed  - return true if object was failed
+### Methods
+- on.success( action ) - adds function as action after success
+- on.fail( action ) - adds function as action after fail
+- run.success() - starts success
+- run.fail() - starts fail
+- switch.success() - just switches status to success, not starts callbacks
+- switch.fail() - just switches status to fail, not starts callbacks
+- wait( async object ||  array of async objects ) - wait for async object or array of async objects
+    - .then( action )  - starts action after success all sync objects
+    - .except( action )  - starts action after at least one object will be fail
+### Examples
+```js
+class Some extends $Async
+{
+    constructor(path)
+    {
+        var self = this, file;
+        file = $http.get(path);
+        this.wait(file)
+        .then(function(data){
+            self.data = data;
+        })
+    }
+}
+
+class Some2 extends $Async
+{
+    constructor(some)
+    {
+        var self = this;
+        this.wait(some)
+        .then(function(){
+            self.data = self.action(some.data);
+        })
+    }
+    action(data)
+    {
+        return data + " action";
+    }
+}
+
+var some = new Some("/file.txt"),
+    some2 = new Some2(some);
+```
+### Result
+
+----------
+
+## $Timer
 ### Description
 ### Methods
 ### Examples
@@ -421,15 +501,7 @@
 
 ----------
 
-## Timer
-### Description
-### Methods
-### Examples
-### Result
-
-----------
-
-## StyleSheet
+## $StyleSheet
 ### Description
 ### Methods
 ### Examples
@@ -441,7 +513,7 @@
 
 ----------
 
-## http
+## $http
 ### Description
 ### Methods
 ### Examples
@@ -449,7 +521,7 @@
 
 ----------
 
-## http.url
+## $url
 ### Description
 ### Methods
 ### Examples

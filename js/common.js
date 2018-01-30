@@ -36,59 +36,63 @@
 // 	log(block);
 // });
 
-DOC.ready(function(){
+// DOC.ready(function(){
 
-	var info = {
-		template : "<p><b>{name}</b> : {test}<span>{age}</span></p>",
-		content : {
-			name : "name",
-			age : "age"
-		}
-	}
+// 	var info = {
+// 		template : "<p><b>{name}</b> : {test}<span>{age}</span></p>",
+// 		content : {
+// 			name : "name",
+// 			age : "age"
+// 		}
+// 	}
 
-	var form = {
-		tag : "form",
-		attrs : {
-			action : "/"
-		}
-	}
+// 	var form = {
+// 		tag : "form",
+// 		attrs : {
+// 			action : "/"
+// 		}
+// 	}
 
-	var name = {
-		tag : "input",
-		value : "def",
-		attrs : {
-			type : "text",
-			name : "name"
-		},
-		events : {
-			input : function(e)
-			{
-				info.content.name = name.value;
-			}
-		},
-		bind : { value : true }
-	}
+// 	var name = {
+// 		tag : "input",
+// 		value : "def",
+// 		attrs : {
+// 			type : "text",
+// 			name : "name"
+// 		},
+// 		events : {
+// 			input : function(e)
+// 			{
+// 				info.content.name = name.value;
+// 			}
+// 		},
+// 		bind : { value : true }
+// 	}
 
-	var age = name.$clone(true);
-		age.events = {
-			input : function(e)
-			{
-				info.content.age = age.value;
-			}
-		}
+// 	var age = name.$clone(true);
+// 		age.events = {
+// 			input : function(e)
+// 			{
+// 				info.content.age = age.value;
+// 			}
+// 		}
 
-		age.attrs.name = "age";
+// 		age.attrs.name = "age";
 
-	form.nodes = [name, age]
+// 	form.nodes = [name, age]
 
-	DOC.select(".app").json.append(form);
-	DOC.select(".app").json.append(info);
+// 	DOC.select(".app").json.append(form);
+// 	DOC.select(".app").json.append(info);
 
-});
+// });
 
+var onchange = superFunction();
 
-var arr = ["v1", "v2", "v3"];
+    onchange.push(function(){
+        log("do something");
+    });
+    onchange.push(function(){
+        log("do sfter something");
+    });
 
-arr.$remove.last();
-
-log(arr)
+    onchange();

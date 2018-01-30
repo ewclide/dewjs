@@ -1,92 +1,100 @@
-export class URL
+export class URLmanager
 {
 	constructor()
 	{
-		this.params = {}
+		this._params = this._getParamsInSearch();
+		this.search = location.search;
+		this.path = location.pathname;
 	}
 
-	get(params)
+	take(name)
 	{
-		var all, search;
+		if (name === undefined)
+			return this._params;
 
-		all = {};
+		else if (typeof name == "string")
+			return this._params[name];
+
+		else if (Array.isArray(name))
+		{
+			var self = this,
+				result = {};
+
+			this.name.forEach(function(p){
+				if (p in self._params)
+					result[p] = self._params[p];
+			});
+
+			return result;
+		}
+	}
+
+	_getParamsInSearch()
+	{
+		var params, search;
+
+		params = {};
 		search = location.search;
 
 		if (!search) return false;
 
 		search = search.replace("?", "");
 		search = search.split("&");
-		search.forEach(function(pair){
-			pair = pair.split("=");
-			all[pair[0]] = pair[1];
+		search.forEach(function(p){
+			p = p.split("=");
+			params[p[0]] = p[1];
 		});
 
-		if (params === undefined) return all;
-		else if (istype(params, "string")) return all[params];
-		else if (istype(params, "array"))
-		{
-			var arr = {}
-			params.forEach(function(param, name){
-				if (param in all) arr[param] = all[param];
-			});
-			return arr;
-		}
+		return params;
 	}
 
-	set(options)
+	put(params)
 	{
-		var params = this._build(options);
+		var self = this, search;
 
-		history.pushState({ foo: "bar" }, "page", location.pathname + params);
+		this._params = params;
+		search = this._build();
+
+		history.pushState({ foo: "bar" }, "page", self.path + search);
 
 		return {
 			go : function(path)
 			{
-				if (!path) path = location.pathname;
-				if (params) path += params;
+				if (!path) path = self.path;
+				path += search;
 
 				location.href = path;
 			}
 		}
 	}
 
-	add(options)
+	add(params)
 	{
-		var params = self.get();
+		var self = this, search;
 
-		if (params)
-		{
-			for (var i in options)
-				params[i] = options[i];
-		}
-		else params = options;
+		this._params.$join(params);
+		search = this._build();
 
-		params = this._build(params);
-
-		history.pushState({ foo: "bar" }, "page", location.pathname + params);
+		history.pushState({ foo: "bar" }, "page", self.path + search);
 
 		return {
 			go : function(path)
 			{
-				if (!path) path = location.pathname;
-				if (params) path += params;
+				if (!path) path = self.path;
+				path += search;
 
 				location.href = path;
 			}
 		}
 	}
 
-	_build(options)
+	_build()
 	{
-		if (options)
-		{
-			var request = "?";
+		var request = "?";
 
-			for (var i in options)
-				request += i + "=" + options[i] + "&";
+		for (var i in this._params)
+			request += i + "=" + this._params[i] + "&";
 
-			return request.slice(0, -1);
-		}
-		else return "";
+		return request.slice(0, -1);
 	}
 }
