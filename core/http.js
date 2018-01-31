@@ -17,7 +17,9 @@ export class HTTP
 		{
 			if (request.readyState == 4)
 			{
-				if (request.status == 200) async.run.success(request.responseText);
+				if (request.status == 200)
+					async.run.success(request.responseText);
+				
 				else log.err(this.status ? this.statusText : 'ajax send error');
 			}
 		}
@@ -55,7 +57,9 @@ export class HTTP
 					{
 						if (request.readyState == 4)
 						{
-							if (request.status == 200) async.run.success(request.responseText);
+							if (request.status == 200)
+								async.run.success(request.responseText);
+
 							else
 							{
 								async.run.fail(request.statusText);

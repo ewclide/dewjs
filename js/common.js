@@ -27,72 +27,55 @@
 // 	}
 // };
 
-// DOC.ready(function()
-// {
-// 	var block = new Block({
-// 		element: DOC.select("#block-1")
-// 	});
+DOC.ready(function(){
 
-// 	log(block);
-// });
+	var info = {
+		template : "<p><b>{name}</b> : {test}<span>{age}</span></p>",
+		content : {
+			name : "name",
+			age : "age"
+		}
+	}
 
-// DOC.ready(function(){
+	var form = {
+		tag : "form",
+		attrs : {
+			action : "/"
+		}
+	}
 
-// 	var info = {
-// 		template : "<p><b>{name}</b> : {test}<span>{age}</span></p>",
-// 		content : {
-// 			name : "name",
-// 			age : "age"
-// 		}
-// 	}
+	var name = {
+		tag : "input",
+		value : "def",
+		attrs : {
+			type : "text",
+			name : "name"
+		},
+		events : {
+			input : function(e)
+			{
+				info.content.name = name.value;
+			}
+		},
+		bind : [ "value", "transform" ]
+	}
 
-// 	var form = {
-// 		tag : "form",
-// 		attrs : {
-// 			action : "/"
-// 		}
-// 	}
+	var age = name.$clone(true);
+		age.events = {
+			input : function(e)
+			{
+				info.content.age = age.value;
+			}
+		}
 
-// 	var name = {
-// 		tag : "input",
-// 		value : "def",
-// 		attrs : {
-// 			type : "text",
-// 			name : "name"
-// 		},
-// 		events : {
-// 			input : function(e)
-// 			{
-// 				info.content.name = name.value;
-// 			}
-// 		},
-// 		bind : { value : true }
-// 	}
+		age.attrs.name = "age";
 
-// 	var age = name.$clone(true);
-// 		age.events = {
-// 			input : function(e)
-// 			{
-// 				info.content.age = age.value;
-// 			}
-// 		}
+		log(age)
 
-// 		age.attrs.name = "age";
+	form.nodes = [name, age]
 
-// 	form.nodes = [name, age]
+	DOC.select(".app").json.append(form);
+	DOC.select(".app").json.append(info);
 
-// 	DOC.select(".app").json.append(form);
-// 	DOC.select(".app").json.append(info);
+});
 
-// });
-
-var onchange = superFunction();
-
-    onchange.push(function(){
-        log("do something");
-    });
-    onchange.push(function(){
-        log("do sfter something");
-    });
-
-    onchange();

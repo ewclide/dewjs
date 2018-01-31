@@ -30,7 +30,11 @@ export class JsonConverter
                     case "checked" : doc.checked(json.checked); break;
                     case "attrs" : doc.attr.set(json.attrs); break;
                     case "css"   : doc.css(json.css); break;
-                    case "transform" : doc.transform(json.transform, json.transform.units); break;
+                    case "transform" :
+                        if (json.transform.units)
+                            doc.transform.units(json.transform.units);
+                        doc.transform.apply(json.transform);
+                        break;
                     case "nodes" :
                     if (Array.isArray(json.nodes))
                         json.nodes.forEach(function(node){
@@ -155,76 +159,83 @@ export class JsonConverter
 
         if (json.bind)
         {
-            for (var item in json.bind)
+            for (var i = 0; i < json.bind.length; i++)
+            {
+                var item = json.bind[i];
+                
                 switch (item)
                 {
                     case "text":
-                        if (json.bind.text)
-                            $bind.change( json, "text", function(value){ json._doc.text(value); });
+                        $bind.change( json, "text", function(value){
+                            json._doc.text(value);
+                        });
+
                         break;
                     case "html":
-                        if (json.bind.html)
-                            $bind.change( json, "html", function(value){ json._doc.html(value); });
+                        $bind.change( json, "html", function(value){
+                            json._doc.html(value);
+                        });
+
                         break;
                     case "value":
-                        if (json.bind.value)
-                        {
-                            $bind.change( json, "value", function(value){ json._doc.value(value); });
+                        $bind.change( json, "value", function(value){
+                            json._doc.value(value);
+                        });
 
-                            if ((json.tag == "input" && json.attrs.type == "text") || json.tag == "textarea")
-                                json._doc.event.attach({
-                                    input : function(e)
-                                    {
-                                        json._value = e.srcElement.value;
-                                        json._doc.value(e.srcElement.value);
-                                    }
-                                });
-                        }
-                    break;
+                        if ((json.tag == "input" && json.attrs.type == "text") || json.tag == "textarea")
+                            json._doc.event.attach({
+                                input : function(e)
+                                {
+                                    json._value = e.srcElement.value;
+                                    json._doc.value(e.srcElement.value);
+                                }
+                            });
+
+                        break;
                     case "checked" : 
-                        if (json.bind.checked)
-                        {
-                            $bind.change( json, "checked", function(value){ json._doc.checked(value); });
+                        $bind.change( json, "checked", function(value){
+                            json._doc.checked(value);
+                        });
 
-                            if (json.tag == "input" && (json.attrs.type == "checkbox" || json.attrs.type == "radio"))
-                                json._doc.event.attach({
-                                    change : function(e)
-                                    {
-                                        json._checked = e.srcElement.checked;
-                                        json._doc.checked(e.srcElement.checked);
-                                    }
-                                });
-                        }
-                    break;
+                        if (json.tag == "input" && (json.attrs.type == "checkbox" || json.attrs.type == "radio"))
+                            json._doc.event.attach({
+                                change : function(e)
+                                {
+                                    json._checked = e.srcElement.checked;
+                                    json._doc.checked(e.srcElement.checked);
+                                }
+                            });
+
+                        break;
                     case "attrs":
-                        if (json.bind.attrs)
-                            for (let name in json.attrs)
-                                $bind.change(
-                                    json.attrs,
-                                    name,
-                                    function(value)
-                                    {
-                                        var attr = {};
-                                        attr[name] = value;
-                                        json._doc.attr.set(attr);
-                                    }
-                                );
+                        for (let name in json.attrs)
+                            $bind.change( json.attrs, name, function(value){
+                                var attr = {};
+                                attr[name] = value;
+                                json._doc.attr.set(attr);
+                            });
+
                         break;
                     case "css":
-                        if (json.bind.css)
-                            for (let name in json.css)
-                                $bind.change(
-                                    json.css,
-                                    name,
-                                    function(value)
-                                    {
-                                        var style = {};
-                                        style[name] = value;
-                                        json._doc.css(style);
-                                    }
-                                );
+                        for (let name in json.css)
+                            $bind.change( json.css, name, function(value){
+                                var style = {};
+                                style[name] = value;
+                                json._doc.css(style);
+                            });
+
+                        break;
+                    case "transform":
+                        for (let name in json.transform)
+                            $bind.change( json.transform, name, function(value){
+                                var action = {};
+                                action[name] = value;
+                                json._doc.transform.apply(action);
+                            });
+
                         break;
                 }
+            }
         }
 	}
 

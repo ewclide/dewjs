@@ -1,7 +1,16 @@
 import {JsonConverter} from './json-converter';
 import {Async} from './async';
 
-var jsonConverter = new JsonConverter();
+var jsonConverter = new JsonConverter(),
+    transformUnits = {
+        perspective : "px",
+        translate : "px",
+        rotate : "deg",
+        skew : "deg",
+        origin : "%",
+        transition : "ms"
+    },
+    actionsList = [ "translate", "rotate", "scale", "skew", "origin", "transition" ]
 
 export class DocumentTools
 {
@@ -12,6 +21,10 @@ export class DocumentTools
         this._id = random();
         this._query = '';
         this._readyActions = new Async();
+        this._transformState = {
+            actions : {},
+            units : transformUnits
+        }
 
         this.addElements(elements);
     }
@@ -253,7 +266,8 @@ export class DocumentTools
     {
         if (typeof flag == "boolean")
             this.elements.forEach(function(element){
-                element.checked = flag;
+                if ("checked" in element)
+                    element.checked = flag;
             });
         else if (flag == undefined)
             return this.elements[0].checked;
@@ -262,8 +276,24 @@ export class DocumentTools
     toogle()
     {
         this.elements.forEach(function(element){
-            if (element.checked) element.checked = false;
-            else element.checked = true;
+            if ("checked" in element)
+            {
+                if (element.checked) element.checked = false;
+                else element.checked = true;
+            }
+        });
+    }
+
+    get index()
+    {
+        return this.elements[0].selectedIndex;
+    }
+
+    choose(index)
+    {
+        this.elements.forEach(function(element){
+            if ("selectedIndex" in element)
+                element.selectedIndex = index;
         });
     }
 
@@ -330,30 +360,57 @@ export class DocumentTools
         return this;
     }
 
-    transform(actions, units = {})
+    get transform()
     {
-        this.css({ "transform" : this._buildTransform(actions, units) });
-        if (actions.origin)
-        {
-            var origin = actions.origin,
-                unit = units.origin || "%";
+        var self = this;
 
-            this.css({ transformOrigin : origin[0] + unit + " " + origin[1] + unit });
+        return {
+            apply : function(actions)
+            {
+                var selfActions = self._transformState.actions,
+                    units = self._transformState.units;
+
+                for (var i in actions)
+                {
+                    if (actionsList.$have(i))
+                        self._transformState.actions[i] = actions[i];
+                }
+
+                if (selfActions.transition)
+                    self.css({ "transition" : selfActions.transition + units.transition });
+
+                if (selfActions.origin && selfActions.origin.length == 2)
+                    self.css({ "transform-origin" : selfActions.origin[0] + units.origin + " " + selfActions.origin[1] + units.origin });
+
+                self.css({ "transform" : self._buildTransform(selfActions, units) });
+
+                return self;
+            },
+            units : function(units)
+            {
+                var state = self._transformState;
+
+                if (typeof units == "object")
+                    for (var i in units)
+                    {
+                        if (i in state.units)
+                            state.units[i] = units[i];
+                    }
+            },
+            reset : function(units)
+            {
+                self._transformState.actions = {};
+                if (units) self._transformState.units = transformUnits;
+            }
         }
-        return this;
     }
 
-    _buildTransform(actions, units = {})
+    _buildTransform(actions, units)
     {
         var result = "";
 
         for (var name in actions)
         {
-            if (!units.perspective) units.perspective = "px";
-            if (!units.translate) units.translate = "px";
-            if (!units.rotate) units.rotate = "deg";
-            if (!units.skew) units.skew = "deg";
-
             var action = actions[name],
                 unit = units[name] || "";
 
@@ -471,21 +528,19 @@ export class DocumentTools
     {
         if (element !== undefined && element.nodeType == 1 && element.attributes.length)
         {
-            var attributes = Object.create(null);
+            var attributes = {};
 
             if (list)
             {
                 if (Array.isArray(list))
-                {
                     list.forEach(function(name){
                         var attribute = element.getAttribute(name);
                         if (attribute) attributes[name] = attribute;
                     });
-                } 
+
                 else if (typeof list == "string")
-                {
                     attributes = element.getAttribute(list);
-                }
+
                 else return;
             }
             else
@@ -504,9 +559,8 @@ export class DocumentTools
     css(styles)
     {
         if (typeof styles == "string")
-        {
             return this.elements[0].style[styles];
-        }
+
         else
         {
             this.elements.forEach(function(element){
@@ -535,11 +589,13 @@ export class DocumentTools
 
                 for (var event in list)
                 {
-                    if (!eventList[event]) eventList[event] = superFunction(list[event]);
+                    if (!eventList[event])
+                        eventList[event] = superFunction(list[event]);
+
                     else eventList[event].push(list[event]);
 
                     var evAttr = {}
-                    evAttr["on" + event] = "DOC._runEvFunc(" + self._id + ", '" + event + "', event)";
+                    evAttr["on" + event] = "DOC._startEventFunc(" + self._id + ", '" + event + "', event)";
                     self.attr.set(evAttr);
                 }
 
@@ -555,7 +611,7 @@ export class DocumentTools
             },
             run : function(type)
             {
-                DOC._runEvFunc(self._id, type);
+                DOC._startEventFunc(self._id, type);
             },
             detach : function()
             {
@@ -677,7 +733,7 @@ export class DocumentTools
             if (element.parentNode)
                 element.parentNode.removeChild(element);
 
-            self.elements.$remove({ index : index });
+            self.elements.$remove.index(index);
         });
     }
 }

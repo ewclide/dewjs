@@ -33,16 +33,25 @@ Object.prototype.$define({
 
 function clone(object, full)
 {
-   function CloneObject(field)
-   {
-        for (field in object)
+    function CloneObject()
+    {
+        for (var field in object)
         {
             if (object.hasOwnProperty(field))
-                this[field] = ( full && typeof object[field] == "object" ) ? clone(object[field], true) : object[field];
+                this[field] = full ? clone(object[field], true) : object[field];
         }
-   }
+    }
 
-   if ("__proto__" in object) CloneObject.prototype = object.__proto__;
+    if (Array.isArray(object))
+        return object.$copy();
 
-   return new CloneObject();
+    else if (typeof object == "object")
+    {
+        if ("__proto__" in object)
+            CloneObject.prototype = object.__proto__;
+
+        return new CloneObject();
+    }
+
+    else return object;
 }

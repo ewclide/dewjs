@@ -9,13 +9,12 @@ export class StyleSheet
 	_create()
 	{
 		if (document.createStyleSheet)
-		{
 			this.styleSheet = document.createStyleSheet();
-		}
+
 		else
 		{
 			var head = document.getElementsByTagName("head")[0],
-			element = document.createElement("style");
+				element = document.createElement("style");
 
 			head.appendChild(element);
 
@@ -42,6 +41,11 @@ export class StyleSheet
 	{
 		for (selector in styles)
 			this._addRule(selector, styles[selector]);
+	}
+
+	deleteRule(index)
+	{
+		this.styleSheet.deleteRule(index) 
 	}
 
 	_stylesToString(styles)

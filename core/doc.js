@@ -1,4 +1,5 @@
 import {DocumentTools} from './document-tools';
+import {StyleSheet} from './stylesheet';
 
 var proto = DocumentTools.prototype,
     DOC = new DocumentTools(document);
@@ -9,7 +10,7 @@ DOC.$define({
         proto[name] = method;
     },
     _eventList : {},
-    _runEvFunc : function(id, type, e)
+    _startEventFunc : function(id, type, e)
     {
         this._eventList[id][type](e);
     },
@@ -18,25 +19,26 @@ DOC.$define({
         var parse, errors = '';
 
         if (typeof window.DOMParser != "undefined")
-        {
             parse = function(str)
             {
                 return (new window.DOMParser()).parseFromString(str, "text/xml");
             }
-        }
+
         else if (typeof window.ActiveXObject != "undefined" && new window.ActiveXObject("Microsoft.XMLDOM"))
-        {
             parse = function(str)
             {
                 var xml = new window.ActiveXObject("Microsoft.XMLDOM");
-                xml.async = "false";
-                xml.loadXML(str);
+                    xml.async = "false";
+                    xml.loadXML(str);
+
                 return xml;
             }
-        }
+
         else errors += 'No XML parser found';
 
-        if (!errors) return parse(data);
+        if (!errors)
+            return parse(data);
+
         else
         {
             log.err(errors);
@@ -56,6 +58,10 @@ DOC.$define({
         if (css) doc.css(css);
 
         return doc;
+    },
+    styleSheet()
+    {
+       return new StyleSheet(); 
     }
 });
 

@@ -18,6 +18,10 @@ Array.prototype.$define({
 		{
 			this.push(arr);
 		}
+	},
+	$copy : function()
+	{
+		return this.slice().sort();
 	}
 });
 
