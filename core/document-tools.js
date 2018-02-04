@@ -2,15 +2,17 @@ import {JsonConverter} from './json-converter';
 import {Async} from './async';
 
 var jsonConverter = new JsonConverter(),
-    transformUnits = {
-        perspective : "px",
-        translate : "px",
-        rotate : "deg",
-        skew : "deg",
-        origin : "%",
-        transition : "ms"
-    },
-    actionsList = [ "translate", "rotate", "scale", "skew", "origin", "transition" ]
+    transform = {
+        units : {
+            perspective : "px",
+            translate : "px",
+            rotate : "deg",
+            skew : "deg",
+            origin : "%",
+            transition : "ms"
+        },
+        actions : [ "translate", "rotate", "scale", "skew", "origin", "transition", "perspective", "style", "backface" ]
+    }
 
 export class DocumentTools
 {
@@ -23,7 +25,7 @@ export class DocumentTools
         this._readyActions = new Async();
         this._transformState = {
             actions : {},
-            units : transformUnits
+            units : transform.units
         }
 
         this.addElements(elements);
@@ -92,7 +94,7 @@ export class DocumentTools
         if (tag == "img" && element.complete)
             async.run.success();
 
-        else if (tag == "img" || tag == "link" || tag == "script" || tag == "frame")
+        else if (tag == "link" || tag == "script" || tag == "frame")
             element.addEventListener("load", function(){
                 async.run.success();
             });
@@ -143,27 +145,27 @@ export class DocumentTools
         return methods[name];
     }
 
-    before(doc, del = true)
+    before(doc, rm = true)
     {
-        return this._insert(doc, del, this._getInsertMethod("before"));
+        return this._insert(doc, rm, this._getInsertMethod("before"));
     }
 
-    after(doc, del = true)
+    after(doc, rm = true)
     {
-        return this._insert(doc, del, this._getInsertMethod("after"));
+        return this._insert(doc, rm, this._getInsertMethod("after"));
     }
 
-    append(doc, del = true)
+    append(doc, rm = true)
     {
-        return this._insert(doc, del, this._getInsertMethod("append"));
+        return this._insert(doc, rm, this._getInsertMethod("append"));
     }    
 
-    prepend(doc, del = true)
+    prepend(doc, rm = true)
     {
-        return this._insert(doc, del, this._getInsertMethod("prepend"));
+        return this._insert(doc, rm, this._getInsertMethod("prepend"));
     }
 
-    _insert(doc, del, method)
+    _insert(doc, rm, method)
     {
         var self = this, result = [];
 
@@ -184,7 +186,7 @@ export class DocumentTools
                 result = result.concat(clones);
             });
 
-            if (del) doc.remove();
+            if (rm) doc.remove();
 
             doc.addElements(result);
 
@@ -360,54 +362,75 @@ export class DocumentTools
         return this;
     }
 
-    get transform()
+    parent()
     {
-        var self = this;
+        var self = this,
+            parents = [];
 
-        return {
-            apply : function(actions)
-            {
-                var selfActions = self._transformState.actions,
-                    units = self._transformState.units;
+        this.elements.forEach(function(element){
+            parents.push(self._getParent(element));
+        });
 
-                for (var i in actions)
-                {
-                    if (actionsList.$have(i))
-                        self._transformState.actions[i] = actions[i];
-                }
+        return new DocumentTools(parents);
+    }
 
-                if (selfActions.transition)
-                    self.css({ "transition" : selfActions.transition + units.transition });
+    _getParent(element)
+    { 
+        var parent = element.parentElement;
 
-                if (selfActions.origin && selfActions.origin.length == 2)
-                    self.css({ "transform-origin" : selfActions.origin[0] + units.origin + " " + selfActions.origin[1] + units.origin });
+        if (!parent) parent = element.parentNode || null;
 
-                self.css({ "transform" : self._buildTransform(selfActions, units) });
+        return parent;
+    }
 
-                return self;
-            },
-            units : function(units)
-            {
-                var state = self._transformState;
-
-                if (typeof units == "object")
-                    for (var i in units)
-                    {
-                        if (i in state.units)
-                            state.units[i] = units[i];
-                    }
-            },
-            reset : function(units)
-            {
-                self._transformState.actions = {};
-                if (units) self._transformState.units = transformUnits;
-            }
+    transform(data)
+    {
+        if (data.reset)
+        {
+            this._transformState.actions = {};
+            this._transformState.units = transform.units;
         }
+
+        var actions = this._transformState.actions,
+            units = this._transformState.units;
+
+        if (data.units) units.$join(data.units);
+
+        for (var i in data)
+        {
+            if (transform.actions.$have(i))
+                actions[i] = data[i];
+        }
+
+        if (actions.transition)
+            this.css({ "transition" : actions.transition + units.transition });
+
+        if (actions.origin)
+            this.css({ "transform-origin" : actions.origin[0] + units.origin + " " + actions.origin[1] + units.origin });
+
+        if (actions.backface !== undefined && actions.backface == false)
+            this.css({ "backface-visibility" : "hidden" });
+
+        if (actions.style)
+        {
+            if (actions.style == "3d")
+                this.css({ "transform-style" : "preserve-3d" });
+
+            else if (actions.style == "flat")
+                this.css({ "transform-style" : "flat" });
+        }
+
+        this.css({ "transform" : this._buildTransform(actions, units) });
+
+        return this;
     }
 
     _buildTransform(actions, units)
     {
         var result = "";
+
+        if (actions.perspective)
+            result += "perspective(" + actions.perspective + units.perspective + ") ";
 
         for (var name in actions)
         {
@@ -427,9 +450,11 @@ export class DocumentTools
                         result += "rotate(" + action + unit + ") ";
                     else if (Array.isArray(action))
                     {
-                        if (action[0] != 0) result += "rotateX(" + action[0] + unit + ") ";
-                        if (action[1] != 0) result += "rotateY(" + action[1] + unit + ") ";
-                        if (action[2] != 0) result += "rotateZ(" + action[2] + unit + ") ";
+                        result += "rotateX(" + action[0] + unit + ") ";
+                        result += "rotateY(" + action[1] + unit + ") ";
+                        
+                        if (action[2] !== undefined)
+                            result += "rotateZ(" + action[2] + unit + ") ";
                     }
                     break;
                 case "scale" :
@@ -444,8 +469,6 @@ export class DocumentTools
                     else if (Array.isArray(action))
                         result += "skew(" + action[0] + unit + "," + action[1] + unit +  ") ";
                     break;
-                case "perspective" :
-                    result += "perspective(" + action + unit + ") ";
             }
 
             if (result) result += " ";

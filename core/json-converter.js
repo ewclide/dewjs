@@ -30,11 +30,7 @@ export class JsonConverter
                     case "checked" : doc.checked(json.checked); break;
                     case "attrs" : doc.attr.set(json.attrs); break;
                     case "css"   : doc.css(json.css); break;
-                    case "transform" :
-                        if (json.transform.units)
-                            doc.transform.units(json.transform.units);
-                        doc.transform.apply(json.transform);
-                        break;
+                    case "transform" : doc.transform(json.transform); break;
                     case "nodes" :
                     if (Array.isArray(json.nodes))
                         json.nodes.forEach(function(node){
@@ -157,6 +153,9 @@ export class JsonConverter
                 );
         }
 
+        if (json.tag == "input" && json.attrs.type == "text")
+            json.value = "";
+
         if (json.bind)
         {
             for (var i = 0; i < json.bind.length; i++)
@@ -230,7 +229,7 @@ export class JsonConverter
                             $bind.change( json.transform, name, function(value){
                                 var action = {};
                                 action[name] = value;
-                                json._doc.transform.apply(action);
+                                json._doc.transform(action);
                             });
 
                         break;

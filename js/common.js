@@ -27,55 +27,90 @@
 // 	}
 // };
 
+
+// var info = {
+// 	template : "<p><b>{name}</b> : {test}<span>{age}</span></p>",
+// 	content : {
+// 		name : "name",
+// 		age : "age"
+// 	}
+// }
+
+// var form = {
+// 	tag : "form",
+// 	attrs : {
+// 		action : "/"
+// 	}
+// }
+
+// var theName = {
+// 	tag : "input",
+// 	value : "def",
+// 	attrs : {
+// 		type : "text",
+// 		name : "name"
+// 	},
+// 	events : {
+// 		input : function(e)
+// 		{
+// 			info.content.name = theName.value;
+// 		}
+// 	},
+// 	bind : [ "value", "transform" ]
+// }
+
+// var theAge = theName.$clone(true);
+// theAge.events = {
+// 	input : function(e)
+// 	{
+// 		info.content.age = theAge.value;
+// 	}
+// }
+// theAge.attrs.name = "age";
+
+// form.nodes = [theName, theAge];
+
+// DOC.ready(function(){
+
+// 	DOC.select(".app").json.append(form);
+// 	DOC.select(".app").json.append(info);
+
+// });
+
 DOC.ready(function(){
 
-	var info = {
-		template : "<p><b>{name}</b> : {test}<span>{age}</span></p>",
-		content : {
-			name : "name",
-			age : "age"
-		}
-	}
+var quad = DOC.select(".quad");
+var circle = DOC.select(".circle");
 
-	var form = {
-		tag : "form",
-		attrs : {
-			action : "/"
-		}
-	}
+circle.transform({
+	rotate : [45, 0 , 0],
+	perspective : 500
+});
 
-	var name = {
-		tag : "input",
-		value : "def",
-		attrs : {
-			type : "text",
-			name : "name"
-		},
-		events : {
-			input : function(e)
-			{
-				info.content.name = name.value;
-			}
-		},
-		bind : [ "value", "transform" ]
-	}
+quad.transform({
+	rotate : [0, 0, 0],
+	translate : [0, 0],
+	perspective : 500,
+	style : "3d",
+	transition : 2000
+	// backface : false
+});
 
-	var age = name.$clone(true);
-		age.events = {
-			input : function(e)
-			{
-				info.content.age = age.value;
-			}
-		}
+setTimeout(function(){
+	quad.transform({
+		rotate : [0, 360, 0],
+		translate : [100, 0]
+	});
+}, 1);
 
-		age.attrs.name = "age";
+setTimeout(function(){
+	quad.transform({
+		rotate : [360, 0, 0],
+	});
+}, 2000);
 
-		log(age)
-
-	form.nodes = [name, age]
-
-	DOC.select(".app").json.append(form);
-	DOC.select(".app").json.append(info);
 
 });
 
+/*-------------need updates------------*/
+//update $join - add left, right and full join

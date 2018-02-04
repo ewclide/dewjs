@@ -20,6 +20,6 @@ window.$define({
 	$bind  : new Binder,
 	$http  : new HTTP,
 	$url   : new URLmanager,
-	DOC    : DOC // ? need thing about symbol $ in begin
+	DOC    : DOC
 });
 

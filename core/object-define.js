@@ -1,7 +1,7 @@
 import {Init} from './init';
 
 Object.prototype.$define({
-    $join : function(objects)
+    $join : function(objects, have = false)
     {
         var self = this;
 

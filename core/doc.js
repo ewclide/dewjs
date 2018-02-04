@@ -65,4 +65,8 @@ DOC.$define({
     }
 });
 
+DOC.ready(function(){
+    DOC.body = new DocumentTools(document.body);
+});
+
 export {DOC}
