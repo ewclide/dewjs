@@ -1,4 +1,4 @@
-import {DocumentTools} from './document-tools';
+import {HTMLTools} from './html-tools';
 
 export class JsonConverter
 {
@@ -7,16 +7,16 @@ export class JsonConverter
 
 	}
 
-	wrap(json)
+	toHTML(json)
 	{
-		if (!json._doc)
+		if (!json._htool)
         {
-            var element, doc, self = this;
+            var element, htool, self = this;
 
             if (!json.tag) json.tag = "div";
 
             element = document.createElement(json.tag);
-            doc = new DocumentTools(element);
+            htool = new HTMLTools(element);
 
             json._defaults = {};
 
@@ -24,19 +24,19 @@ export class JsonConverter
             {
                 switch (item)
                 {
-                    case "text"  : doc.text(json.text); break;
-                    case "html"  : doc.html(json.html); break;
-                    case "value" : doc.value(json.value); break;
-                    case "checked" : doc.checked(json.checked); break;
-                    case "attrs" : doc.attr.set(json.attrs); break;
-                    case "css"   : doc.css(json.css); break;
-                    case "transform" : doc.transform(json.transform); break;
+                    case "text"  : htool.text(json.text); break;
+                    case "html"  : htool.inner(json.html); break;
+                    case "value" : htool.value(json.value); break;
+                    case "checked" : htool.checked(json.checked); break;
+                    case "attrs" : htool.attr.set(json.attrs); break;
+                    case "css"   : htool.css(json.css); break;
+                    case "transform" : htool.transform(json.transform); break;
                     case "nodes" :
                     if (Array.isArray(json.nodes))
                         json.nodes.forEach(function(node){
-                            self.wrap(node)
+                            self.toHTML(node)
                         });
-                    else self.wrap(json.nodes);
+                    else self.toHTML(json.nodes);
                     break;
                 }
             }
@@ -44,18 +44,18 @@ export class JsonConverter
             if (json.content && json.template)
             {
                 json._defaults.content = JSON.parse(JSON.stringify(json.content));
-                doc.html(self._getContent(json));
+                htool.inner(self._getContent(json));
             }
 
             json._element = element;
-            json._doc = doc;
+            json._htool = htool;
 
             this._bind(json);
 
             if (json.events)
-                doc.event.attach(json.events);
+                htool.event.attach(json.events);
 
-            json._doc.elements = [];
+            json._htool.elements = [];
         }
 	}
 
@@ -72,7 +72,7 @@ export class JsonConverter
             else current.appendChild(self.build(json.nodes));
         }
 
-        json._doc.addElements(current);
+        json._htool.addElements(current);
 
         return current;
 	}
@@ -148,7 +148,7 @@ export class JsonConverter
                 	json.content,
                 	field,
                 	function(value){
-                		json._doc.html(self._getContent(json));
+                		json._htool.inner(self._getContent(json));
                 	}
                 );
         }
@@ -166,42 +166,42 @@ export class JsonConverter
                 {
                     case "text":
                         $bind.change( json, "text", function(value){
-                            json._doc.text(value);
+                            json._htool.text(value);
                         });
 
                         break;
                     case "html":
                         $bind.change( json, "html", function(value){
-                            json._doc.html(value);
+                            json._htool.inner(value);
                         });
 
                         break;
                     case "value":
                         $bind.change( json, "value", function(value){
-                            json._doc.value(value);
+                            json._htool.value(value);
                         });
 
                         if ((json.tag == "input" && json.attrs.type == "text") || json.tag == "textarea")
-                            json._doc.event.attach({
+                            json._htool.event.attach({
                                 input : function(e)
                                 {
                                     json._value = e.srcElement.value;
-                                    json._doc.value(e.srcElement.value);
+                                    json._htool.value(e.srcElement.value);
                                 }
                             });
 
                         break;
                     case "checked" : 
                         $bind.change( json, "checked", function(value){
-                            json._doc.checked(value);
+                            json._htool.checked(value);
                         });
 
                         if (json.tag == "input" && (json.attrs.type == "checkbox" || json.attrs.type == "radio"))
-                            json._doc.event.attach({
+                            json._htool.event.attach({
                                 change : function(e)
                                 {
                                     json._checked = e.srcElement.checked;
-                                    json._doc.checked(e.srcElement.checked);
+                                    json._htool.checked(e.srcElement.checked);
                                 }
                             });
 
@@ -211,7 +211,7 @@ export class JsonConverter
                             $bind.change( json.attrs, name, function(value){
                                 var attr = {};
                                 attr[name] = value;
-                                json._doc.attr.set(attr);
+                                json._htool.attr.set(attr);
                             });
 
                         break;
@@ -220,7 +220,7 @@ export class JsonConverter
                             $bind.change( json.css, name, function(value){
                                 var style = {};
                                 style[name] = value;
-                                json._doc.css(style);
+                                json._htool.css(style);
                             });
 
                         break;
@@ -229,7 +229,7 @@ export class JsonConverter
                             $bind.change( json.transform, name, function(value){
                                 var action = {};
                                 action[name] = value;
-                                json._doc.transform(action);
+                                json._htool.transform(action);
                             });
 
                         break;
@@ -238,7 +238,7 @@ export class JsonConverter
         }
 	}
 
-	convert(element)
+	fromHTML(element)
 	{
 		if (element.nodeType == 1)
         {
@@ -267,7 +267,7 @@ export class JsonConverter
                 for (var i = 0; i < elements.length; i++)
                 {
                     if (elements[i].nodeType == 1)
-                        result.nodes.push(this.convert(elements[i]));
+                        result.nodes.push(this.fromHTML(elements[i]));
 
                     else if (elements[i].nodeType == 3)
                         result.text = elements[i].textContent;

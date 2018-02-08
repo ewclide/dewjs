@@ -194,7 +194,7 @@ function superFunction(fn)
 
 	shell.remove = function(fn)
 	{
-		shell._handlers.$remove({ value : fn });
+		shell._handlers.$remove.value(fn);
 		shell.count = shell._handlers.length;
 	}
 

@@ -5,20 +5,6 @@ Array.prototype.$define({
 		if (index == -1) return false;
 		else return { index : index }
 	},
-	$attach : function(arr)
-	{
-		if (Array.isArray(arr))
-		{
-			var self = this;
-			arr.forEach(function(item){
-				self.push(item);
-			});
-		}
-		else
-		{
-			this.push(arr);
-		}
-	},
 	$copy : function()
 	{
 		return this.slice().sort();
@@ -44,7 +30,7 @@ Array.prototype.$define("$remove", {
 			{
 				var saved = [],
 					list = [];
-					list.$attach(index);
+					list = list.concat(index);
 
 				for (var i = 0; i < list.length; i++)
 				{
@@ -64,7 +50,7 @@ Array.prototype.$define("$remove", {
 			value : function(value)
 			{
 				var list = [];
-					list.$attach(value);
+					list = list.concat(value);
 
 				for (var i = 0; i < self.length; i++)
 				{

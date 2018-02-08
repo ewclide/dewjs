@@ -2,6 +2,7 @@
     background: #0064ff;
     width: 150px;
     height: 150px;
+    position: relative;
 }
 
 .circle {

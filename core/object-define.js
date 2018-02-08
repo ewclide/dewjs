@@ -1,17 +1,31 @@
 import {Init} from './init';
 
-Object.prototype.$define({
-    $join : function(objects, have = false)
+function clone(object, full)
+{
+    function Copy()
     {
-        var self = this;
+        for (var field in object)
+        {
+            if (object.hasOwnProperty(field))
+                this[field] = full ? clone(object[field], true) : object[field];
+        }
+    }
 
-        if (Array.isArray(objects))
-            objects.forEach(function(object){
-                Object.assign(self, object);
-            });
+    if (Array.isArray(object))
+        return object.$copy();
 
-        else Object.assign(self, objects);
-    },
+    else if (typeof object == "object")
+    {
+        if ("__proto__" in object)
+            Copy.prototype = object.__proto__;
+
+        return new Copy();
+    }
+
+    else return object;
+}
+
+Object.prototype.$define({
     $clone : function(full)
     {
         if (this.constructor != Object)
@@ -30,28 +44,44 @@ Object.prototype.$define({
     }
 });
 
-
-function clone(object, full)
+function join(objects, method)
 {
-    function CloneObject()
-    {
-        for (var field in object)
-        {
-            if (object.hasOwnProperty(field))
-                this[field] = full ? clone(object[field], true) : object[field];
-        }
-    }
+    if (Array.isArray(objects))
+        objects.forEach(function(object){
+            method(object);
+        });
 
-    if (Array.isArray(object))
-        return object.$copy();
-
-    else if (typeof object == "object")
-    {
-        if ("__proto__" in object)
-            CloneObject.prototype = object.__proto__;
-
-        return new CloneObject();
-    }
-
-    else return object;
+    else method(objects);
 }
+
+Object.prototype.$define("$join", {
+    get : function()
+    {
+        var self = this;
+
+        return {
+            left : function(objects)
+            {
+                join(objects, function(object){
+                    for (var i in object)
+                        i in self && (self[i] = object[i]);
+                }); 
+            },
+            right : function(objects)
+            {
+                join(objects, function(object){
+                    for (var i in object)
+                        !(i in self) && (self[i] = object[i]);
+                }); 
+            },
+            full : function(objects)
+            {
+                join(objects, function(object){
+                    for (var i in object)
+                        self[i] = object[i];
+                });
+            }
+        }
+    },
+    set : function(){}
+});

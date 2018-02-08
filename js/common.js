@@ -77,38 +77,41 @@
 
 // });
 
-DOC.ready(function(){
+$html.select(".app").append($html.create("div", "asdad"));
 
-var quad = DOC.select(".quad");
-var circle = DOC.select(".circle");
+$html.ready(function(){
+
+var quad = $html.select(".quad");
+var circle = $html.select(".circle");
 
 circle.transform({
-	rotate : [45, 0 , 0],
-	perspective : 500
+	rotate : [45, 0 , 0]
 });
 
-quad.transform({
-	rotate : [0, 0, 0],
+var trans = quad.transform();
+
+trans.apply({
+	rotate : [0, 45, 0],
 	translate : [0, 0],
-	perspective : 500,
-	style : "3d",
-	transition : 2000
-	// backface : false
+	settings : {
+		perspective : 500,
+		style : "3d",
+		transition : 2000
+	}
 });
 
 setTimeout(function(){
-	quad.transform({
-		rotate : [0, 360, 0],
-		translate : [100, 0]
+	trans.apply({
+		rotate : [0, 70, 0]
+	})
+	.then(function(){
+		trans.apply({
+			rotate : [0, 100, 0]
+		})
 	});
-}, 1);
+}, 1000);
 
-setTimeout(function(){
-	quad.transform({
-		rotate : [360, 0, 0],
-	});
-}, 2000);
-
+log(trans)
 
 });
 

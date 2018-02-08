@@ -72,7 +72,7 @@ export class URLmanager
 	{
 		var self = this, search;
 
-		this._params.$join(params);
+		this._params.$join.full(params);
 		search = this._build();
 
 		history.pushState({ foo: "bar" }, "page", self.path + search);

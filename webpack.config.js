@@ -5,7 +5,7 @@ module.exports = {
 	entry: "./core/main.js",
 	output: {
 		path: path.resolve(__dirname, 'src'),
-		filename: 'epsilon.min.js'
+		filename: 'epsilon.dev.js'
 	},
 	// plugins: [
 	// 	new UglifyJsPlugin({
