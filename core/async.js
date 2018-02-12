@@ -7,6 +7,7 @@ export class Async
 			_async_status  : 0,
 			_async_calls   : superFunction(),
 			_async_fails   : superFunction(),
+			_async_progress: superFunction(),
 			_async_data    : null,
 			_async_error   : null
 		});
@@ -26,6 +27,10 @@ export class Async
 			{
 				self._async_fails.push(fn);
 				if (self._async_status == -1) fn(self._async_error);
+			},
+			progress : function(fn)
+			{
+				self._async_progress.push(fn);
 			}
 		}
 	}
@@ -37,7 +42,7 @@ export class Async
 		return {
 			success : function(data)
 			{
-				if (self._async_status != 1)
+				if (self._async_status == 0)
 				{
 					self._async_status = 1;
 					if (data) self._async_data = data;
@@ -46,12 +51,16 @@ export class Async
 			},
 			fail : function(error)
 			{
-				if (self._async_status != -1)
+				if (self._async_status == 0)
 				{
 					self._async_status = -1;
 					if (error) self._async_error = error;
 					self._async_fails(error);
 				}
+			},
+			progress : function(value)
+			{
+				self._async_progress(value);
 			}
 		}
 	}
@@ -87,25 +96,25 @@ export class Async
 	wait(objects)
 	{
 		var self = this,
-		handler = {};
+			count = 0,
+			handler = {};
 
 		if (Array.isArray(objects))
-		{
 			objects.forEach(function(current){
 				self._async_waiters.push(current);
 			});
-		}
-		else
-		{
-			this._async_waiters.push(objects);
-		}
+
+		else this._async_waiters.push(objects);
 
 		this._async_waiters.forEach(function(waiter){
 			waiter.on.success(function(){
-				var check = self._checkWaiters();
-				if (check.success) self.run.success();
-				else if (check.fail) self.run.fail();
+				count++;
+				if (count == self._async_waiters.length)
+					self.run.success();
 			});
+			waiter.on.fail(function(){
+				self.run.fail();
+			})
 		});
 
 		handler.then = function(action)
@@ -125,19 +134,5 @@ export class Async
 		}
 
 		return handler;
-	}
-
-	_checkWaiters()
-	{
-		for (var i = 0; i < this._async_waiters.length; i++)
-		{
-			if (this._async_waiters[i].failed)
-				return { fail : true };
-
-			if (!this._async_waiters[i].completed)
-				return { success : false };
-		}
-
-		return { success : true };
 	}
 }

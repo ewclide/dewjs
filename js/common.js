@@ -1,85 +1,82 @@
 'use strict';
 
-// class Block
-// {
-// 	constructor(options)
-// 	{
-// 		var self = this;
+/*class Block
+{
+	constructor(options)
+	{
+		var self = this;
 
-// 		this.settings = {};
+		this.settings = {};
 
-// 		this.$init({
-// 			height: { type: "number", required: true, root: self.settings },
-// 			width: {
-// 				type: "number",
-// 				required: true,
-// 				def: 150,
-// 				attr: {
-// 					element: options.element,
-// 					prefix: "data-",
-// 					only: true
-// 				},
-// 				filter: function filter(value) {
-// 					return value * 2;
-// 				}
-// 			}
-// 		}, options, true);
-// 	}
-// };
+		this.$init({
+			height: { type: "number", required: true, root: self.settings },
+			width: {
+				type: "number",
+				required: true,
+				def: 150,
+				attr: {
+					element: options.element,
+					prefix: "data-",
+					only: true
+				},
+				filter: function filter(value) {
+					return value * 2;
+				}
+			}
+		}, options, true);
+	}
+};*/
 
+/*var info = {
+	template : "<p><b>{name}</b> : {test}<span>{age}</span></p>",
+	content : {
+		name : "name",
+		age : "age"
+	}
+}
 
-// var info = {
-// 	template : "<p><b>{name}</b> : {test}<span>{age}</span></p>",
-// 	content : {
-// 		name : "name",
-// 		age : "age"
-// 	}
-// }
+var form = {
+	tag : "form",
+	attrs : {
+		action : "/"
+	}
+}
 
-// var form = {
-// 	tag : "form",
-// 	attrs : {
-// 		action : "/"
-// 	}
-// }
+var theName = {
+	tag : "input",
+	value : "def",
+	attrs : {
+		type : "text",
+		name : "name"
+	},
+	events : {
+		input : function(e)
+		{
+			info.content.name = theName.value;
+		}
+	},
+	bind : [ "value", "transform" ]
+}
 
-// var theName = {
-// 	tag : "input",
-// 	value : "def",
-// 	attrs : {
-// 		type : "text",
-// 		name : "name"
-// 	},
-// 	events : {
-// 		input : function(e)
-// 		{
-// 			info.content.name = theName.value;
-// 		}
-// 	},
-// 	bind : [ "value", "transform" ]
-// }
+var theAge = theName.$clone(true);
+theAge.events = {
+	input : function(e)
+	{
+		info.content.age = theAge.value;
+	}
+}
+theAge.attrs.name = "age";
 
-// var theAge = theName.$clone(true);
-// theAge.events = {
-// 	input : function(e)
-// 	{
-// 		info.content.age = theAge.value;
-// 	}
-// }
-// theAge.attrs.name = "age";
+form.nodes = [theName, theAge];
 
-// form.nodes = [theName, theAge];
+DOC.ready(function(){
 
-// DOC.ready(function(){
+	DOC.select(".app").json.append(form);
+	DOC.select(".app").json.append(info);
 
-// 	DOC.select(".app").json.append(form);
-// 	DOC.select(".app").json.append(info);
+});*/
 
-// });
-
-$html.select(".app").append($html.create("div", "asdad"));
-
-$html.ready(function(){
+/*$html.ready(function(){
 
 var quad = $html.select(".quad");
 var circle = $html.select(".circle");
@@ -113,7 +110,48 @@ setTimeout(function(){
 
 log(trans)
 
-});
+});*/
 
-/*-------------need updates------------*/
-//update $join - add left, right and full join
+class Test extends $Async
+{
+	constructor(bar)
+	{
+		super();
+
+		var some = $http.get('/assets/bigimage.bmp'),
+			some2 = $http.get('/assets/test.json');
+
+		some.on.progress(function(e){
+			bar.transform({
+				scale : e.relation
+			})
+		});
+
+		this.wait([some, some2]).then(function(){
+			log("loaded!")
+		});
+	}
+}
+
+$html.ready(function(){
+
+	var loadBar = $html.create("div", "loadbar");
+		loadBar.css({
+			height : "5px",
+			width  : "100%",
+			background : "#0070ff"
+		})
+		loadBar.transform({
+			scale : 0,
+			settings : {
+				transition : 50,
+				origin : [0, 0]
+			}
+		})
+
+
+	$html.body.append(loadBar);
+
+	var test = new Test(loadBar);
+
+});

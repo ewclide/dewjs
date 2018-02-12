@@ -87,6 +87,7 @@ var Async = exports.Async = function () {
 			_async_status: 0,
 			_async_calls: superFunction(),
 			_async_fails: superFunction(),
+			_async_progress: superFunction(),
 			_async_data: null,
 			_async_error: null
 		});
@@ -96,20 +97,20 @@ var Async = exports.Async = function () {
 		key: "wait",
 		value: function wait(objects) {
 			var self = this,
+			    count = 0,
 			    handler = {};
 
-			if (Array.isArray(objects)) {
-				objects.forEach(function (current) {
-					self._async_waiters.push(current);
-				});
-			} else {
-				this._async_waiters.push(objects);
-			}
+			if (Array.isArray(objects)) objects.forEach(function (current) {
+				self._async_waiters.push(current);
+			});else this._async_waiters.push(objects);
 
 			this._async_waiters.forEach(function (waiter) {
 				waiter.on.success(function () {
-					var check = self._checkWaiters();
-					if (check.success) self.run.success();else if (check.fail) self.run.fail();
+					count++;
+					if (count == self._async_waiters.length) self.run.success();
+				});
+				waiter.on.fail(function () {
+					self.run.fail();
 				});
 			});
 
@@ -128,17 +129,6 @@ var Async = exports.Async = function () {
 			return handler;
 		}
 	}, {
-		key: "_checkWaiters",
-		value: function _checkWaiters() {
-			for (var i = 0; i < this._async_waiters.length; i++) {
-				if (this._async_waiters[i].failed) return { fail: true };
-
-				if (!this._async_waiters[i].completed) return { success: false };
-			}
-
-			return { success: true };
-		}
-	}, {
 		key: "on",
 		get: function get() {
 			var self = this;
@@ -151,6 +141,9 @@ var Async = exports.Async = function () {
 				fail: function fail(fn) {
 					self._async_fails.push(fn);
 					if (self._async_status == -1) fn(self._async_error);
+				},
+				progress: function progress(fn) {
+					self._async_progress.push(fn);
 				}
 			};
 		}
@@ -161,18 +154,21 @@ var Async = exports.Async = function () {
 
 			return {
 				success: function success(data) {
-					if (self._async_status != 1) {
+					if (self._async_status == 0) {
 						self._async_status = 1;
 						if (data) self._async_data = data;
 						self._async_calls(data);
 					}
 				},
 				fail: function fail(error) {
-					if (self._async_status != -1) {
+					if (self._async_status == 0) {
 						self._async_status = -1;
 						if (error) self._async_error = error;
 						self._async_fails(error);
 					}
+				},
+				progress: function progress(value) {
+					self._async_progress(value);
 				}
 			};
 		}
@@ -1705,29 +1701,44 @@ var Timer = exports.Timer = function () {
 Object.defineProperty(exports, "__esModule", {
 	value: true
 });
+exports.HTTP = undefined;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _async = __webpack_require__(0);
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var HTTP = exports.HTTP = function () {
 	function HTTP() {
 		_classCallCheck(this, HTTP);
+
+		this.XHR = "onload" in new XMLHttpRequest() ? XMLHttpRequest : XDomainRequest;
 	}
 
 	_createClass(HTTP, [{
 		key: "get",
 		value: function get(path) {
 			var self = this,
-			    async = new $Async(),
-			    request = new XMLHttpRequest();
+			    async = new _async.Async(),
+			    request = new this.XHR();
 
-			request.open("GET", path, true);
+			request.open("GET", path + "?c=" + Math.random(), true);
 			request.send();
-			request.onreadystatechange = function () {
-				if (request.readyState == 4) {
-					if (request.status == 200) async.run.success(request.responseText);else log.err(this.status ? this.statusText : 'ajax send error');
-				}
+			request.onload = function () {
+				async.run.success(this.responseText);
+			};
+			request.onerror = function () {
+				async.run.fail(this.statusText);
+				log.err("$http.send ajax error (" + this.status + "): " + this.statusText);
+			};
+			request.onprogress = function (e) {
+				var response = {
+					loaded: e.loaded,
+					total: e.total,
+					relation: e.loaded / e.total
+				};
+				async.run.progress(response);
 			};
 
 			return async;
@@ -1736,7 +1747,6 @@ var HTTP = exports.HTTP = function () {
 		key: "post",
 		value: function post(data) {
 			var self = this,
-			    request,
 			    formData;
 
 			if (data) {
@@ -1750,19 +1760,25 @@ var HTTP = exports.HTTP = function () {
 			return {
 				to: function to(path) {
 					if (path) {
-						request = new XMLHttpRequest();
+						var async = new _async.Async(),
+						    request = new self.XHR();
 						request.open("POST", path, true);
 						request.send(formData);
 
-						var async = new $Async();
-
-						request.onreadystatechange = function () {
-							if (request.readyState == 4) {
-								if (request.status == 200) async.run.success(request.responseText);else {
-									async.run.fail(request.statusText);
-									log.err("http.send ajax error (" + request.status + "): " + request.statusText);
-								}
-							}
+						request.onload = function () {
+							async.run.success(this.responseText);
+						};
+						request.onerror = function () {
+							async.run.fail(this.statusText);
+							log.err("$http.send ajax error (" + this.status + "): " + this.statusText);
+						};
+						request.onprogress = function (e) {
+							var response = {
+								loaded: e.loaded,
+								total: e.total,
+								relation: e.loaded / e.total
+							};
+							async.run.progress(response);
 						};
 
 						return async;

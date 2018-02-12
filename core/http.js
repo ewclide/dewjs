@@ -1,27 +1,37 @@
+import {Async} from './async';
+
 export class HTTP
 {
 	constructor()
 	{
-		
+		this.XHR = ("onload" in new XMLHttpRequest()) ? XMLHttpRequest : XDomainRequest;
 	}
 
 	get(path)
 	{
 		var self = this,
-			async = new $Async(),
-			request = new XMLHttpRequest();
+			async = new Async(),
+			request = new this.XHR();
 
-		request.open("GET", path, true);
+		request.open("GET", path + "?c=" + Math.random(), true);
 		request.send();
-		request.onreadystatechange = function()
+		request.onload = function()
 		{
-			if (request.readyState == 4)
-			{
-				if (request.status == 200)
-					async.run.success(request.responseText);
-				
-				else log.err(this.status ? this.statusText : 'ajax send error');
+			async.run.success(this.responseText);
+		}
+		request.onerror = function()
+		{
+			async.run.fail(this.statusText);
+			log.err("$http.send ajax error (" + this.status + "): " + this.statusText);
+		}
+		request.onprogress = function(e)
+		{
+			var response = {
+				loaded : e.loaded,
+				total  : e.total,
+				relation : e.loaded / e.total
 			}
+			async.run.progress(response);
 		}
 
 		return async;
@@ -30,7 +40,6 @@ export class HTTP
 	post(data)
 	{
 		var self = this,
-			request,
 			formData;
 
 		if (data)
@@ -47,25 +56,28 @@ export class HTTP
 			{
 				if (path)
 				{
-					request = new XMLHttpRequest();
-					request.open("POST", path, true);
-					request.send(formData);
+					var async = new Async(),
+						request = new self.XHR();
+						request.open("POST", path, true);
+						request.send(formData);
 
-					var async = new $Async();
-
-					request.onreadystatechange = function()
+					request.onload = function()
 					{
-						if (request.readyState == 4)
-						{
-							if (request.status == 200)
-								async.run.success(request.responseText);
-
-							else
-							{
-								async.run.fail(request.statusText);
-								log.err("http.send ajax error (" + request.status + "): " + request.statusText);
-							}
+						async.run.success(this.responseText);
+					}
+					request.onerror = function()
+					{
+						async.run.fail(this.statusText);
+						log.err("$http.send ajax error (" + this.status + "): " + this.statusText);
+					}
+					request.onprogress = function(e)
+					{
+						var response = {
+							loaded : e.loaded,
+							total  : e.total,
+							relation : e.loaded / e.total
 						}
+						async.run.progress(response);
 					}
 
 					return async;
