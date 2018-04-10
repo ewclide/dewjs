@@ -2,98 +2,82 @@ export class URLmanager
 {
 	constructor()
 	{
-		this._params = this._getParamsInSearch();
+		this.params = this._getSearchParams();
 		this.search = location.search;
 		this.path = location.pathname;
 	}
 
-	take(name)
+	getParams(name)
 	{
 		if (name === undefined)
-			return this._params;
+			return this.params;
 
 		else if (typeof name == "string")
-			return this._params[name];
+			return this.params[name];
 
 		else if (Array.isArray(name))
 		{
-			var self = this,
-				result = {};
+			var result = {};
 
-			this.name.forEach(function(p){
-				if (p in self._params)
-					result[p] = self._params[p];
+			this.name.forEach( p => {
+				if (p in this.params)
+					result[p] = this.params[p];
 			});
 
 			return result;
 		}
 	}
 
-	_getParamsInSearch()
+	setParams(params, clear = false)
 	{
-		var params, search;
+		if (clear) this.clear();
 
-		params = {};
-		search = location.search;
+		for (var i in params)
+			this.params[i] = params[i];
 
-		if (!search) return false;
+		history.pushState({ foo: "bar" }, "page", this.path + this.serialize(this.params));
 
-		search = search.replace("?", "");
-		search = search.split("&");
-		search.forEach(function(p){
-			p = p.split("=");
-			params[p[0]] = p[1];
-		});
-
-		return params;
+		return this;
 	}
 
-	put(params)
+	clear()
 	{
-		var self = this, search;
+		this.params = {}
+		return this;
+	}
 
-		this._params = params;
-		search = this._build();
+	go(path)
+	{
+		if (!path) path = location.pathname;
+		location.href = path + this.serialize(this.params);
+	}
 
-		history.pushState({ foo: "bar" }, "page", self.path + search);
+	_getSearchParams()
+	{
+		var request = location.search,
+			result = {};
 
-		return {
-			go : function(path)
-			{
-				if (!path) path = self.path;
-				path += search;
-
-				location.href = path;
-			}
+		if (request)
+		{
+			request = request.replace("?", "").split("&");
+			request.forEach( p => {
+				var p = p.split("=");
+				result[p[0].replace("-", "_")] = p[1];
+			});
 		}
+
+		return result;
 	}
 
-	add(params)
-	{
-		var self = this, search;
-
-		this._params.$join.full(params);
-		search = this._build();
-
-		history.pushState({ foo: "bar" }, "page", self.path + search);
-
-		return {
-			go : function(path)
-			{
-				if (!path) path = self.path;
-				path += search;
-
-				location.href = path;
-			}
-		}
-	}
-
-	_build()
+	serialize(data)
 	{
 		var request = "?";
 
-		for (var i in this._params)
-			request += i + "=" + this._params[i] + "&";
+		for (var i in data)
+		{
+			if (typeof data[i] == "number" || typeof data[i] == "string" || typeof data[i] == "boolean")
+				request += i + "=" + data[i] + "&";
+		}
 
 		return request.slice(0, -1);
 	}

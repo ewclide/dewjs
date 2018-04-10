@@ -1,10 +1,11 @@
 # **EPSILON**
 
-    Epsilon - is open source JavaScript library for UI programming.  
+    **Epsilon** - is open source JavaScript library for UI programming.  
     Provides useful access for document tools  
-    Various functions make your code readable and simple
+    Various functions make your code readable and simple.  
+    **Warning!** This is the beta-version, and some solutions can be changed.
 
-### Defined Functions
+### Extending functions
 - Object.$clone
 - Object.$init
 - Object.$join

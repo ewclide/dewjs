@@ -19,7 +19,7 @@
 					prefix: "data-",
 					only: true
 				},
-				filter: function filter(value) {
+				filter: function(value) {
 					return value * 2;
 				}
 			}
@@ -59,75 +59,67 @@ var theName = {
 }
 
 var theAge = theName.$clone(true);
-theAge.events = {
-	input : function(e)
-	{
-		info.content.age = theAge.value;
+	theAge.attrs.name = "age";
+	theAge.events = {
+		input : function(e)
+		{
+			info.content.age = theAge.value;
+		}
 	}
-}
-theAge.attrs.name = "age";
 
 form.nodes = [theName, theAge];
 
-DOC.ready(function(){
+$html.ready(function(){
 
-	DOC.select(".app").json.append(form);
-	DOC.select(".app").json.append(info);
+	$html.select(".app").json.append(form);
+	$html.select(".app").json.append(info);
 
 });*/
 
 /*$html.ready(function(){
 
-var quad = $html.select(".quad");
-var circle = $html.select(".circle");
+	var quad = $html.select(".quad");
+	var circle = $html.select(".circle");
 
-circle.transform({
-	rotate : [45, 0 , 0]
-});
-
-var trans = quad.transform();
-
-trans.apply({
-	rotate : [0, 45, 0],
-	translate : [0, 0],
-	settings : {
-		perspective : 500,
-		style : "3d",
-		transition : 2000
-	}
-});
-
-setTimeout(function(){
-	trans.apply({
-		rotate : [0, 70, 0]
-	})
-	.then(function(){
-		trans.apply({
-			rotate : [0, 100, 0]
-		})
+	circle.transform({
+		rotate : [45, 0 , 0]
 	});
-}, 1000);
 
-log(trans)
+	var trans = quad.transform();
+
+	trans.apply({
+		// matrix3d : [0.583333, 0.186887, 0.79044, 0, -0.52022, 0.833333, 0.186887, 0, -0.623773, -0.52022, 0.583333, 0, 0, 0, 0, 1],
+		rotate : [0, 45, 0],
+		translate : [0, 0],
+		settings : {
+			perspective : 500,
+			style : "3d",
+			transition : 2000
+		}
+	});
+
+	log(trans)
 
 });*/
 
-class Test extends $Async
+/*class Test extends $Async
 {
 	constructor(bar)
 	{
 		super();
 
-		var some = $http.get('/assets/bigimage.bmp'),
-			some2 = $http.get('/assets/test.json');
+		var some = $http.get('/assets/bigimage.bmp', { progress : false }),
+			some2 = $http.get('/assets/bigimage.bmp', { progress : false }),
+			some3 = $http.get('/assets/bigimage.bmp', { progress : false }),
+			some4 = $http.get('/assets/bigimage.bmp', { progress : false })
 
-		some.on.progress(function(e){
+		this.on.progress(function(e){
 			bar.transform({
-				scale : e.relation
+				scale : e.ready
 			})
 		});
 
-		this.wait([some, some2]).then(function(){
+		this.wait([some, some2, some3, some4]).then(function(){
 			log("loaded!")
 		});
 	}
@@ -142,16 +134,17 @@ $html.ready(function(){
 			background : "#0070ff"
 		})
 		loadBar.transform({
-			scale : 0,
+			scale : 0.01,
 			settings : {
-				transition : 50,
+				transition : 500,
 				origin : [0, 0]
 			}
 		})
-
 
 	$html.body.append(loadBar);
 
 	var test = new Test(loadBar);
 
-});
+});*/
+
+$url.setParams({ t : 2, s : "test" });

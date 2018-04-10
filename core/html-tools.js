@@ -1,18 +1,20 @@
 import {JsonConverter} from './json-converter';
-import {Transform} from './transform';
-import {Async} from './async';
+import {Transform}     from './transform';
+import {Animation}     from './animation';
+import {Async}         from './async';
 
 var jsonConverter = new JsonConverter();
 
-export class HTMLTools
+export class HTMLTools extends Async
 {
     constructor(elements)
     {
+        super();
+
         this.elements = [];
         this.length = 0;
         this._id = random();
         this._query = '';
-        this._readyActions = new Async();
 
         this.addElements(elements);
     }
@@ -37,67 +39,123 @@ export class HTMLTools
         return this.elements[0].tagName.toLowerCase();
     }
 
-    get isHTMLTool()
+    get isHTMLTools()
     {
         return true;
     }
 
-    ready(fn)
+    ready()
     {
-        var self = this;
+        var fn, sub,
+            list = this.elements;
 
-        this._readyActions.on.success(fn);
+        if (arguments.length == 1)
+            fn = arguments[0];
 
-        if (this.elements[0] == document)
-        {
-            document.addEventListener("DOMContentLoaded", function(e){
-                self._readyActions.run.success();
-            });
-        }
         else
         {
-            var sub = this.select("img, link, script, frame"),
-            async = new Async(),
-            waitList = [];
+            sub = arguments[0];
+            fn = arguments[1];
+        }
 
-            if (sub.length)
-                sub.elements.forEach(function(element){
-                    waitList.push(self._wrapAsync(element));
-                });
-            else
-                this.elements.forEach(function(element){
-                    waitList.push(self._wrapAsync(element));
-                });
+        if (sub)
+        {
+            sub = this.select("img, link, script, iframe");
+            list = list.concat(sub.elements);
+        }
 
-            async.wait(waitList).then(function(){
-                self._readyActions.run.success();
-            });
+        this.then(fn);
+
+        this._observReady(list);
+
+        return this;
+    }
+
+    _observReady(list)
+    {
+        var self = this,
+
+        checkout = function()
+        {
+            list._countReady++;
+            if (list._countReady == list.length)
+                self.resolve();
+        }
+
+        list._countReady = 0;
+
+        list.forEach( element => {
+
+            var tag = element.tagName.toLowerCase(),
+                complete = true;
+                
+            if (tag == "img")
+                complete = element.complete;
+
+            else if (tag == "link" || tag == "iframe")
+                complete = false;
+
+            complete ? checkout() : element.addEventListener("load", checkout);
+
+        }); 
+    }
+
+    mutation(fn, options)
+    {
+        if ("MutationObserver" in window && !element._observer)
+        {
+            this.mutations = [];
+            this.elements.forEach( element => this._observMutation(element, fn, options) );
         }
     }
 
-    _wrapAsync(element)
+    _observMutation(element, fn, options)
     {
-        var async = new Async(),
-        tag = element.tagName.toLowerCase();
+        var mutation = new MutationObserver(function(mutations){
+            fn(mutations);
+        });
 
-        if (tag == "img" && element.complete)
-            async.run.success();
+        mutation.observe(element, options);
 
-        else if (tag == "link" || tag == "script" || tag == "frame")
-            element.addEventListener("load", function(){
-                async.run.success();
-            });
+       this.mutations.push(mutation);
+    }
 
-        else async.run.success();
+    isVisible(maxDepth = 3)
+    {
+        return this._checkVisible(this.elements[0], maxDepth);
+    }
 
-        return async;
+    _checkVisible(element, maxDepth, depth = 0)
+    {
+        if (depth >= maxDepth) return result;
+
+        var parent = element.parentElement || element.parentNode || null;
+
+        if (parent && parent != document)
+        {
+            this.display(parent)
+            ? result = parent
+            : result = this._checkVisible(parent, maxDepth, depth++);
+        }
+
+        return result;
+    }
+
+    display(element)
+    {
+        var display;
+
+        element.style.display
+        ? display = element.style.display : display = element.getComputedStyle().display;
+
+        return display == "none" ? false : true;
     }
 
     select(query)
     {
         var elements = [], result;
 
-        this.elements.forEach(function(element){
+        this.elements.forEach( element => {
             var search = element.querySelectorAll(query);
             elements = elements.concat(Array.from(search));
         });
@@ -134,39 +192,45 @@ export class HTMLTools
         return methods[name];
     }
 
-    before(doc, rm = true)
+    before(htl, rm = true)
     {
-        return this._insert(doc, rm, this._getInsertMethod("before"));
+        return this._insert(htl, rm, this._getInsertMethod("before"));
     }
 
-    after(doc, rm = true)
+    after(htl, rm = true)
     {
-        return this._insert(doc, rm, this._getInsertMethod("after"));
+        return this._insert(htl, rm, this._getInsertMethod("after"));
     }
 
-    append(doc, rm = true)
+    append(htl, rm = true)
     {
-        return this._insert(doc, rm, this._getInsertMethod("append"));
-    }    
-
-    prepend(doc, rm = true)
-    {
-        return this._insert(doc, rm, this._getInsertMethod("prepend"));
+        return this._insert(htl, rm, this._getInsertMethod("append"));
     }
 
-    _insert(doc, rm, method)
+    appendTo(target, rm = true)
+    {
+        target.append(this, rm);
+        return this;
+    }
+
+    prepend(htl, rm = true)
+    {
+        return this._insert(htl, rm, this._getInsertMethod("prepend"));
+    }
+
+    _insert(htl, rm, method)
     {
         var self = this, result = [];
 
-        doc = this.convert(doc);
+        htl = $html.convert(htl);
 
-        if (doc)
+        if (htl)
         {
-            this.elements.forEach(function(element){
+            this.elements.forEach( element => {
 
                 var clones = [];
 
-                doc.elements.forEach(function(insertElement){
+                htl.elements.forEach( insertElement => {
                     var clone = insertElement.cloneNode(true);
                     clones.push(clone);
                     method(clone, element);
@@ -175,43 +239,30 @@ export class HTMLTools
                 result = result.concat(clones);
             });
 
-            if (rm) doc.remove();
+            if (rm) htl.remove();
 
-            doc.addElements(result);
+            htl.addElements(result);
 
-            return doc;
+            return htl;
         }
         else return false;
     }
 
     addClass(name)
     {
-        this.elements.forEach(function(element){
-            var attr = element.getAttribute("class");
-            if (attr) attr += " " + name;
-            else attr = name;
-            element.setAttribute("class", attr);
-        });
+        this.elements.forEach( element => element.classList.add(name) );
     }
 
     removeClass(name)
     {
-        this.elements.forEach(function(element){
-            var attr = element.getAttribute("class");
-            attr = attr.split(" ");
-            attr = attr.filter(function(value){
-                return value != name;
-            });
-            attr = attr.join(" ");
-            element.setAttribute(attr);
-        });
+        this.elements.forEach( element => element.classList.remove(name) );
     }
 
-    inner(str, clear = true)
+    html(str, clear = true)
     {
         if (str !== undefined)
         {
-            this.elements.forEach(function(element){
+            this.elements.forEach( element => {
                 if (clear) element.innerHTML = str;
                 else element.innerHTML += str;
             });
@@ -225,10 +276,7 @@ export class HTMLTools
     {
         if (str !== undefined)
         {
-            this.elements.forEach(function(element){
-                element.innerText = str;
-            });
-
+            this.elements.forEach( element => element.innerText = str );
             return this;
         }
         else return this.elements[0].innerText;
@@ -238,40 +286,34 @@ export class HTMLTools
     {
         if (data !== undefined)
         {
-            this.elements.forEach(function(element){
-                element.value = data;
-            });
-
+            this.elements.forEach( element => element.value = data );
             return this;
         }
         else return this.elements[0].value;
     }
 
-    active(flag)
+    active(yes)
     {
-        if (flag) this.addClass("active");
+        if (yes) this.addClass("active");
         else this.removeClass("active");
     }
 
-    checked(flag)
+    checked(yes)
     {
-        if (typeof flag == "boolean")
-            this.elements.forEach(function(element){
-                if ("checked" in element)
-                    element.checked = flag;
+        if (typeof yes == "boolean")
+            this.elements.forEach( element => {
+                if ("checked" in element) element.checked = yes;
             });
-        else if (flag == undefined)
+
+        else if (yes == undefined)
             return this.elements[0].checked;
     }
 
     toogle()
     {
-        this.elements.forEach(function(element){
+        this.elements.forEach( element => {
             if ("checked" in element)
-            {
-                if (element.checked) element.checked = false;
-                else element.checked = true;
-            }
+                element.checked ? element.checked = false : element.checked = true;
         });
     }
 
@@ -282,33 +324,24 @@ export class HTMLTools
 
     choose(index)
     {
-        this.elements.forEach(function(element){
-            if ("selectedIndex" in element)
-                element.selectedIndex = index;
+        this.elements.forEach( element => {
+            if ("selectedIndex" in element) element.selectedIndex = index;
         });
     }
 
     width(value)
     {
-        if (value)
-        {
-            if (typeof value == "number") value += "px";
-            this.elements.forEach(function(element){
-                element.style.width = value;
-            });
-        }
+        if (typeof value == "number")
+            this.elements.forEach( element => element.style.width = value + "px" );
+
         else return this.elements[0].offsetWidth;
     }
 
     height(value)
     {
-        if (value)
-        {
-            if (typeof value == "number") value += "px";
-            this.elements.forEach(function(element){
-                element.style.height = value;
-            });
-        } 
+        if (typeof value == "number")
+            this.elements.forEach( element => element.style.height = value + "px" );
+
         else return this.elements[0].offsetHeight;
     }
 
@@ -317,8 +350,10 @@ export class HTMLTools
         if (typeof classList == "string")
         {
             var wrapper = $html.create("div", classList);
+
             this.after(wrapper);
             wrapper.append(this);
+
             return wrapper;
         }
         else if (Array.isArray(classList))
@@ -331,7 +366,7 @@ export class HTMLTools
             for (var i = 1; i < classList.length; i++)
                 inside += '</div>';
 
-            wrapper.inner(inside);
+            wrapper.html(inside);
             this.after(wrapper);
             wrapper.select("." + classList[classList.length - 1]).append(this);
 
@@ -353,22 +388,16 @@ export class HTMLTools
 
     parent()
     {
-        var self = this,
-            parents = [];
+        var parents = [];
 
-        this.elements.forEach(function(element){
-            parents.push(self._getParent(element));
-        });
+        this.elements.forEach( element => parents.push(this._getParent(element)) );
 
         return new HTMLTools(parents);
     }
 
     _getParent(element)
     { 
-        var parent = element.parentElement;
-
-        if (!parent) parent = element.parentNode || null;
-
+        var parent = element.parentElement || element.parentNode || null;
         return parent;
     }
 
@@ -380,6 +409,16 @@ export class HTMLTools
         return transform;
     }
 
+    animate(data, settings)
+    {
+        var animation = new Animation(this);
+        
+        if (data && settings)
+            animation.key(data, settings);
+            
+        return animation;
+    }
+
     get attr()
     {
         var self = this;
@@ -387,62 +426,37 @@ export class HTMLTools
         return {
             get : function(name)
             {
-                var result;
-
                 if (self.elements.length == 1)
-                    result = self._getAttributes(self.elements[0], name);
-
-                return result;
+                    return self._getAttributes(self.elements[0], name);
             },
-            set : function(attrs)
+            set : function(attrs, value)
             {
-                if (typeof attrs == "string")
-                {
-                    self.elements.forEach(function(element){
-                        element.setAttribute(attrs, "");
-                    });
-                }
-                else
-                {
-                    var result = [];
+                if (typeof attrs == "string" && value !== undefined)
+                    self.elements.forEach( element => element.setAttribute(attrs, value) );
 
-                    self.elements.forEach(function(element){
+                else self.elements.forEach( element => {
                         for (var i in attrs)
                             element.setAttribute(i, attrs[i]);
                     });
-                }
 
                 return self;
             },
             unset : function(attrs)
             {
                 if (typeof attrs == "string")
-                {
-                    self.elements.forEach(function(element){
-                        element.removeAttribute(attrs);
-                    });
-                }
-                else if (Array.isArray(attrs))
-                {
-                    var result = [];
+                    self.elements.forEach( element => element.removeAttribute(attrs) );
 
-                    self.elements.forEach(function(element){
-                        attrs.forEach(function(attr){
-                            element.removeAttribute(attr);
-                        });
-                    });
-                }
+                else if (Array.isArray(attrs))
+                    self.elements.forEach( element => attrs.forEach( attr => element.removeAttribute(attr) ) );
+
                 else if (attrs == undefined)
                 {
                     attrs = self.attr.get();
 
                     if (attrs)
-                    {
-                        self.elements.forEach(function(element){
-                            for (var i in attrs)
-                                element.removeAttribute(i);
+                        self.elements.forEach( element => {
+                            for (var i in attrs) element.removeAttribute(i);
                         });
-                    }
                 }
 
                 return self;
@@ -454,32 +468,31 @@ export class HTMLTools
     {
         if (element !== undefined && element.nodeType == 1 && element.attributes.length)
         {
-            var attributes = {};
+            var attributes;
 
             if (list)
             {
                 if (Array.isArray(list))
-                    list.forEach(function(name){
-                        var attribute = element.getAttribute(name);
-                        if (attribute) attributes[name] = attribute;
-                    });
+                {
+                    attributes = {};
 
+                    list.forEach( name => {
+                        var value = element.getAttribute(name);
+                        if (value) attributes[name] = value;
+                    });
+                }
                 else if (typeof list == "string")
                     attributes = element.getAttribute(list);
-
-                else return;
             }
             else
             {
-                [].forEach.call(element.attributes, function (attribute) {
-                    attributes[attribute.name] = attribute.value;
-                }); 
-            }
+                attributes = {};
 
-            if (attributes) return attributes;
-            else return false;
+                [].forEach.call(element.attributes,  attr => attributes[attr.name] = attr.value ); 
+            }
+            
+            return attributes;
         }
-        else return false;
     }
 
     css(styles)
@@ -489,7 +502,7 @@ export class HTMLTools
 
         else
         {
-            this.elements.forEach(function(element){
+            this.elements.forEach( element => {
                 for (var name in styles)
                     element.style[name] = styles[name];
             });
@@ -504,26 +517,19 @@ export class HTMLTools
         var self = this;
 
         return {
-            attach : function(list)
+            attach : function(data, fn)
             {
-                var eventList;
-
                 if (!$html._eventList[self._id])
                     $html._eventList[self._id] = {};
 
-                eventList = $html._eventList[self._id];
+                var list = $html._eventList[self._id];
 
-                for (var event in list)
-                {
-                    if (!eventList[event])
-                        eventList[event] = superFunction(list[event]);
+                if (typeof data == "string" && fn !== undefined)
+                    self._attachEvent(list, data, fn);
 
-                    else eventList[event].push(list[event]);
-
-                    var evAttr = {}
-                    evAttr["on" + event] = "$html._startEventFunc(" + self._id + ", '" + event + "', event)";
-                    self.attr.set(evAttr);
-                }
+                else if (typeof data == "object")
+                    for (var event in data)
+                        self._attachEvent(list, event, data[event]);
 
                 return self;
             },
@@ -531,19 +537,41 @@ export class HTMLTools
             {
                 var event = new Event(type);
 
-                self.elements.forEach(function(element){
-                    element.dispatchEvent(event);
-                });
-            },
-            run : function(type)
-            {
-                $html._startEventFunc(self._id, type);
-            },
-            detach : function()
-            {
+                self.elements.forEach( element => element.dispatchEvent(event) );
 
+                return self;
+            },
+            start : function(type)
+            {
+                $html._eventFunction(self._id, type);
+
+                return self;
+            },
+            detach : function(name)
+            {
+                var list = $html._eventList[self._id];
+
+                if (!name)
+                {
+                    for (var event in list)
+                        self.elements.attr.unset(event.substr(0, 2));
+                }
+                else $html._eventList[self._id][name] = undefined;
+
+                return self;
             }
         }
+    }
+
+    _attachEvent(list, name, fn)
+    {
+        var evAttr = {}
+
+        list[name] ? list[name].push(fn) : list[name] = superFunction(fn);
+        
+        evAttr["on" + name] = "$html._eventFunction(" + this._id + ", '" + name + "', event)";
+
+        this.attr.set(evAttr);
     }
 
     get json()
@@ -582,9 +610,7 @@ export class HTMLTools
                     else
                     {
                         result = [];
-                        self.elements.forEach(function(element){
-                            result.push(jsonConverter.fromHTML(element));
-                        });
+                        self.elements.forEach( element => result.push(jsonConverter.fromHTML(element)) );
                     }   
 
                     return result;
@@ -600,7 +626,7 @@ export class HTMLTools
 
         jsonConverter.toHTML(json);
 
-        this.elements.forEach(function(current){
+        this.elements.forEach( current => {
             var element = jsonConverter.build(json);
             clones.push(element);
             method(element, current);
@@ -611,9 +637,9 @@ export class HTMLTools
 
     each(fn)
     {
-        this.elements.forEach(function(element, index, array){
-            fn($html.convert(element), index, array);
-        });
+        this.elements.forEach(
+            (element, index, array) => fn($html.convert(element), index, array)
+        );
 
         return this;
     }
@@ -622,40 +648,27 @@ export class HTMLTools
     {
         var self = this, clones = [];
 
-        this.elements.forEach(function(element){
-            clones.push(element.cloneNode(true));
-        });
+        this.elements.forEach( element => clones.push(element.cloneNode(true)) );
 
         return new HTMLTools(clones);
     }
 
-    convert(elements)
+    merge(htl)
     {
-        if (elements.nodeType == 1 || elements.nodeType == 9)
-            return new HTMLTools(elements);
-
-        else if (elements.isHTMLTool)
-            return elements;
-
-        else return false;
-    }
-
-    merge(doc)
-    {
-        this.elements = this.elements.concat(doc.elements);
+        this.elements = this.elements.concat(htl.elements);
         return this;
     }
 
     clear()
     {
-        this.inner("");
+        this.html("");
     }
 
     remove()
     {
         var self = this;
 
-        this.elements.forEach(function(element, index){
+        this.elements.forEach( (element, index) => {
             if (element.parentNode)
                 element.parentNode.removeChild(element);
 

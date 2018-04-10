@@ -118,8 +118,8 @@ export class Binder
 	_setData(object, field, data)
 	{
 		var sourseValue = data.value || data,
-		binded = object["_" + field];
-		binded.value = sourseValue;
+			binded = object["_" + field];
+			binded.value = sourseValue;
 
 		if (!data.value && binded.trigger)
 			binded.trigger(sourseValue, field);

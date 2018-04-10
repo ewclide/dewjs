@@ -79,14 +79,12 @@ export class Init
 
 	_getAttrValue(options, name, value)
 	{
-		var attr;
-
 		if (options.element)
 		{
-			if (!options.prefix) options.prefix = "";
+			if (!options.prefix) options.prefix = "data-";
 			if (!options.name) options.name = name;
 
-			attr = DOC.convert(options.element).attr.get(options.prefix + options.name);
+			var attr = $html.convert(options.element).attr.get(options.prefix + options.name);
 
 			if (options.only)
 				!attr ? ( value = undefined, this._errors.push('empty required attribute of option "' + name + '"') )

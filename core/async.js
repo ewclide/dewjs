@@ -2,137 +2,154 @@ export class Async
 {
 	constructor()
 	{
-		this.$define({
-			_async_waiters : [],
-			_async_status  : 0,
-			_async_calls   : superFunction(),
-			_async_fails   : superFunction(),
-			_async_progress: superFunction(),
-			_async_data    : null,
-			_async_error   : null
+		this._async_waiters  = [];
+		this._async_status   = 0;
+		this._async_calls    = superFunction();
+		this._async_fails    = superFunction();
+		this._async_progress = superFunction();
+		this._async_ready    = 0;
+		this._async_subReady = false;
+		this._async_strict   = true;
+		this._async_data     = null;
+		this._async_error    = null;
+	}
+
+	resolve(data)
+	{
+		if (this._canStart)
+		{
+			this._async_status = 1;
+
+			if (this._async_ready != 1)
+				this.shift({ ready : 1 });
+
+			if (data) this._async_data = data;
+			this._async_calls(data);
+		}
+	}
+
+	reject(error)
+	{
+		if (this._canStart)
+		{
+			this._async_status = -1;
+			if (error) this._async_error = error;
+			this._async_fails(error);
+		}
+	}
+
+	get _canStart()
+	{
+		var waited = true;
+
+		if (this._async_strict && this._async_waiters.length && !this._async_subReady)
+			waited = false;
+
+		return this._async_status == 0 && waited ? true : false;
+	}
+
+	then(fn)
+	{
+		this._async_calls.push(fn);
+
+		if (this._async_status == 1)
+			fn(this._async_data);
+	}
+
+	except(fn)
+	{
+		this._async_fails.push(fn);
+
+		if (this._async_status == -1)
+			fn(this._async_error);
+	}
+
+	progress(fn)
+	{
+		self._async_progress.push(fn);
+	}
+
+	shift(data)
+	{
+		if (typeof data.ready != "number" || data.ready < 0 || data.ready > 1)
+			data.ready = 0;
+
+		this._async_ready = data.ready;
+		this._async_progress(data);
+	}
+
+	wait(list, progress = false)
+	{
+		var self = this,
+			count = 0;
+
+		if (Array.isArray(list))
+			list.forEach( item => {
+				if (item.isAsync) this._async_waiters.push(item);
+			});
+
+		else (list.isAsync)
+			this._async_waiters.push(list);
+
+		if (this._async_waiters.length)
+			this._async_waiters.forEach( waiter => {
+
+				waiter.then(function(){
+					count++;
+					if (count == self._async_waiters.length)
+						(self._async_subReady = true, self.resolve());
+				});
+
+				waiter.except(function(){
+					self.reject();
+				});
+
+				if (progress)
+					waiter.then(function(){
+						self.shift({ ready : self._calcProgress() });
+					})
+			});
+
+		else self.resolve();
+
+		return this;
+	}
+
+	_calcProgress()
+	{
+		var part = 1 / this._async_waiters.length,
+			ready = 0;
+
+		this._async_waiters.forEach(function(waiter){
+			ready += waiter._async_ready * part;
 		});
+
+		return ready;
 	}
 
-	get on()
+	set strict(value)
 	{
-		var self = this;
-
-		return {
-			success : function(fn)
-			{
-				self._async_calls.push(fn);
-				if (self._async_status == 1) fn(self._async_data);
-			},
-			fail : function(fn)
-			{
-				self._async_fails.push(fn);
-				if (self._async_status == -1) fn(self._async_error);
-			},
-			progress : function(fn)
-			{
-				self._async_progress.push(fn);
-			}
-		}
+		if (typeof value == "bolean")
+			this._async_strict = value;
 	}
 
-	get run()
+	get strict()
 	{
-		var self = this;
-
-		return {
-			success : function(data)
-			{
-				if (self._async_status == 0)
-				{
-					self._async_status = 1;
-					if (data) self._async_data = data;
-					self._async_calls(data);
-				}
-			},
-			fail : function(error)
-			{
-				if (self._async_status == 0)
-				{
-					self._async_status = -1;
-					if (error) self._async_error = error;
-					self._async_fails(error);
-				}
-			},
-			progress : function(value)
-			{
-				self._async_progress(value);
-			}
-		}
-	}
-
-	get switch()
-	{
-		var self = this;
-
-		return {
-			success : function()
-			{
-				self._async_status = 1;
-			},
-			fail : function()
-			{
-				self._async_status = -1;
-			}
-		}
+		return this._async_strict;
 	}
 
 	get completed()
 	{
-		if (this._async_status == 1) return true;
-		else return false;
+		return this._async_status == 1 ? true : false;
 	}
 
 	get failed()
 	{
-		if (this._async_status == -1) return true;
-		else return false;
+		return this._async_status == -1 ? true : false;
 	}
 
-	wait(objects)
+	get isAsync()
 	{
-		var self = this,
-			count = 0,
-			handler = {};
-
-		if (Array.isArray(objects))
-			objects.forEach(function(current){
-				self._async_waiters.push(current);
-			});
-
-		else this._async_waiters.push(objects);
-
-		this._async_waiters.forEach(function(waiter){
-			waiter.on.success(function(){
-				count++;
-				if (count == self._async_waiters.length)
-					self.run.success();
-			});
-			waiter.on.fail(function(){
-				self.run.fail();
-			})
-		});
-
-		handler.then = function(action)
-		{
-			if (typeof action == "function")
-				self.on.success(action);
-
-			return handler;
-		}
-
-		handler.except = function(action)
-		{
-			if (typeof action == "function")
-				self.on.fail(action);
-
-			return handler;
-		}
-
-		return handler;
+		return true;
 	}
 }

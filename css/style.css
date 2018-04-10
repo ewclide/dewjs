@@ -17,3 +17,10 @@
     bottom: 0;
     margin: auto;
 }
+
+.bigimg
+{
+    width: 200px;
+    border: 1px dashed red;
+    margin: 20px 0;
+}

@@ -7,34 +7,60 @@ export class HTTP
 		this.XHR = ("onload" in new XMLHttpRequest()) ? XMLHttpRequest : XDomainRequest;
 	}
 
-	get(path)
+	get(path, options = {})
 	{
 		var self = this,
+			data = options.data,
 			async = new Async(),
 			request = new this.XHR();
 
-		request.open("GET", path + "?c=" + Math.random(), true);
+		options.$join.right({
+			uncache : true,
+			progress : false
+		});
+
+		if (options.uncache)
+			!data ? data = { с : Math.random() } : data.с = Math.random();
+
+		request.open("GET", path + this.serialize(data), true);
 		request.send();
+
 		request.onload = function()
 		{
-			async.run.success(this.responseText);
+			async.resolve(this.responseText);
 		}
+		
 		request.onerror = function()
 		{
-			async.run.fail(this.statusText);
+			async.reject(this.statusText);
 			log.err("$http.send ajax error (" + this.status + "): " + this.statusText);
 		}
-		request.onprogress = function(e)
-		{
-			var response = {
-				loaded : e.loaded,
-				total  : e.total,
-				relation : e.loaded / e.total
+
+		if (options.progress)
+			request.onprogress = function(e)
+			{
+				var response = {
+					loaded : e.loaded,
+					total  : e.total,
+					ready  : e.loaded / e.total
+				}
+				async.shift(response);
 			}
-			async.run.progress(response);
-		}
 
 		return async;
+	}
+
+	serialize(data)
+	{
+		var request = "?";
+
+		for (var i in data)
+		{
+			if (typeof data[i] == "number" || typeof data[i] == "string" || typeof data[i] == "boolean")
+				request += i + "=" + data[i] + "&";
+		}
+
+		return request.slice(0, -1);
 	}
 
 	post(data)
@@ -52,7 +78,7 @@ export class HTTP
 		else log.err("http.post must have some data!");
 
 		return {
-			to : function(path)
+			to : function(path, options)
 			{
 				if (path)
 				{
@@ -63,22 +89,25 @@ export class HTTP
 
 					request.onload = function()
 					{
-						async.run.success(this.responseText);
+						async.resolve(this.responseText);
 					}
+
 					request.onerror = function()
 					{
-						async.run.fail(this.statusText);
+						async.reject(this.statusText);
 						log.err("$http.send ajax error (" + this.status + "): " + this.statusText);
 					}
-					request.onprogress = function(e)
-					{
-						var response = {
-							loaded : e.loaded,
-							total  : e.total,
-							relation : e.loaded / e.total
+
+					if (options.progress)
+						request.onprogress = function(e)
+						{
+							var response = {
+								loaded : e.loaded,
+								total  : e.total,
+								ready : e.loaded / e.total
+							}
+							async.shift(response);
 						}
-						async.run.progress(response);
-					}
 
 					return async;
 				}

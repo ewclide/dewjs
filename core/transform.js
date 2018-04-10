@@ -4,12 +4,11 @@ var defaults = {
 		translate : "px",
 		rotate : "deg",
 		skew : "deg",
-		origin : "%",
-		transition : "ms"
+		origin : "%"
 	},
 	actions : {
-		matrix2d : [], // need add support
-		matrix3d : [], // need add support
+		matrix2d : [],
+		matrix3d : [],
 		translate : [0, 0, 0],
 		rotate : [0, 0, 0],
 		scale : [1, 1],
@@ -17,7 +16,6 @@ var defaults = {
 	},
 	settings : {
 		origin : false,
-		transition : 0,
 		perspective : 0,
 		style : false,
 		backface : true
@@ -34,20 +32,6 @@ export class Transform
 		this._actions = defaults.actions.$clone(true);
 		this._units = defaults.units.$clone();
 		this._settings = defaults.settings.$clone();
-		this._callback;
-		this.completed = false;
-
-		this.element.event.attach({
-			"transitionend" : function()
-			{
-	        	if (self._callback)
-	        	{
-	        		self._callback();
-	        		self._callback = null;
-	        	}
-	        	self.completed = true;
-        	}
-    	});
 	}
 
 	apply(data)
@@ -63,9 +47,6 @@ export class Transform
 			actions = this._actions,
 			settings = this._settings,
 			transform = "";
-
-        if (settings.transition)
-            this.element.css({ "transition" : settings.transition + units.transition });
 
         if (settings.origin)
             this.element.css({ "transform-origin" : settings.origin[0] + units.origin + " " + settings.origin[1] + units.origin });
@@ -91,12 +72,6 @@ export class Transform
         return this;
 	}
 
-	then(fn)
-	{
-		if (this.completed) fn();
-		else this._callback = fn;
-	}
-
 	actions(data)
 	{
 		var actions = this._actions;
@@ -107,6 +82,8 @@ export class Transform
 		if (data.rotate)    actions.rotate = this._join(actions.rotate, data.rotate);
 		if (data.scale)     actions.scale = this._join(actions.scale, data.scale, true);
 		if (data.skew)      actions.skew = this._join(actions.skew, data.skew);
+		if (data.matrix2d)  actions.matrix2d = data.matrix2d;
+		if (data.matrix3d)  actions.matrix3d = data.matrix3d;
 	}
 
 	units(data)
@@ -118,9 +95,6 @@ export class Transform
 	settings(data)
 	{
 		var settings = this._settings;
-
-		if (data.transition && typeof data.transition == "number")
-			settings.transition = data.transition;
 
 		if (data.origin && data.origin.length == 2)
 			settings.origin = data.origin;
@@ -155,21 +129,21 @@ export class Transform
 		return {
 			units : function()
 			{
-				this._units = defaults.units.$clone();
+				self._units = defaults.units.$clone();
 			},
 			actions : function()
 			{
-				this._actions = defaults.actions.$clone(true);
+				self._actions = defaults.actions.$clone(true);
 			},
 			settings : function()
 			{
-				this._settings = defaults.settings.$clone();
+				self._settings = defaults.settings.$clone();
 			},
 			full : function()
 			{
-				this._actions = defaults.actions.$clone(true);
-				this._units = defaults.units.$clone();
-				this._settings = defaults.settings.$clone();
+				self._actions = defaults.actions.$clone(true);
+				self._units = defaults.units.$clone();
+				self._settings = defaults.settings.$clone();
 			}
 		}
 	}
@@ -178,46 +152,48 @@ export class Transform
 	{
 		var result = "";
 
-        for (var name in actions)
-        {
-            var action = actions[name],
-                unit = units[name] || "";
+		if (actions.matrix2d.length || actions.matrix3d.length)
+		{
+			if (actions.matrix2d.length) result += "matrix2d(" + actions.matrix2d.join(",") + ") ";
+            else if (actions.matrix3d.length) result += "matrix3d(" + actions.matrix3d.join(",") + ") ";
+		}
+		else
+		{
+	        for (var name in actions)
+	        {
+	            var action = actions[name],
+	                unit = units[name] || "";
 
-            switch (name)
-            {
-                case "translate" :
-                	if (!this._empty(action))
-                		result += "translate3d(" + action.join(unit + ",") + unit + ") ";
-                	break;
-                case "rotate" :
-	                if (action[0]) result += "rotateX(" + action[0] + unit + ") ";
-	                if (action[1]) result += "rotateY(" + action[1] + unit + ") ";
-	                if (action[2]) result += "rotateZ(" + action[2] + unit + ") ";
-                    break;
-                case "scale":
-                	if (!this._empty(action, 1))
-                		result += "scale(" + action.join() +  ") ";
-                	break;
-                case "skew" :
-                	if (!this._empty(action))
-                		result += "skew(" + action.join(unit + ",") + unit + ") ";
-                	break;
-            }
-
-            if (result) result += " ";
-        }
+	            switch (name)
+	            {
+	                case "translate" :
+	                	if (!this._empty(action))
+	                		result += "translate3d(" + action.join(unit + ",") + unit + ") ";
+	                	break;
+	                case "rotate" :
+		                if (action[0]) result += "rotateX(" + action[0] + unit + ") ";
+		                if (action[1]) result += "rotateY(" + action[1] + unit + ") ";
+		                if (action[2]) result += "rotateZ(" + action[2] + unit + ") ";
+	                    break;
+	                case "scale":
+	                	if (!this._empty(action, 1))
+	                		result += "scale(" + action.join() +  ") ";
+	                	break;
+	                case "skew" :
+	                	if (!this._empty(action))
+	                		result += "skew(" + action.join(unit + ",") + unit + ") ";
+	                	break;
+	            }
+	        }
+	    }
 
         return result;
 	}
 
 	_empty(array, char = 0)
 	{
-		var result = array.filter(function(item){
-			if (item === char) return false;
-			else return true;
-		});
-
-		if (!result.length) return true;
-		else return false;
+		var result = array.filter( item => item === char ? false : true );
+		
+		return !result.length ? true : false;
 	}
 }

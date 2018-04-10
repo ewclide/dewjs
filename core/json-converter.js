@@ -9,14 +9,14 @@ export class JsonConverter
 
 	toHTML(json)
 	{
-		if (!json._htool)
+		if (!json._htl)
         {
-            var element, htool, self = this;
+            var element, htl, self = this;
 
             if (!json.tag) json.tag = "div";
 
             element = document.createElement(json.tag);
-            htool = new HTMLTools(element);
+            htl = new HTMLTools(element);
 
             json._defaults = {};
 
@@ -24,13 +24,13 @@ export class JsonConverter
             {
                 switch (item)
                 {
-                    case "text"  : htool.text(json.text); break;
-                    case "html"  : htool.inner(json.html); break;
-                    case "value" : htool.value(json.value); break;
-                    case "checked" : htool.checked(json.checked); break;
-                    case "attrs" : htool.attr.set(json.attrs); break;
-                    case "css"   : htool.css(json.css); break;
-                    case "transform" : htool.transform(json.transform); break;
+                    case "text"  : htl.text(json.text); break;
+                    case "html"  : htl.html(json.html); break;
+                    case "value" : htl.value(json.value); break;
+                    case "checked" : htl.checked(json.checked); break;
+                    case "attrs" : htl.attr.set(json.attrs); break;
+                    case "css"   : htl.css(json.css); break;
+                    case "transform" : htl.transform(json.transform); break;
                     case "nodes" :
                     if (Array.isArray(json.nodes))
                         json.nodes.forEach(function(node){
@@ -44,35 +44,34 @@ export class JsonConverter
             if (json.content && json.template)
             {
                 json._defaults.content = JSON.parse(JSON.stringify(json.content));
-                htool.inner(self._getContent(json));
+                htl.html(self._getContent(json));
             }
 
             json._element = element;
-            json._htool = htool;
+            json._htl = htl;
 
             this._bind(json);
 
             if (json.events)
-                htool.event.attach(json.events);
+                htl.event.attach(json.events);
 
-            json._htool.elements = [];
+            json._htl.elements = [];
         }
 	}
 
 	build(json)
 	{
-		var self = this, current = json._element.cloneNode(true);
+		var current = json._element.cloneNode(true);
 
         if (json.nodes && !json.template)
         {
             if (Array.isArray(json.nodes))
-                json.nodes.forEach(function(node){
-                    current.appendChild(self.build(node));
-                })
-            else current.appendChild(self.build(json.nodes));
+                json.nodes.forEach( node => current.appendChild(this.build(node)) )
+
+            else current.appendChild(this.build(json.nodes));
         }
 
-        json._htool.addElements(current);
+        json._htl.addElements(current);
 
         return current;
 	}
@@ -94,16 +93,17 @@ export class JsonConverter
         if (json.nodes)
         {
             if (Array.isArray(json.nodes))
-                json.nodes.forEach(function(node, index){
-                    template = template.replace("{node[" + index + "]}", node._element.outerHTML);
+                json.nodes.forEach( (node, index) => {
+                    template = template.replace("{node[" + index + "]}", node._element.outerHTML)
                 });
+
             else template = template.replace("{node}", json.nodes._element.outerHTML);
         }
 
         var tokens = this._splitTokens(template);
 
-        tokens.forEach(function(token){
-            template = template.replace("{" + token + "}", '<span style="color : red">{unknown token: '+ token +'}</span>');
+        tokens.forEach(token => {
+            template = template.replace("{" + token + "}", '<span style="color : red">{unknown token: '+ token +'}</span>')
         });
 
         return template;
@@ -148,7 +148,7 @@ export class JsonConverter
                 	json.content,
                 	field,
                 	function(value){
-                		json._htool.inner(self._getContent(json));
+                		json._htl.html(self._getContent(json));
                 	}
                 );
         }
@@ -166,42 +166,42 @@ export class JsonConverter
                 {
                     case "text":
                         $bind.change( json, "text", function(value){
-                            json._htool.text(value);
+                            json._htl.text(value);
                         });
 
                         break;
                     case "html":
                         $bind.change( json, "html", function(value){
-                            json._htool.inner(value);
+                            json._htl.html(value);
                         });
 
                         break;
                     case "value":
                         $bind.change( json, "value", function(value){
-                            json._htool.value(value);
+                            json._htl.value(value);
                         });
 
                         if ((json.tag == "input" && json.attrs.type == "text") || json.tag == "textarea")
-                            json._htool.event.attach({
+                            json._htl.event.attach({
                                 input : function(e)
                                 {
                                     json._value = e.srcElement.value;
-                                    json._htool.value(e.srcElement.value);
+                                    json._htl.value(e.srcElement.value);
                                 }
                             });
 
                         break;
                     case "checked" : 
                         $bind.change( json, "checked", function(value){
-                            json._htool.checked(value);
+                            json._htl.checked(value);
                         });
 
                         if (json.tag == "input" && (json.attrs.type == "checkbox" || json.attrs.type == "radio"))
-                            json._htool.event.attach({
+                            json._htl.event.attach({
                                 change : function(e)
                                 {
                                     json._checked = e.srcElement.checked;
-                                    json._htool.checked(e.srcElement.checked);
+                                    json._htl.checked(e.srcElement.checked);
                                 }
                             });
 
@@ -211,7 +211,7 @@ export class JsonConverter
                             $bind.change( json.attrs, name, function(value){
                                 var attr = {};
                                 attr[name] = value;
-                                json._htool.attr.set(attr);
+                                json._htl.attr.set(attr);
                             });
 
                         break;
@@ -220,7 +220,7 @@ export class JsonConverter
                             $bind.change( json.css, name, function(value){
                                 var style = {};
                                 style[name] = value;
-                                json._htool.css(style);
+                                json._htl.css(style);
                             });
 
                         break;
@@ -229,7 +229,7 @@ export class JsonConverter
                             $bind.change( json.transform, name, function(value){
                                 var action = {};
                                 action[name] = value;
-                                json._htool.transform(action);
+                                json._htl.transform(action);
                             });
 
                         break;

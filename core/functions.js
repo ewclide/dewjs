@@ -30,11 +30,11 @@ function istype(value, type)
 				if (typeof value == "function") return true;
 				else return false;
 				break;
-			case "dom":
+			case "DOM":
 				if (value !== undefined && value.nodeType == 1) return true;
 				else return false;
 				break;
-			case "docTool":
+			case "HTMLTools":
 				if (value.isDocTool) return true;
 				else return false;
 				break;
@@ -50,8 +50,8 @@ function istype(value, type)
 		else if (typeof value == "boolean") return "boolean";
 		else if (Array.isArray(value)) return "array";
 		else if (typeof value == "function") return "function";
-		else if (value.nodeType == 1) return "dom";
-		else if (value.isDocTool) return "docTool";
+		else if (value.nodeType == 1) return "DOM";
+		else if (value.isDocTool) return "HTMLTools";
 		else return "object";
 	}
 }
@@ -82,28 +82,15 @@ function strconv(value)
 	}
 }
 
-function log()
-{
-	var args = "";
-
-	for (var i = 0; i < arguments.length; i++)
-		args += "arguments[" + i + "]" + ",";
-
-	args = args.slice(0, args.length - 1);
-
-	eval("console.log(" + args + ")");
-}
-
+var log = console.log;
 log.time = function()
 {
 	console.time();
 }
-
-log.timeoff = function()
+log.timeEnd = function()
 {
 	console.timeEnd();
 }
-
 log.err = function(data)
 {
 	var error = "";
@@ -118,7 +105,7 @@ log.err = function(data)
 			tab = "   - ";
 		}
 
-		data.forEach(function(message){
+		data.forEach( message => {
 			error += tab + message + ";\n\r";
 		});
 
@@ -170,11 +157,11 @@ function superFunction(fn)
 		shell._data = data;
 
 		if (!order)
-			shell._handlers.forEach(function(handler){
+			shell._handlers.forEach( handler => {
 				handler(data);
 			});
 		else
-			shell._handlers.forEach(function(handler){
+			shell._handlers.forEach( handler => {
 				shell._data = handler(shell.data);
 			});   
 	}

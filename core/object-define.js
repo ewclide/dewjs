@@ -47,9 +47,7 @@ Object.prototype.$define({
 function join(objects, method)
 {
     if (Array.isArray(objects))
-        objects.forEach(function(object){
-            method(object);
-        });
+        objects.forEach( object => method(object) );
 
     else method(objects);
 }
@@ -62,21 +60,21 @@ Object.prototype.$define("$join", {
         return {
             left : function(objects)
             {
-                join(objects, function(object){
+                join(objects, object => {
                     for (var i in object)
                         i in self && (self[i] = object[i]);
                 }); 
             },
             right : function(objects)
             {
-                join(objects, function(object){
+                join(objects, object => {
                     for (var i in object)
                         !(i in self) && (self[i] = object[i]);
                 }); 
             },
             full : function(objects)
             {
-                join(objects, function(object){
+                join(objects,  object => {
                     for (var i in object)
                         self[i] = object[i];
                 });

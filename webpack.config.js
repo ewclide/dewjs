@@ -1,25 +1,28 @@
-var path = require('path'),
-	UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+var path = require('path').resolve(__dirname, 'src'),
+	UglifyJsPlugin = require('uglifyjs-webpack-plugin'),
+	output = "epsilon",
+	babel = {
+		test: /\.js$/,
+		use: { loader: 'babel-loader?presets[]=env' }
+	}
 
-module.exports = {
+const dev = {
 	entry: "./core/main.js",
 	output: {
-		path: path.resolve(__dirname, 'src'),
-		filename: 'epsilon.dev.js'
+		path: path,
+		filename: output + '.dev.js'
 	},
-	// plugins: [
-	// 	new UglifyJsPlugin({
-	// 		include: /\.min\.js$/
-	// 	})
-	// ],
-	module: {
-	  rules: [
-	    {
-	    	test: /\.js$/,
-	    	use: {
-		    	loader: 'babel-loader?presets[]=env'
-	      	}
-	    }
-	  ]
-	}
-};
+	module: { rules: [ babel ] }
+}
+
+const min = {
+	entry: "./core/main.js",
+	output: {
+		path: path,
+		filename: output + '.min.js'
+	},
+	plugins: [ new UglifyJsPlugin() ],
+	module: { rules: [ babel ] }
+}
+
+module.exports = dev;
