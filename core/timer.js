@@ -1,3 +1,5 @@
+import {megaFunction} from './functions';
+
 export class Timer
 {
 	constructor(options)
@@ -11,9 +13,9 @@ export class Timer
 		this.delay = options.delay || 0;
 		this.step = options.step || 0;
 
-		this.onTick   = superFunction(options.onTick);
-		this.onStart  = superFunction(options.onStart);
-		this.onStop   = superFunction(options.onStop);
+		this.onTick   = megaFunction(options.onTick);
+		this.onStart  = megaFunction(options.onStart);
+		this.onStop   = megaFunction(options.onStop);
 
 		this._state = {
 			timePassed : 0,

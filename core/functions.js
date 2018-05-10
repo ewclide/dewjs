@@ -1,48 +1,92 @@
-function istype(value, type)
+import {array} from './array';
+
+export function printErrors(data, source = true)
+{
+	var error = "";
+
+	if (Array.isArray(data) && data.length)
+	{
+		error += data.title || "Error list";
+		if (source) error += " ( " + getSourceLog() + " )";
+		error += ":\n";
+
+		data.forEach( message => error += "   - " + message + "\n" );
+	}
+	else if (typeof data == "string")
+	{
+		error += data;
+		if (source) error += " ( " + getSourceLog() + " )";
+	}
+	else return false;
+
+	console.error(error);
+
+	return false;
+}
+
+function getSourceLog()
+{
+	var stack = (new Error()).stack.split("\n");
+
+	for (var i = 0; i < stack.length; i++)
+		if (stack[i].search(/dew\.(min|dev)\.js|anonymous/g) == -1)
+		{
+			var src = stack[i].match(/https?:[^\)]+/g);
+			if (src && src[0]) return src[0];
+		}
+
+	return "";
+}
+
+export function define(obj, fields, options = {})
+{
+	var desc = {
+		enumerable   : options.enumer != undefined ? options.enumer : false,
+		configurable : options.config != undefined ? options.config : true,
+		writable     : options.write  != undefined ? options.write  : true
+	};
+
+	if (typeof fields == "string")
+	{
+		if (options.value) desc.value = options.value;
+		else if (options.get && options.set)
+		{
+			desc.get = options.get;
+			desc.set = options.set;
+			delete desc.writable;
+		}
+
+		Object.defineProperty(obj, fields, desc);
+
+		if (options.set && options.value != undefined)
+			obj[fields] = options.value;
+	}
+	else for (var key in fields)
+		 {
+			desc.value = fields[key];
+			Object.defineProperty(obj, String(key), desc);
+		 }
+	
+};
+
+export function istype(value, type)
 {
 	if (Array.isArray(type))
-	{
-		return type.some(function(t){
-			if (istype(value, t)) return true;
-		});
-	}
+		return type.some( t => istype(value, t) ? true : false );
+
 	else if (type !== undefined)
-	{
 		switch (type)
 		{
-			case "number":
-				if (typeof value == "number") return true;
-				else return false;
-				break;
-			case "string":
-				if (typeof value == "string") return true;
-				else return false;
-				break;
-			case "boolean":
-				if (typeof value == "boolean") return true;
-				else return false;
-				break;
-			case "array":
-				if (Array.isArray(value)) return true;
-				else return false;
-				break;
-			case "function":
-				if (typeof value == "function") return true;
-				else return false;
-				break;
-			case "DOM":
-				if (value !== undefined && value.nodeType == 1) return true;
-				else return false;
-				break;
-			case "HTMLTools":
-				if (value.isDocTool) return true;
-				else return false;
-				break;
-			default :
-				log.err('the type "' + type + '" is unknown!');
-				return false;
+			case "number"   : return typeof value == "number" ? true : false;
+			case "string"   : return typeof value == "string" ? true : false;
+			case "boolean"  : return typeof value == "boolean" ? true : false;
+			case "array"    : return Array.isArray(value) ? true : false;
+			case "function" : return typeof value == "function" ? true : false;
+			case "DOM"      : return value !== undefined && value.nodeType == 1 ? true : false;
+			case "HTMLTools": return value.isHTMLTools ? true : false;
+			default : printErrors('the type "' + type + '" is unknown!'); return false;
 		}
-	}
+
 	else
 	{
 		if (typeof value == "number") return "number";
@@ -51,12 +95,12 @@ function istype(value, type)
 		else if (Array.isArray(value)) return "array";
 		else if (typeof value == "function") return "function";
 		else if (value.nodeType == 1) return "DOM";
-		else if (value.isDocTool) return "HTMLTools";
+		else if (value.isHTMLTools) return "HTMLTools";
 		else return "object";
 	}
 }
 
-function strconv(value)
+export function strconv(value)
 {
 	if (typeof value == "string")
 	{
@@ -65,81 +109,40 @@ function strconv(value)
 		if (value == "false" || value == "FALSE") return false;
 		if (value.search(/\[.+\]/g) != -1)
 		{
-			value = value.replace(/\[|\]/g, "");
-			value = value.split(",");
-
-			return value.map(function(val){
-				return strconv(val);
-			});
+			value = value.replace(/\[|\]/g, "").split(",");
+			return value.map(val => strconv(val));
 		}
 		if (value.search(/\{.+\}/g) != -1) return JSON.parse(value);
 
 		return value.replace(/^\s+|\s+$/g, "");
 	}
-	else
-	{
-		log.err('strconv function error : type of argument must be "string"')
-	}
+	else printErrors('strconv function error : type of argument must be "string"')
 }
 
-var log = console.log;
-log.time = function()
-{
-	console.time();
-}
-log.timeEnd = function()
-{
-	console.timeEnd();
-}
-log.err = function(data)
-{
-	var error = "";
-
-	if (Array.isArray(data))
-	{
-		var tab = "";
-
-		if ("title" in data)
-		{
-			error = data.title + ":\n\r";
-			tab = "   - ";
-		}
-
-		data.forEach( message => {
-			error += tab + message + ";\n\r";
-		});
-
-		error = error.slice(0, error.length - 2);
-	}
-	else error = data;
-
-	console.error(error);
-};
-
-function random(min = 0, max = 9999999)
+export function random(min = 0, max = 9999999)
 {
 	return Math.floor(Math.random() * (max - min)) + min;
 }
 random.key = function(length = 15, types = ["all"])
 {
 	var lower = 'abcdefghijklmnopqrstuvwxyz',
-	upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
-	numbers = '1234567890',
-	specials = "!?@#$%^&*()*-_+=[]{}<>.,;:/'\"\\",
-	chars = "";
+		upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+		numbers = '1234567890',
+		specials = "!?@#$%^&*()*-_+=[]{}<>.,;:/'\"\\",
+		chars = "";
 
-	if (types.$have("all"))
+	if (array(types).have("all")) 
 		chars = lower + upper + numbers + specials;
 	else
 	{
-		if (types.$have("lower")) chars += lower;
-		if (types.$have("upper")) chars += upper;
-		if (types.$have("numbers")) chars += numbers;
-		if (types.$have("specials")) chars += specials;
+		if (array(types).have("lower")) chars += lower;
+		if (array(types).have("upper")) chars += upper;
+		if (array(types).have("numbers")) chars += numbers;
+		if (array(types).have("specials")) chars += specials;
 	}
 
 	var limit = chars.length - 1,
-	result = "";
+		result = "";
 
 	for (var i = 1; i < length; i++)
 	{
@@ -150,20 +153,15 @@ random.key = function(length = 15, types = ["all"])
 	return result;
 }
 
-function superFunction(fn)
+export function megaFunction(fn)
 {
 	var shell = function(data, order)
 	{
 		shell._data = data;
 
-		if (!order)
-			shell._handlers.forEach( handler => {
-				handler(data);
-			});
-		else
-			shell._handlers.forEach( handler => {
-				shell._data = handler(shell.data);
-			});   
+		!order
+		? shell._handlers.forEach( handler => handler(data) )
+		: shell._handlers.forEach( handler => shell._data = handler(shell.data) )
 	}
 
 	shell._handlers = [];
@@ -181,8 +179,14 @@ function superFunction(fn)
 
 	shell.remove = function(fn)
 	{
-		shell._handlers.$remove.value(fn);
+		array(shell._handlers).removeValue(fn);
 		shell.count = shell._handlers.length;
+	}
+
+	shell.index = function(i, data)
+	{
+		shell._data = data;
+		shell._handlers[i](data);
 	}
 
 	if (fn) shell.push(fn);
@@ -190,10 +194,17 @@ function superFunction(fn)
 	return shell;
 }
 
-window.$define({
-	log     : log,
-	istype  : istype,
-	strconv : strconv,
-	random  : random,
-	superFunction : superFunction
+export function log()
+{
+	console.log.apply(window, arguments);
+}
+
+define(log, "time", {
+	get : console.time,
+	set : function(){}
+});
+
+define(log, "timeEnd", {
+	get : console.timeEnd,
+	set : function(){}
 });

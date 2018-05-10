@@ -1,9 +1,32 @@
 import {JsonConverter} from './json-converter';
-import {Transform}     from './transform';
-import {Animation}     from './animation';
-import {Async}         from './async';
+import {Transform} from './transform';
+import {Async} from './async';
+import {random, megaFunction} from './functions';
+import {array} from './array';
+// import {Animation}     from './animation';
 
-var jsonConverter = new JsonConverter();
+var jsonConverter = new JsonConverter(),
+
+insertMethods = {
+    before : function(element, current)
+    {
+        if (current.parentNode)
+            current.parentNode.insertBefore(element, current);
+    },
+    after : function(element, current)
+    {
+        if (current.parentNode)
+            current.parentNode.insertBefore(element, current.nextSibling);
+    },
+    append : function(element, current)
+    {
+        current.appendChild(element, current);
+    },
+    prepend : function(element, current)
+    {
+        current.insertBefore(element, current.childNodes[0]);
+    }
+}
 
 export class HTMLTools extends Async
 {
@@ -22,15 +45,11 @@ export class HTMLTools extends Async
     addElements(elements)
     {
         if (!Array.isArray(elements) && elements.length)
-        {
             for (var i = 0; i < elements.length; i++)
                 this.elements.push(elements[i]);
-        }
-        else
-        {
-            this.elements = this.elements.concat(elements);
-        }
 
+        else this.elements = this.elements.concat(elements);
+        
         this.length = this.elements.length;
     }
 
@@ -46,17 +65,11 @@ export class HTMLTools extends Async
 
     ready()
     {
-        var fn, sub,
-            list = this.elements;
+        var fn, sub, list = this.elements;
 
-        if (arguments.length == 1)
-            fn = arguments[0];
-
-        else
-        {
-            sub = arguments[0];
-            fn = arguments[1];
-        }
+        arguments.length == 1
+        ? fn = arguments[0]
+        : (sub = arguments[0], fn = arguments[1]);
 
         if (sub)
         {
@@ -65,7 +78,6 @@ export class HTMLTools extends Async
         }
 
         this.then(fn);
-
         this._observReady(list);
 
         return this;
@@ -75,8 +87,7 @@ export class HTMLTools extends Async
     {
         var self = this,
 
-        checkout = function()
-        {
+        checkout = function(){
             list._countReady++;
             if (list._countReady == list.length)
                 self.resolve();
@@ -117,10 +128,10 @@ export class HTMLTools extends Async
 
         mutation.observe(element, options);
 
-       this.mutations.push(mutation);
+        this.mutations.push(mutation);
     }
 
-    isVisible(maxDepth = 3)
+    visible(maxDepth = 3)
     {
         return this._checkVisible(this.elements[0], maxDepth);
     }
@@ -132,11 +143,9 @@ export class HTMLTools extends Async
         var parent = element.parentElement || element.parentNode || null;
 
         if (parent && parent != document)
-        {
             this.display(parent)
             ? result = parent
             : result = this._checkVisible(parent, maxDepth, depth++);
-        }
 
         return result;
     }
@@ -145,8 +154,11 @@ export class HTMLTools extends Async
     {
         var display;
 
+        if (!element) element = this.elements[0]
+
         element.style.display
-        ? display = element.style.display : display = element.getComputedStyle().display;
+        ? display = element.style.display
+        : display = element.getComputedStyle().display;
 
         return display == "none" ? false : true;
     }
@@ -166,45 +178,19 @@ export class HTMLTools extends Async
         return result;
     }
 
-    _getInsertMethod(name)
-    {
-        var methods = {
-            before : function(element, current)
-            {
-                if (current.parentNode)
-                    current.parentNode.insertBefore(element, current);
-            },
-            after : function(element, current)
-            {
-                if (current.parentNode)
-                    current.parentNode.insertBefore(element, current.nextSibling);
-            },
-            append : function(element, current)
-            {
-                current.appendChild(element, current);
-            },
-            prepend : function(element, current)
-            {
-                current.insertBefore(element, current.childNodes[0]);
-            }
-        }
-
-        return methods[name];
-    }
-
     before(htl, rm = true)
     {
-        return this._insert(htl, rm, this._getInsertMethod("before"));
+        return this._insert(htl, rm, insertMethods["before"]);
     }
 
     after(htl, rm = true)
     {
-        return this._insert(htl, rm, this._getInsertMethod("after"));
+        return this._insert(htl, rm, insertMethods["after"]);
     }
 
     append(htl, rm = true)
     {
-        return this._insert(htl, rm, this._getInsertMethod("append"));
+        return this._insert(htl, rm, insertMethods["append"]);
     }
 
     appendTo(target, rm = true)
@@ -215,7 +201,7 @@ export class HTMLTools extends Async
 
     prepend(htl, rm = true)
     {
-        return this._insert(htl, rm, this._getInsertMethod("prepend"));
+        return this._insert(htl, rm, insertMethods["prepend"]);
     }
 
     _insert(htl, rm, method)
@@ -227,15 +213,12 @@ export class HTMLTools extends Async
         if (htl)
         {
             this.elements.forEach( element => {
-
                 var clones = [];
-
                 htl.elements.forEach( insertElement => {
                     var clone = insertElement.cloneNode(true);
                     clones.push(clone);
                     method(clone, element);
                 });
-
                 result = result.concat(clones);
             });
 
@@ -248,73 +231,134 @@ export class HTMLTools extends Async
         else return false;
     }
 
+    jsonBefore(json)
+    {
+        return this._insertJson(json, insertMethods["before"]);
+    }
+
+    jsonAfter(json)
+    {
+        return this._insertJson(json, insertMethods["after"]);
+    }
+
+    jsonPrepend(json)
+    {
+        return this._insertJson(json, insertMethods["prepend"]);
+    }
+
+    jsonAppend(json)
+    {
+        return this._insertJson(json, insertMethods["append"]);
+    }
+
+    jsonGet(element)
+    {
+        var result = [];
+
+        if (element)
+            result = jsonConverter.getFromHTML(element);
+
+        else if (this.elements.length)
+            this.elements.length == 1
+            ? result = jsonConverter.getFromHTML(this.elements[0])
+            : this.elements.forEach( element => result.push(jsonConverter.getFromHTML(element)) );
+
+        else result = false;
+
+        return result;
+    }
+
+    _insertJson(json, method)
+    {
+        var clones = [];
+
+        jsonConverter.toHTML(json);
+
+        this.elements.forEach( current => {
+            var element = jsonConverter.build(json);
+            clones.push(element);
+            method(element, current);
+        });
+
+        return new HTMLTools(clones);
+    }
+
+    tplAppend(tpl)
+    {
+        return tpl.isTemplate ? tpl.appendTo(this) : false;
+    }
+
     addClass(name)
     {
         this.elements.forEach( element => element.classList.add(name) );
+        return this;
     }
 
     removeClass(name)
     {
         this.elements.forEach( element => element.classList.remove(name) );
+        return this;
     }
 
     html(str, clear = true)
     {
         if (str !== undefined)
-        {
             this.elements.forEach( element => {
-                if (clear) element.innerHTML = str;
-                else element.innerHTML += str;
-            });
+                clear ? element.innerHTML = str : element.innerHTML += str
+            })
 
-            return this;
-        }
         else return this.elements[0].innerHTML;
+
+        return this;
     }
 
     text(str)
     {
         if (str !== undefined)
-        {
             this.elements.forEach( element => element.innerText = str );
-            return this;
-        }
+
         else return this.elements[0].innerText;
+
+        return this;
     }
 
     value(data)
     {
         if (data !== undefined)
-        {
             this.elements.forEach( element => element.value = data );
-            return this;
-        }
         else return this.elements[0].value;
+
+        return this;
     }
 
     active(yes)
     {
-        if (yes) this.addClass("active");
-        else this.removeClass("active");
+        yes ? this.addClass("active") : this.removeClass("active");
+
+        return this;
     }
 
     checked(yes)
     {
         if (typeof yes == "boolean")
             this.elements.forEach( element => {
-                if ("checked" in element) element.checked = yes;
+                if ("checked" in element) element.checked = yes
             });
 
         else if (yes == undefined)
             return this.elements[0].checked;
+
+        return this;
     }
 
     toogle()
     {
         this.elements.forEach( element => {
             if ("checked" in element)
-                element.checked ? element.checked = false : element.checked = true;
+                element.checked = element.checked ? false : true;
         });
+
+        return this;
     }
 
     get index()
@@ -327,6 +371,8 @@ export class HTMLTools extends Async
         this.elements.forEach( element => {
             if ("selectedIndex" in element) element.selectedIndex = index;
         });
+
+        return this;
     }
 
     width(value)
@@ -335,6 +381,8 @@ export class HTMLTools extends Async
             this.elements.forEach( element => element.style.width = value + "px" );
 
         else return this.elements[0].offsetWidth;
+
+        return this;
     }
 
     height(value)
@@ -343,6 +391,8 @@ export class HTMLTools extends Async
             this.elements.forEach( element => element.style.height = value + "px" );
 
         else return this.elements[0].offsetHeight;
+
+        return this;
     }
 
     wrap(classList)
@@ -358,7 +408,8 @@ export class HTMLTools extends Async
         }
         else if (Array.isArray(classList))
         {
-            var wrapper = $html.create("div", classList[0]), inside = "";
+            var wrapper = $html.create("div", classList[0]),
+                inside = "";
 
             for (var i = 1; i < classList.length; i++)
                 inside += '<div class="' + classList[i] + '">';
@@ -389,9 +440,7 @@ export class HTMLTools extends Async
     parent()
     {
         var parents = [];
-
         this.elements.forEach( element => parents.push(this._getParent(element)) );
-
         return new HTMLTools(parents);
     }
 
@@ -409,90 +458,64 @@ export class HTMLTools extends Async
         return transform;
     }
 
-    animate(data, settings)
+    getAttr(name)
     {
-        var animation = new Animation(this);
-        
-        if (data && settings)
-            animation.key(data, settings);
-            
-        return animation;
-    }
+        var element = this.elements[0],
+            result = false;
 
-    get attr()
-    {
-        var self = this;
-
-        return {
-            get : function(name)
-            {
-                if (self.elements.length == 1)
-                    return self._getAttributes(self.elements[0], name);
-            },
-            set : function(attrs, value)
-            {
-                if (typeof attrs == "string" && value !== undefined)
-                    self.elements.forEach( element => element.setAttribute(attrs, value) );
-
-                else self.elements.forEach( element => {
-                        for (var i in attrs)
-                            element.setAttribute(i, attrs[i]);
-                    });
-
-                return self;
-            },
-            unset : function(attrs)
-            {
-                if (typeof attrs == "string")
-                    self.elements.forEach( element => element.removeAttribute(attrs) );
-
-                else if (Array.isArray(attrs))
-                    self.elements.forEach( element => attrs.forEach( attr => element.removeAttribute(attr) ) );
-
-                else if (attrs == undefined)
-                {
-                    attrs = self.attr.get();
-
-                    if (attrs)
-                        self.elements.forEach( element => {
-                            for (var i in attrs) element.removeAttribute(i);
-                        });
-                }
-
-                return self;
-            }
-        };
-    }
-
-    _getAttributes(element, list)
-    {
         if (element !== undefined && element.nodeType == 1 && element.attributes.length)
         {
-            var attributes;
+            result = {}
 
-            if (list)
+            if (name)
             {
-                if (Array.isArray(list))
-                {
-                    attributes = {};
-
-                    list.forEach( name => {
-                        var value = element.getAttribute(name);
-                        if (value) attributes[name] = value;
+                if (Array.isArray(name))
+                    name.forEach( item => {
+                        var value = element.getAttribute(item);
+                        if (value) result[item] = value;
                     });
-                }
-                else if (typeof list == "string")
-                    attributes = element.getAttribute(list);
+
+                else if (typeof name == "string")
+                    result = element.getAttribute(name);
             }
             else
-            {
-                attributes = {};
-
-                [].forEach.call(element.attributes,  attr => attributes[attr.name] = attr.value ); 
-            }
-            
-            return attributes;
+                [].forEach.call(
+                    element.attributes,
+                    attr => result[attr.name] = attr.value
+                );
         }
+
+        return result;
+    }
+
+    setAttr(attrs, value)
+    {
+        typeof attrs == "string" && value !== undefined
+        ? this.elements.forEach( element => element.setAttribute(attrs, value) )
+        : this.elements.forEach( element => {
+            for (var i in attrs) element.setAttribute(i, attrs[i])
+        });
+
+        return this;
+    }
+
+    unsetAttr(name)
+    {
+        if (typeof name == "string")
+            this.elements.forEach( element => element.removeAttribute(name) )
+
+        else if (Array.isArray(name))
+            this.elements.forEach( element => name.forEach( attr => element.removeAttribute(attr) ) )
+
+        else if (name == undefined)
+        {
+            var list = this.getAttr();
+            if (list) this.elements.forEach( element => {
+                for (var i in list) element.removeAttribute(i)
+            });
+        }
+
+        return this;
     }
 
     css(styles)
@@ -500,139 +523,69 @@ export class HTMLTools extends Async
         if (typeof styles == "string")
             return this.elements[0].style[styles];
 
-        else
-        {
-            this.elements.forEach( element => {
-                for (var name in styles)
-                    element.style[name] = styles[name];
-            });
+        else this.elements.forEach( element => {
+            for (var name in styles) element.style[name] = styles[name];
+        });
 
-            return this;
-        }
+        return this;
     }
 
-    get event()
+    eventAttach(data, fn)
     {
+        if (!$html._eventList[this._id])
+            $html._eventList[this._id] = {};
 
-        var self = this;
+        var list = $html._eventList[this._id];
 
-        return {
-            attach : function(data, fn)
-            {
-                if (!$html._eventList[self._id])
-                    $html._eventList[self._id] = {};
+        if (typeof data == "string" && fn !== undefined)
+            this._eventAttach(list, data, fn);
 
-                var list = $html._eventList[self._id];
+        else if (typeof data == "object")
+            for (var event in data)
+                this._eventAttach(list, event, data[event]);
 
-                if (typeof data == "string" && fn !== undefined)
-                    self._attachEvent(list, data, fn);
-
-                else if (typeof data == "object")
-                    for (var event in data)
-                        self._attachEvent(list, event, data[event]);
-
-                return self;
-            },
-            dispatch(type)
-            {
-                var event = new Event(type);
-
-                self.elements.forEach( element => element.dispatchEvent(event) );
-
-                return self;
-            },
-            start : function(type)
-            {
-                $html._eventFunction(self._id, type);
-
-                return self;
-            },
-            detach : function(name)
-            {
-                var list = $html._eventList[self._id];
-
-                if (!name)
-                {
-                    for (var event in list)
-                        self.elements.attr.unset(event.substr(0, 2));
-                }
-                else $html._eventList[self._id][name] = undefined;
-
-                return self;
-            }
-        }
+        return this;
     }
 
-    _attachEvent(list, name, fn)
+    eventDispatch(type)
+    {
+        var event = new Event(type);
+        this.elements.forEach( element => element.dispatchEvent(event) );
+
+        return this;
+    }
+
+    eventStart(type)
+    {
+        $html._eventFunction(this._id, type);
+        return this;
+    }
+
+    eventDetach(name)
+    {
+        var list = $html._eventList[this._id];
+
+        if (name)
+        {
+            for (var event in list)
+                this.elements.unsetAttr(event.substr(0, 2));
+        }
+        else $html._eventList[this._id][name] = undefined;
+
+        return this;
+    }
+
+    _eventAttach(list, name, fn)
     {
         var evAttr = {}
 
-        list[name] ? list[name].push(fn) : list[name] = superFunction(fn);
-        
+        list[name]
+        ? list[name].push(fn)
+        : list[name] = megaFunction(fn);
+
         evAttr["on" + name] = "$html._eventFunction(" + this._id + ", '" + name + "', event)";
 
-        this.attr.set(evAttr);
-    }
-
-    get json()
-    {
-        var self = this;
-
-        return {
-            before : function(json)
-            {
-                return self._insertJson(json, self._getInsertMethod("before"));
-            },
-            after : function(json)
-            {
-                return self._insertJson(json, self._getInsertMethod("after"));
-            },
-            prepend : function(json)
-            {
-                return self._insertJson(json, self._getInsertMethod("prepend"));
-            },
-            append : function(json)
-            {
-                return self._insertJson(json, self._getInsertMethod("append"));
-            },
-            get : function(element)
-            {
-                if (element)
-                    return jsonConverter.fromHTML(element);
-
-                else if (self.elements.length)
-                {
-                    var result;
-
-                    if (self.elements.length == 1)
-                        result = jsonConverter.fromHTML(self.elements[0]);
-
-                    else
-                    {
-                        result = [];
-                        self.elements.forEach( element => result.push(jsonConverter.fromHTML(element)) );
-                    }   
-
-                    return result;
-                }
-                else return false;
-            }
-        }
-    }
-
-    _insertJson(json, method)
-    {
-        var self = this, clones = [];
-
-        jsonConverter.toHTML(json);
-
-        this.elements.forEach( current => {
-            var element = jsonConverter.build(json);
-            clones.push(element);
-            method(element, current);
-        });
-
-        return new HTMLTools(clones);
+        this.setAttr(evAttr);
     }
 
     each(fn)
@@ -646,7 +599,7 @@ export class HTMLTools extends Async
 
     clone()
     {
-        var self = this, clones = [];
+        var clones = [];
 
         this.elements.forEach( element => clones.push(element.cloneNode(true)) );
 
@@ -666,13 +619,11 @@ export class HTMLTools extends Async
 
     remove()
     {
-        var self = this;
-
         this.elements.forEach( (element, index) => {
             if (element.parentNode)
                 element.parentNode.removeChild(element);
 
-            self.elements.$remove.index(index);
+            array(this.elements).removeIndex(index);
         });
     }
 }

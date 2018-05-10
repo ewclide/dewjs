@@ -1,17 +1,15 @@
 import {HTMLTools} from './html-tools';
+import {bind} from './binder';
 
 export class JsonConverter
 {
-	constructor()
-	{
-
-	}
+	constructor(){}
 
 	toHTML(json)
 	{
 		if (!json._htl)
         {
-            var element, htl, self = this;
+            var element, htl;
 
             if (!json.tag) json.tag = "div";
 
@@ -28,23 +26,20 @@ export class JsonConverter
                     case "html"  : htl.html(json.html); break;
                     case "value" : htl.value(json.value); break;
                     case "checked" : htl.checked(json.checked); break;
-                    case "attrs" : htl.attr.set(json.attrs); break;
+                    case "attrs" : htl.setAttr(json.attrs); break;
                     case "css"   : htl.css(json.css); break;
                     case "transform" : htl.transform(json.transform); break;
                     case "nodes" :
-                    if (Array.isArray(json.nodes))
-                        json.nodes.forEach(function(node){
-                            self.toHTML(node)
-                        });
-                    else self.toHTML(json.nodes);
-                    break;
+                        if (!Array.isArray(json.nodes)) json.nodes = [json.nodes];
+                        json.nodes.forEach( node => this.toHTML(node) )
+                        break;
                 }
             }
 
             if (json.content && json.template)
             {
                 json._defaults.content = JSON.parse(JSON.stringify(json.content));
-                htl.html(self._getContent(json));
+                htl.html(this._getTemplate(json));
             }
 
             json._element = element;
@@ -53,7 +48,7 @@ export class JsonConverter
             this._bind(json);
 
             if (json.events)
-                htl.event.attach(json.events);
+                htl.eventAttach(json.events);
 
             json._htl.elements = [];
         }
@@ -76,88 +71,63 @@ export class JsonConverter
         return current;
 	}
 
-	_getContent(json)
-	{
-		var content = json.content,
-            template = json.template,
-            defaults = json._defaults.content;
+    _getTemplate(json)
+    {
+        var template = json.template,
+            defaults = json._defaults.content,
+            tokens = this._splitTokens(template);
 
-        for (var field in content)
-        {
-            if (content[field] == "")
-                content[field] = defaults[field];
+        for (var field in json.content)
+            if (json.content[field] == "")
+                json.content[field] = defaults[field];
 
-            template = template.replace("{" + field + "}", content[field]);
-        }
-
-        if (json.nodes)
-        {
-            if (Array.isArray(json.nodes))
-                json.nodes.forEach( (node, index) => {
-                    template = template.replace("{node[" + index + "]}", node._element.outerHTML)
-                });
-
-            else template = template.replace("{node}", json.nodes._element.outerHTML);
-        }
-
-        var tokens = this._splitTokens(template);
-
-        tokens.forEach(token => {
-            template = template.replace("{" + token + "}", '<span style="color : red">{unknown token: '+ token +'}</span>')
+        tokens.forEach( token => {
+            if (token in json.content)
+                template = template.replace("{" + token + "}", json.content[token]);
+            
+            else if (token.search(/node\[\d+\]/g) != -1)
+            {
+                token = token.replace(/[^0-9]/g, "");
+                template = token in json.nodes
+                ? template.replace("{node[" + token + "]}", json.nodes[token]._element.outerHTML)
+                : template.replace("{node[" + token + "]}", '<span style="color:red">{undefined node index: "'+ token +'"}</span>')
+            }
+            else template = template.replace("{" + token + "}", '<span style="color:red">{unknown token: "'+ token +'"}</span>')
         });
 
         return template;
-	}
+    }
 
-	_splitTokens(str)
-	{
-		var token = "", start = false, tokens = [];
+    _splitTokens(str)
+    {
+        var tokens = [],
 
-        for (var i = 0; i < str.length; i++)
-        {
-            if (str[i] == "{")
-            {
-                start = true;
-                continue;
-            }
-            else if (str[i] == "}")
-            {
-                start = false;
-                continue;
-            }
-
-            if (start) token += str[i];
-            else if (token)
-            {
-                tokens.push(token);
-                token = "";
-            }
-        }
+        list = str.replace(/\{/g, "{#").split(/\{|\}/gi);
+        list.forEach( token => {
+            if (token[0] == "#") tokens.push(token.slice(1))
+        })
 
         return tokens;
-	}
+    }
 
 	_bind(json)
 	{
 		var self = this;
 
         if (json.content && json.template)
-        {
             for (let field in json.content)
-                $bind.change(
+                bind.change(
                 	json.content,
                 	field,
                 	function(value){
-                		json._htl.html(self._getContent(json));
+                		json._htl.html(self._getTemplate(json));
                 	}
                 );
-        }
-
+    
         if (json.tag == "input" && json.attrs.type == "text")
             json.value = "";
 
         if (json.bind)
-        {
             for (var i = 0; i < json.bind.length; i++)
             {
                 var item = json.bind[i];
@@ -165,80 +135,78 @@ export class JsonConverter
                 switch (item)
                 {
                     case "text":
-                        $bind.change( json, "text", function(value){
+                        bind.change( json, "text", function(value){
                             json._htl.text(value);
                         });
-
                         break;
+
                     case "html":
-                        $bind.change( json, "html", function(value){
+                        bind.change( json, "html", function(value){
                             json._htl.html(value);
                         });
-
                         break;
+
                     case "value":
-                        $bind.change( json, "value", function(value){
+                        bind.change( json, "value", function(value){
                             json._htl.value(value);
                         });
 
                         if ((json.tag == "input" && json.attrs.type == "text") || json.tag == "textarea")
-                            json._htl.event.attach({
+                            json._htl.eventAttach({
                                 input : function(e)
                                 {
                                     json._value = e.srcElement.value;
                                     json._htl.value(e.srcElement.value);
                                 }
                             });
-
                         break;
+
                     case "checked" : 
-                        $bind.change( json, "checked", function(value){
+                        bind.change( json, "checked", function(value){
                             json._htl.checked(value);
                         });
 
                         if (json.tag == "input" && (json.attrs.type == "checkbox" || json.attrs.type == "radio"))
-                            json._htl.event.attach({
+                            json._htl.eventAttach({
                                 change : function(e)
                                 {
                                     json._checked = e.srcElement.checked;
                                     json._htl.checked(e.srcElement.checked);
                                 }
                             });
-
                         break;
+
                     case "attrs":
                         for (let name in json.attrs)
-                            $bind.change( json.attrs, name, function(value){
+                            bind.change( json.attrs, name, function(value){
                                 var attr = {};
                                 attr[name] = value;
-                                json._htl.attr.set(attr);
+                                json._htl.setAttr(attr);
                             });
-
                         break;
+
                     case "css":
                         for (let name in json.css)
-                            $bind.change( json.css, name, function(value){
+                            bind.change( json.css, name, function(value){
                                 var style = {};
                                 style[name] = value;
                                 json._htl.css(style);
                             });
-
                         break;
+
                     case "transform":
                         for (let name in json.transform)
-                            $bind.change( json.transform, name, function(value){
+                            bind.change( json.transform, name, function(value){
                                 var action = {};
                                 action[name] = value;
                                 json._htl.transform(action);
                             });
-
                         break;
                 }
             }
-        }
 	}
 
-	fromHTML(element)
+	getFromHTML(element)
 	{
 		if (element.nodeType == 1)
         {
@@ -267,7 +235,7 @@ export class JsonConverter
                 for (var i = 0; i < elements.length; i++)
                 {
                     if (elements[i].nodeType == 1)
-                        result.nodes.push(this.fromHTML(elements[i]));
+                        result.nodes.push(this.getFromHTML(elements[i]));
 
                     else if (elements[i].nodeType == 3)
                         result.text = elements[i].textContent;

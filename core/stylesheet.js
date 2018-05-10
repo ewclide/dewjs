@@ -14,9 +14,9 @@ export class StyleSheet
 		else
 		{
 			var head = document.getElementsByTagName("head")[0],
-				element = document.createElement("style");
+				style = document.createElement("style");
 
-			head.appendChild(element);
+			head.appendChild(style);
 
 			this.styleSheet = document.styleSheets[document.styleSheets.length - 1];
 		}
@@ -26,21 +26,15 @@ export class StyleSheet
 	{
 		var styles = this._stylesToString(styles);
 
-		if (this.styleSheet.insertRule)
-		{
-			var rule = selector + " {" + styles + "}";
-			this.styleSheet.insertRule(rule, this.styleSheet.cssRules.length);
-		}
-		else
-		{
-			this.styleSheet.addRule(selector, styles, this.styleSheet.cssRules.length);
-		}
+		this.styleSheet.insertRule
+		? this.styleSheet.insertRule(selector + " {" + styles + "}", this.styleSheet.cssRules.length)
+		: this.styleSheet.addRule(selector, styles, this.styleSheet.cssRules.length)
 	}
 
 	addRules(styles)
 	{
 		for (selector in styles)
-			this._addRule(selector, styles[selector]);
+			this.addRule(selector, styles[selector]);
 	}
 
 	deleteRule(index)

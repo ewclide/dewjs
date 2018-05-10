@@ -1,4 +1,6 @@
-export class Binder
+import {define} from './functions';
+
+class Binder
 {
 	constructor(){}
 
@@ -7,9 +9,9 @@ export class Binder
 		var hidden = "_" + field;
 		// object[hidden] = object[field];
 
-		object.$define(hidden, { value : object[field] });
+		define(object, hidden, { value : object[field] });
 
-		object.$define(field, {
+		define(object, field, {
 			get : function()
 			{
 				return object[hidden];
@@ -19,7 +21,7 @@ export class Binder
 				object[hidden] = value;
 				trigger(value);
 			},
-			conf : true,
+			config : true,
 			enumer : true
 		});
 	}
@@ -28,7 +30,7 @@ export class Binder
 	{
 		return function(){
 			return fn.apply(context, arguments);
-		};
+		}
 	}
 
 	fields(data)
@@ -43,9 +45,9 @@ export class Binder
 			case "left" : this._attach(left, right, modifier, trigger); break;
 			case "right" : this._attach(right, left, modifier, trigger); break;
 			case "cross" :
-			this._attach(left, right, right.modifier, left.trigger);
-			this._attach(right, left, left.modifier, right.trigger);
-			break;
+				this._attach(left, right, right.modifier, left.trigger);
+				this._attach(right, left, left.modifier, right.trigger);
+				break;
 		}
 	}
 
@@ -71,7 +73,7 @@ export class Binder
 	_genGetSet(object, field, trigger)
 	{
 		var self = this,
-		hidden = "_" + field;
+			hidden = "_" + field;
 
 		if (!(hidden in object))
 		{
@@ -81,14 +83,14 @@ export class Binder
 				trigger : trigger
 			}
 
-			object.$define( field, {
+			define(object, field, {
 				get : function(){
 					return object[hidden].value;
 				},
 				set : function(value){
 					self._setData(object, field, value);
 				},
-				conf : true,
+				config : true,
 				enumer : true
 			});
 		}
@@ -142,3 +144,7 @@ export class Binder
 		});
 	}
 }
+
+var bind = new Binder();
+
+export {bind}

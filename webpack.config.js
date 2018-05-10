@@ -1,6 +1,6 @@
-var path = require('path').resolve(__dirname, 'src'),
+var path = require('path').resolve(__dirname, 'result'),
 	UglifyJsPlugin = require('uglifyjs-webpack-plugin'),
-	output = "epsilon",
+	output = "dew",
 	babel = {
 		test: /\.js$/,
 		use: { loader: 'babel-loader?presets[]=env' }

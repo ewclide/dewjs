@@ -1,9 +1,9 @@
 {
-  "name": "epsilon",
+  "name": "dew",
   "version": "1.0.0",
   "description": "open source javascript library",
   "author": "ewclide",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "babel-core": "^6.25.0",
     "babel-loader": "^7.1.2",

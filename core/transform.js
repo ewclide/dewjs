@@ -1,3 +1,5 @@
+import {object} from './object';
+
 var defaults = {
 	units : {
 		perspective : "px",
@@ -29,9 +31,9 @@ export class Transform
 		var self = this;
 
 		this.element = element;
-		this._actions = defaults.actions.$clone(true);
-		this._units = defaults.units.$clone();
-		this._settings = defaults.settings.$clone();
+		this._actions = object(defaults.actions).clone(true);
+		this._units = object(defaults.units).clone();
+		this._settings = object(defaults.settings).clone();
 	}
 
 	apply(data)
@@ -49,7 +51,9 @@ export class Transform
 			transform = "";
 
         if (settings.origin)
-            this.element.css({ "transform-origin" : settings.origin[0] + units.origin + " " + settings.origin[1] + units.origin });
+            this.element.css({
+            	"transform-origin" : settings.origin[0] + units.origin + " " + settings.origin[1] + units.origin
+            });
 
         if (!settings.backface)
             this.element.css({ "backface-visibility" : "hidden" });
@@ -89,7 +93,7 @@ export class Transform
 	units(data)
 	{
 		if (data.reset) this.reset.units();
-		if (data) this._units.$join.left(data);
+		if (data) object(this._units).joinLeft(data);
 	}
 
 	settings(data)
@@ -122,30 +126,26 @@ export class Transform
 		});
 	}
 
-	get reset()
+	reset()
 	{
-		var self = this;
+		this._actions = object(defaults.actions).clone(true);
+		this._units = object(defaults.units).clone();
+		this._settings = object(defaults.settings).clone();
+	}
 
-		return {
-			units : function()
-			{
-				self._units = defaults.units.$clone();
-			},
-			actions : function()
-			{
-				self._actions = defaults.actions.$clone(true);
-			},
-			settings : function()
-			{
-				self._settings = defaults.settings.$clone();
-			},
-			full : function()
-			{
-				self._actions = defaults.actions.$clone(true);
-				self._units = defaults.units.$clone();
-				self._settings = defaults.settings.$clone();
-			}
-		}
+	resetUnits()
+	{
+		this._units = object(defaults.units).clone();
+	}
+
+	resetActions()
+	{
+		this._actions = object(defaults.actions).clone(true);
+	}
+
+	resetSettings()
+	{
+		this._settings = object(defaults.settings).clone();
 	}
 
 	_build(actions, units)

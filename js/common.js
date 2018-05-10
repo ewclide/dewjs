@@ -1,6 +1,23 @@
-'use strict';
+var hello = $html.create("h1").text("Hello world!");
+$html.ready(function(){
+	$html.body.append(hello);
+});
 
-/*class Block
+/*
+var arr = [ "4-5 t", "3-7.5 t", "3", "7-8,5 t", "12 - 20.5 t", "12 - 20 t"];
+
+log(Dew.array(arr).smartSort());
+
+var one = [ "a", "b", "c", "d", "f"],
+	two = [ "a", "b", "c", "d", "e"];
+
+log(Dew.array(one).difference(two));
+log(Dew.array(one).subtract(two));
+log(Dew.array(one).compare(two));
+*/
+
+/*
+class Block
 {
 	constructor(options)
 	{
@@ -8,7 +25,7 @@
 
 		this.settings = {};
 
-		this.$init({
+		Dew.object(this).init(options, {
 			height: { type: "number", required: true, root: self.settings },
 			width: {
 				type: "number",
@@ -16,22 +33,78 @@
 				def: 150,
 				attr: {
 					element: options.element,
-					prefix: "data-",
 					only: true
 				},
 				filter: function(value) {
 					return value * 2;
 				}
 			}
-		}, options, true);
+		}, {
+			errors : true
+		});
 	}
-};*/
+}
 
-/*var info = {
-	template : "<p><b>{name}</b> : {test}<span>{age}</span></p>",
+class Block2
+{
+	constructor(options)
+	{
+		this.settings = {};
+
+		Dew.object(this).init(options, {
+			width  : 100,
+			height : 200,
+			length : 300,
+			count  : 400
+		},
+		{
+			// required : true,
+			type   : "number",
+			root   : this.settings,
+			errors : true,
+			attr   : {
+				element : options.element
+			}
+		});
+	}
+}
+
+$html.ready(function(){
+
+log.time
+	var block = new Block({
+		element : "#root",
+		height : 250
+	});
+log.timeEnd
+
+log.time
+	var block2 = new Block2({
+		element : "#root",
+		// length : 300,
+		// count  : 400
+	});
+log.timeEnd
+
+log(block, block2)
+
+})
+*/
+
+/*
+var info = {
+	template : `
+	<div class="info-block">
+		<p><b>{name}</b> : {test} <span>{age}</span></p>
+		{node[1]}
+	</div>`,
 	content : {
 		name : "name",
 		age : "age"
+	},
+	nodes : {
+		tag : "input",
+		attrs : { type : "text" }
 	}
 }
 
@@ -42,7 +115,7 @@ var form = {
 	}
 }
 
-var theName = {
+var nameInput = {
 	tag : "input",
 	value : "def",
 	attrs : {
@@ -52,31 +125,35 @@ var theName = {
 	events : {
 		input : function(e)
 		{
-			info.content.name = theName.value;
+			info.content.name = nameInput.value;
 		}
 	},
 	bind : [ "value", "transform" ]
 }
 
-var theAge = theName.$clone(true);
-	theAge.attrs.name = "age";
-	theAge.events = {
+var ageInput = Dew.object(nameInput).clone(true);
+	ageInput.attrs.name = "age";
+	ageInput.events = {
 		input : function(e)
 		{
-			info.content.age = theAge.value;
+			info.content.age = ageInput.value;
 		}
 	}
 
-form.nodes = [theName, theAge];
+form.nodes = [nameInput, ageInput];
 
 $html.ready(function(){
 
-	$html.select(".app").json.append(form);
-	$html.select(".app").json.append(info);
+log.time();
+	$html.select(".app").jsonAppend(form);
+	$html.select(".app").jsonAppend(info);
+log.timeEnd()
 
-});*/
+});
+*/
 
-/*$html.ready(function(){
+/*
+$html.ready(function(){
 
 	var quad = $html.select(".quad");
 	var circle = $html.select(".circle");
@@ -100,51 +177,133 @@ $html.ready(function(){
 
 	log(trans)
 
-});*/
+});
+*/
 
-/*class Test extends $Async
+/*class Loader extends Dew.Async
 {
 	constructor(bar)
 	{
 		super();
 
-		var some = $http.get('/assets/bigimage.bmp', { progress : false }),
-			some2 = $http.get('/assets/bigimage.bmp', { progress : false }),
-			some3 = $http.get('/assets/bigimage.bmp', { progress : false }),
-			some4 = $http.get('/assets/bigimage.bmp', { progress : false })
+		var img1  = Dew.http.get('/assets/bigimage.bmp', { progress : true }),
+			img2  = Dew.http.get('/assets/bigimage.bmp', { progress : true });
 
-		this.on.progress(function(e){
+		this.progress(function(e){
 			bar.transform({
 				scale : e.ready
 			})
 		});
 
-		this.wait([some, some2, some3, some4]).then(function(){
+		this.wait([img1, img2], true).then(function(){
 			log("loaded!")
+			log(img1)
 		});
 	}
 }
 
 $html.ready(function(){
 
-	var loadBar = $html.create("div", "loadbar");
-		loadBar.css({
+	var bar = $html.create("div", "loadbar");
+		bar.css({
 			height : "5px",
 			width  : "100%",
-			background : "#0070ff"
+			background : "#0070ff",
+			transition : "500ms"
 		})
-		loadBar.transform({
+		bar.transform({
 			scale : 0.01,
 			settings : {
-				transition : 500,
 				origin : [0, 0]
 			}
 		})
 
-	$html.body.append(loadBar);
+	$html.body.append(bar);
 
-	var test = new Test(loadBar);
+	var loader = new Loader(bar);
+});
+*/
 
+// Dew.url.setParams({ t : 2, s : "test" });
+
+/*
+var info = {
+	names : ["max", "alex", "serj"],
+	title : "names-list"
+};
+
+var template = `
+<h2><& :=title &></h2>
+<ul class="names-list">
+<& names.forEach( name => { &>
+	<li class="item"><& :=name &></li>
+<& }) &>
+<& //echo(names) &>
+</ul>
+`;
+
+// log.time
+var tpl = new Dew.Template(template, ["title", "names"]);
+// log.timeEnd
+
+var input = $html.create("input", { type : "text" }),
+	add = $html.create("button").text("add")
+	.eventAttach("click", function(e){
+		var value = input.value();
+		if (value && !Dew.array(info.names).have(value))
+		{
+			info.names.push(input.value());
+			input.value("");
+			tpl.draw(info);
+		}
+	});
+
+$html.ready(function(){
+	log.time
+	$html.select(".app").tplAppend(tpl).draw(info);
+	$html.select("#in").append(input);
+	$html.select("#in").append(add);
+	// tpl.appendTo(".app").draw(info);
+	log.timeEnd
+});
+*/
+
+/*
+var jq = $html.script("https://code.jquery.com/jquery-3.2.1.min.js")
+	.ready(function(){
+		log("jquery loaded!");
+		// $(".imload").css("background", "red");
+	});
+
+$html.ready(function(){
+	log("dom loaded!");
 });*/
 
-$url.setParams({ t : 2, s : "test" });
+/*
+var test = {
+	a : { b : "b", c : "c" },
+	b : { d : "d", e : "e" },
+}
+
+log.time
+var clone2 = Dew.object(test).clone(true);
+log.timeEnd
+
+test.a.b = "BBBBB"
+
+log(clone2)
+*/
+
+
+/* need to add */
+/*
+
+2. $html.mutation update
+   $html.append(array)
+
+3. animation
+
+4. Async refresh
+
+*/
+

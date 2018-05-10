@@ -1,12 +1,15 @@
+import {megaFunction} from './functions';
+
 export class Async
 {
 	constructor()
 	{
 		this._async_waiters  = [];
 		this._async_status   = 0;
-		this._async_calls    = superFunction();
-		this._async_fails    = superFunction();
-		this._async_progress = superFunction();
+		this._async_calls    = megaFunction();
+		this._async_fails    = megaFunction();
+		this._async_progress = megaFunction();
+		this._async_refresh  = megaFunction();
 		this._async_ready    = 0;
 		this._async_subReady = false;
 		this._async_strict   = true;
@@ -14,16 +17,15 @@ export class Async
 		this._async_error    = null;
 	}
 
-	resolve(data)
+	resolve(data, saveData = false)
 	{
 		if (this._canStart)
 		{
 			this._async_status = 1;
 
-			if (this._async_ready != 1)
-				this.shift({ ready : 1 });
-
-			if (data) this._async_data = data;
+			if (this._async_ready != 1) this.shift({ ready : 1 });
+			if (saveData) this._async_data = data;
+			
 			this._async_calls(data);
 		}
 	}
@@ -33,7 +35,7 @@ export class Async
 		if (this._canStart)
 		{
 			this._async_status = -1;
-			if (error) this._async_error = error;
+			this._async_error = error;
 			this._async_fails(error);
 		}
 	}
@@ -66,29 +68,28 @@ export class Async
 
 	progress(fn)
 	{
-		self._async_progress.push(fn);
+		this._async_progress.push(fn);
 	}
 
 	shift(data)
 	{
-		if (typeof data.ready != "number" || data.ready < 0 || data.ready > 1)
-			data.ready = 0;
-
-		this._async_ready = data.ready;
-		this._async_progress(data);
+		if (typeof data.ready == "number" || data.ready >= 0 || data.ready <= 1)
+		{
+			this._async_ready = data.ready;
+			this._async_progress(data);
+		}
 	}
 
 	wait(list, progress = false)
 	{
-		var self = this,
-			count = 0;
+		var self = this, count = 0;
 
 		if (Array.isArray(list))
 			list.forEach( item => {
 				if (item.isAsync) this._async_waiters.push(item);
 			});
 
-		else (list.isAsync)
+		else if (list.isAsync)
 			this._async_waiters.push(list);
 
 		if (this._async_waiters.length)
@@ -97,7 +98,10 @@ export class Async
 				waiter.then(function(){
 					count++;
 					if (count == self._async_waiters.length)
-						(self._async_subReady = true, self.resolve());
+					{
+						self._async_subReady = true;
+						self.resolve();
+					}
 				});
 
 				waiter.except(function(){
@@ -105,12 +109,12 @@ export class Async
 				});
 
 				if (progress)
-					waiter.then(function(){
+					waiter.progress(function(){
 						self.shift({ ready : self._calcProgress() });
 					})
 			});
 
-		else self.resolve();
+		else this.resolve();
 
 		return this;
 	}
@@ -127,10 +131,36 @@ export class Async
 		return ready;
 	}
 
+	reset()
+	{
+		this._async_status   = 0;
+		this._async_ready    = 0;
+		this._async_subReady = false;
+		this._async_data     = null;
+		this._async_error    = null;
+	}
+
+	onRefresh(fn)
+	{
+		this._async_refresh.push(fn);
+	}
+
+	refresh()
+	{
+		if (this._async_refresh.count)
+		{
+			this.reset();
+			this._async_refresh();
+		}
+		
+		this._async_waiters.forEach( waiter => {
+			if (waiter.failed) waiter.refresh()
+		});
+	}
+
 	set strict(value)
 	{
-		if (typeof value == "bolean")
-			this._async_strict = value;
+		if (typeof value == "bolean") this._async_strict = value;
 	}
 
 	get strict()

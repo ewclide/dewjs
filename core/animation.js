@@ -1,14 +1,14 @@
 ﻿export class Animation
 {
-	constructor(element)
+	constructor($element)
 	{
 		var self = this;
 
-		this.element = element;
+		this.$element = $element;
 		this._keyFrames = [];
 		this._stop = false;
 		this._currentKeyFrame = 0;
-		this.element.event.attach("transitionend", function(){
+		this.$element.eventAttach("transitionend", function(){
 			if (!self._stop)
 			{
 				self._currentKeyFrame++;
@@ -42,17 +42,15 @@
 
 	keys(keys, settings)
 	{
-		var self = this;
-
 		if (Array.isArray(keys))
-			keys.forEach(function(key){
-				var keyFrame = new KeyFrame(self.elements, key, settings);
-				self._keyFrames.push(keyFrame);
+			keys.forEach( key => {
+				var keyFrame = new KeyFrame(this.elements, key, settings);
+				this._keyFrames.push(keyFrame);
 			});
 
 		else
 		{
-			var keyFrame = new KeyFrame(self.elements, keys, settings);
+			var keyFrame = new KeyFrame(this.elements, keys, settings);
 				this._keyFrames.push(keyFrame);
 		}
 	}
@@ -77,24 +75,16 @@
 
 class KeyFrame
 {
-	constructor(element, keys, settings)
+	constructor($element, keys, settings)
 	{
-		this.element = element;
-
-		// this.transform = element.transform();
-		// this.transKeys = keys.transform;
-		// 				 keys.transform = undefined;
-
+		this.$element = $element;
 		this.keys = keys;
 		this.settings = settings;
 	}
 
 	apply()
 	{
-		// if (this.transKeys)
-		// 	this.transform.apply(this.transKeys);
 
-		this.element.css(this.keys);
 	}
 }
 

@@ -1,25 +1,41 @@
 ﻿import './polyfill';
-import './define';
-import './object-define';
-import './array-define';
-import './functions';
-
-import {Binder} from './binder';
+import * as func from './functions';
+import {array} from'./array';
+import {object} from './object';
+import {Template} from './template';
+import {bind} from './binder';
 import {Async} from './async';
 import {Timer} from './timer';
 import {HTTP} from './http';
-import {URLmanager} from'./url';
+import {URLmanager} from './url';
 import {$html} from './html';
 
-window.$define({
-	$Async : Async,
-	$Timer : Timer
+var Dew = {
+	megaFunction : func.megaFunction,
+	define  : func.define,
+	istype  : func.istype,
+	strconv : func.strconv,
+	random  : func.random,
+
+	object : object,
+	array  : array,
+
+	Template : Template,
+	Async : Async,
+	Timer : Timer,
+
+	bind  : bind,
+	http  : new HTTP,
+	url   : new URLmanager
+}
+
+func.define(window, "log", {
+	value  : func.log,
+	config : false,
+	write  : false
 });
 
-window.$define({
-	$bind  : new Binder,
-	$http  : new HTTP,
-	$url   : new URLmanager,
-	$html  : $html
-});
-
+func.define(window, {
+	Dew   : Dew,
+	$html : $html
+})

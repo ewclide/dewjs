@@ -78,7 +78,7 @@ export class URLmanager
 			if (typeof data[i] == "number" || typeof data[i] == "string" || typeof data[i] == "boolean")
 				request += i + "=" + data[i] + "&";
 		}
-
+			
 		return request.slice(0, -1);
 	}
 }
