@@ -286,12 +286,6 @@ exports.array = array;
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function haveInArray(array, value) {
-	for (var i = 0; i < array.length; i++) {
-		if (array[i] == value) return true;
-	}return false;
-}
-
 var Methods = function () {
 	function Methods(arr) {
 		_classCallCheck(this, Methods);
@@ -362,30 +356,28 @@ var Methods = function () {
 	}, {
 		key: "removeValue",
 		value: function removeValue(value) {
+			var _this2 = this;
+
 			var list = [].concat(value);
 
-			for (var i = 0; i < this.arr.length; i++) {
-				if (haveInArray(list, this.arr[i])) {
-					this.arr.splice(i, 1);
-					i--;
-				} else continue;
-			}return list;
+			list.forEach(function (item) {
+				var index = _this2.arr.indexOf(item);
+				if (index != -1) _this2.arr.splice(index, 1);
+			});
+
+			return list;
 		}
 	}, {
 		key: "removeIndex",
 		value: function removeIndex(index) {
-			var saved = [],
-			    list = [].concat(index);
+			var _this3 = this;
 
-			for (var i = 0; i < list.length; i++) {
-				var indexDel = list[i];
-				if (indexDel < this.arr.length && indexDel >= 0) {
-					saved.push(this.arr[indexDel]);
-					this.arr[indexDel] = undefined;
-				}
-			}
+			var list = [].concat(index),
+			    saved = list.map(function (i) {
+				return _this3.arr[i];
+			});
 
-			this.removeValue();
+			this.removeValue(saved);
 
 			return saved;
 		}

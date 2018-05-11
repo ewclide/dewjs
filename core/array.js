@@ -59,30 +59,20 @@ class Methods
 	{
 		var list = [].concat(value);
 
-		for (var i = 0; i < this.arr.length; i++)
-			if (list.includes(this.arr[i]))
-				(this.arr.splice(i, 1) && i--);
-			else continue;
+		list.forEach( item => {
+			var index = this.arr.indexOf(item);
+			if (index != -1) this.arr.splice(index, 1);
+		});
 
 		return list;
 	}
 
 	removeIndex(index)
 	{
-		var saved = [],
-			list  = [].concat(index);
+		var list = [].concat(index),
+			saved = list.map( i => this.arr[i] );
 
-		for (var i = 0; i < list.length; i++)
-		{
-			var indexDel = list[i];
-			if (indexDel < this.arr.length && indexDel >= 0)
-			{
-				saved.push(this.arr[indexDel]);
-				this.arr[indexDel] = undefined;
-			}
-		}
-
-		this.removeValue();
+		this.removeValue(saved);
 
 		return saved;
 	}
