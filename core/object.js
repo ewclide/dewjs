@@ -2,11 +2,22 @@ import {InitObject} from './init-object';
 import {printErrors} from './functions';
 import {array} from './array';
 
-function join(list, method)
+function join(list, target, method)
 {
     Array.isArray(list)
-    ? list.forEach( item => method(item) )
-    : method(list)
+    ? list.forEach( item => method(item, target) )
+    : method(list, target)
+}
+
+function defineProperties(from, to)
+{
+    for (var i in from)
+    {
+        var desc = Object.getOwnPropertyDescriptor(from, i);
+        desc ? Object.defineProperty(to, i, desc) : to[i] = from[i];
+    }
+
+    return to;
 }
 
 function clone(object, full)
@@ -48,37 +59,38 @@ class Methods
         : clone(this.target, full)
     }
 
-    joinLeft(list)
+    joinLeft(list, copy)
     {
-        join(list, item => {
-            for (var i in item)
-                i in this.target && (this.target[i] = item[i]);
-        })
-        
-        return this;
-    }
+        var target = copy ? Object.assign({}, this.target) : this.target;
 
-    joinRight(list)
-    {
-        join(list, item => {
+        join(list, target, (item, target) => {
             for (var i in item)
-                !(i in this.target) && (this.target[i] = item[i]);
+                i in target && (target[i] = item[i]);
         });
 
-        return this;
+        return target;
     }
 
-    joinFull(list)
+    joinRight(list, copy)
     {
-        join(list,  item => {
+        var target = copy ? Object.assign({}, this.target) : this.target;
+
+        join(list, target, (item, target) => {
             for (var i in item)
-                this.target[i] = item[i];
+                !(i in target) && (target[i] = item[i]);
         });
 
-        return this;
+        return target;
     }
 
-    init(values, settings, common = {})
+    joinFull(list, copy)
+    {
+        var target = copy ? defineProperties(this.target, {}) : this.target;
+        join(list, target, item => defineProperties(item, target));
+        return target;
+    }
+
+    init(values, settings, common = { errors : true })
     {
         if (!values || !settings)
         {

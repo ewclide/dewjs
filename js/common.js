@@ -280,20 +280,98 @@ $html.ready(function(){
 });*/
 
 /*
-var test = {
-	a : { b : "b", c : "c" },
-	b : { d : "d", e : "e" },
+var list = {
+	obj : { a : "A", b : "B", c : "C" },
+	arr : [ 1, 2, 3, 4, 5 ],
 }
 
-log.time
-var clone2 = Dew.object(test).clone(true);
-log.timeEnd
+var full = Dew.object(list).clone(true),
+	simple = Dew.object(list).clone();
 
-test.a.b = "BBBBB"
+list.obj.b = "changed B"
 
-log(clone2)
+log(full)
+log(simple)
 */
 
+/*
+var defaults = {
+		width : 100,
+		height: 100,
+		count : 5,
+		color : "red"
+	}
+
+	class Some
+	{
+		constructor(settings)
+		{
+			this.settings = Dew.object(defaults).joinLeft(settings, true);
+		}
+	}
+
+	var some = new Some({
+		width : 200,
+		height: 200,
+		other : "other"
+	});
+
+	log(some)
+	log(defaults)
+*/
+
+/*
+var defaults = {
+		width : 100,
+		height: 100,
+		count : 5,
+		color : "red"
+	}
+
+class Some
+{
+	constructor(settings)
+	{
+		this.settings = Dew.object(settings).joinRight(defaults);
+	}
+}
+
+var some = new Some({
+	width : 200,
+	height: 200,
+	other : "other"
+});
+
+log(some)
+log(defaults)
+*/
+
+/*
+var panel = {
+	width : 250,
+	height: 100,
+	get area()
+	{
+		return this.width * this.height;
+	}
+}
+
+var ring = {
+	radius : 50,
+	get diameter()
+	{
+		return this.radius * 2;
+	},
+	get length()
+	{
+		return 2 * Math.PI * this.radius;
+	}
+}
+
+var form = Dew.object(panel).joinFull(ring, true);
+
+log(form)
+*/
 
 /* need to add */
 /*

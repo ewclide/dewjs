@@ -620,10 +620,19 @@ var _array = __webpack_require__(1);
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function join(list, method) {
+function join(list, target, method) {
     Array.isArray(list) ? list.forEach(function (item) {
-        return method(item);
-    }) : method(list);
+        return method(item, target);
+    }) : method(list, target);
+}
+
+function defineProperties(from, to) {
+    for (var i in from) {
+        var desc = Object.getOwnPropertyDescriptor(from, i);
+        desc ? Object.defineProperty(to, i, desc) : to[i] = from[i];
+    }
+
+    return to;
 }
 
 function _clone(object, full) {
@@ -654,47 +663,43 @@ var Methods = function () {
         }
     }, {
         key: 'joinLeft',
-        value: function joinLeft(list) {
-            var _this = this;
+        value: function joinLeft(list, copy) {
+            var target = copy ? Object.assign({}, this.target) : this.target;
 
-            join(list, function (item) {
+            join(list, target, function (item, target) {
                 for (var i in item) {
-                    i in _this.target && (_this.target[i] = item[i]);
+                    i in target && (target[i] = item[i]);
                 }
             });
 
-            return this;
+            return target;
         }
     }, {
         key: 'joinRight',
-        value: function joinRight(list) {
-            var _this2 = this;
+        value: function joinRight(list, copy) {
+            var target = copy ? Object.assign({}, this.target) : this.target;
 
-            join(list, function (item) {
+            join(list, target, function (item, target) {
                 for (var i in item) {
-                    !(i in _this2.target) && (_this2.target[i] = item[i]);
+                    !(i in target) && (target[i] = item[i]);
                 }
             });
 
-            return this;
+            return target;
         }
     }, {
         key: 'joinFull',
-        value: function joinFull(list) {
-            var _this3 = this;
-
-            join(list, function (item) {
-                for (var i in item) {
-                    _this3.target[i] = item[i];
-                }
+        value: function joinFull(list, copy) {
+            var target = copy ? defineProperties(this.target, {}) : this.target;
+            join(list, target, function (item) {
+                return defineProperties(item, target);
             });
-
-            return this;
+            return target;
         }
     }, {
         key: 'init',
         value: function init(values, settings) {
-            var common = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+            var common = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : { errors: true };
 
             if (!values || !settings) {
                 (0, _functions.printErrors)("Dew object.init error: missing required arguments (values or settings)");
