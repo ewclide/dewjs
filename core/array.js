@@ -74,16 +74,6 @@ class Methods
 
 		return this.removeValue(saved);
 	}
-
-	removeFirst()
-	{
-		return this.arr.splice(0, 1)[0];
-	}
-
-	removeLast()
-	{
-		return this.arr.pop();
-	}
 }
 
 export function array(arr)

@@ -80,9 +80,6 @@ exports.strconv = strconv;
 exports.random = random;
 exports.megaFunction = megaFunction;
 exports.log = log;
-
-var _array = __webpack_require__(1);
-
 function printErrors(data) {
 	var source = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
 
@@ -200,11 +197,11 @@ random.key = function () {
 	    specials = "!?@#$%^&*()*-_+=[]{}<>.,;:/'\"\\",
 	    chars = "";
 
-	if ((0, _array.array)(types).have("all")) chars = lower + upper + numbers + specials;else {
-		if ((0, _array.array)(types).have("lower")) chars += lower;
-		if ((0, _array.array)(types).have("upper")) chars += upper;
-		if ((0, _array.array)(types).have("numbers")) chars += numbers;
-		if ((0, _array.array)(types).have("specials")) chars += specials;
+	if (types.indexOf("all") != -1) chars = lower + upper + numbers + specials;else {
+		if (types.indexOf("lower") != -1) chars += lower;
+		if (types.indexOf("upper") != -1) chars += upper;
+		if (types.indexOf("numbers") != -1) chars += numbers;
+		if (types.indexOf("specials") != -1) chars += specials;
 	}
 
 	var limit = chars.length - 1,
@@ -218,49 +215,71 @@ random.key = function () {
 	return result;
 };
 
-function _evoke(shell, id, data) {
-	var index = 0;
-
-	if (typeof id == "number") index = id;else if (typeof id == "string") index = shell._names[id];
-
-	if (typeof index != "number") return printErrors('Dew megaFunction error: undefined function name "' + id + '"');else if (index >= shell._handlers.length || index < 0) return printErrors('Dew megaFunction error: undefined index "' + index + '"');
-
-	shell._data = data;
-	return shell._handlers[index](data);
-}
-
 function megaFunction(fn, name) {
 	var shell = function shell(data, order) {
 		shell._data = data;
 
-		!order ? shell._handlers.forEach(function (handler) {
-			return handler(data);
+		order ? shell._handlers.forEach(function (handler) {
+			return shell._data = handler(shell._data);
 		}) : shell._handlers.forEach(function (handler) {
-			return shell._data = handler(shell.data);
+			return handler(data);
 		});
+
+		// if (order) for (var i in shell._handlers) shell._data = shell._handlers[i](shell.data);
+		// else for (var i in shell._handlers) shell._handlers[i](data);
+
+		return shell._data;
 	};
 
 	shell._handlers = [];
-	shell._names = {};
+	shell._names = Object.create(null);
+	// shell._handlers = Object.create(null);
 	shell._data;
 	shell.count = 0;
 
 	shell.push = function (fn, name) {
 		if (typeof fn == "function") {
+			// if (!name) name = shell.count;
+			// shell._handlers["_" + name] = fn;
+			if (name) shell._names[name] = shell.count;
 			shell._handlers.push(fn);
-			shell.count = shell._handlers.length;
+			shell.count++;
 		}
-
-		if (name) shell._names[name] = shell._handlers.length - 1;
 	};
 
-	shell.remove = function (fn) {
-		(0, _array.array)(shell._handlers).removeValue(fn);
-		shell.count = shell._handlers.length;
+	shell.remove = function (id) {
+		var index = id,
+		    handler;
+
+		if (typeof id == "string") {
+			index = shell._names[id];
+			delete shell._names[id];
+		}
+
+		if (shell._handlers[index]) {
+			shell._handlers.splice(index, 1);
+			shell.count--;
+		}
+
+		// var name = "_" + id;
+		// if (shell._handlers[name])
+		// {
+		// 	delete shell._handlers[name];
+		// 	shell.count--;
+		// }
 	};
 
 	shell.evoke = function (id, data) {
-		_evoke(shell, id, name);
+		var index = id,
+		    handler;
+
+		if (typeof id == "string") index = shell._names[id];
+
+		if (shell._handlers[index]) return shell._handlers[index](data);else printErrors('Dew megaFunction evoke error: undefined function with id "' + id + '"');
+
+		// var fn = shell._handlers["_" + id];
+		// if (fn) return fn(data)
+		// else printErrors('Dew megaFunction evoke error: undefined function with id "' + id + '"');
 	};
 
 	if (fn) shell.push(fn, name);
@@ -284,135 +303,6 @@ define(log, "timeEnd", {
 
 /***/ }),
 /* 1 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-exports.array = array;
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var Methods = function () {
-	function Methods(arr) {
-		_classCallCheck(this, Methods);
-
-		this.arr = arr;
-	}
-
-	_createClass(Methods, [{
-		key: "have",
-		value: function have(value) {
-			var index = this.arr.indexOf(value);
-			return index == -1 ? false : { index: index };
-		}
-	}, {
-		key: "copy",
-		value: function copy() {
-			return this.arr.slice().sort();
-		}
-	}, {
-		key: "subtract",
-		value: function subtract(arr) {
-			return this.arr.filter(function (item) {
-				return arr.indexOf(item) < 0;
-			});
-		}
-	}, {
-		key: "difference",
-		value: function difference(arr) {
-			var _this = this;
-
-			return this.arr.filter(function (item) {
-				return arr.indexOf(item) < 0;
-			}).concat(arr.filter(function (item) {
-				return _this.arr.indexOf(item) < 0;
-			}));
-		}
-	}, {
-		key: "compare",
-		value: function compare(arr) {
-			return this.arr.length == arr.length && this.arr.every(function (item, index) {
-				return item === arr[index];
-			});
-		}
-	}, {
-		key: "smartSort",
-		value: function smartSort() {
-			return this.arr.sort(function (prev, next) {
-
-				var result = 0,
-				    regClear = /[^\d+\-,\.]/gm;
-
-				prev = prev.replace(",", ".").replace(regClear, "").split("-").map(function (item) {
-					return +item;
-				});
-				next = next.replace(",", ".").replace(regClear, "").split("-").map(function (item) {
-					return +item;
-				});
-
-				if (prev[0] > next[0]) result = 1;else if (prev[0] < next[0]) result = -1;else if (prev[0] == next[0]) {
-					prev = prev.length > 1 ? prev[1] : prev[0];
-					next = next.length > 1 ? next[1] : next[0];
-					result = prev > next ? 1 : -1;
-				}
-
-				return result;
-			});
-		}
-	}, {
-		key: "removeValue",
-		value: function removeValue(value) {
-			var _this2 = this;
-
-			var list = [].concat(value);
-
-			list.forEach(function (item, i) {
-				var index = _this2.arr.indexOf(item);
-				index != -1 ? _this2.arr.splice(index, 1) : list.splice(i, 1);
-			});
-
-			return list;
-		}
-	}, {
-		key: "removeIndex",
-		value: function removeIndex(index) {
-			var _this3 = this;
-
-			var list = [].concat(index),
-			    saved = list.map(function (i) {
-				return _this3.arr[i];
-			});
-
-			return this.removeValue(saved);
-		}
-	}, {
-		key: "removeFirst",
-		value: function removeFirst() {
-			return this.arr.splice(0, 1)[0];
-		}
-	}, {
-		key: "removeLast",
-		value: function removeLast() {
-			return this.arr.pop();
-		}
-	}]);
-
-	return Methods;
-}();
-
-function array(arr) {
-	return new Methods(arr);
-}
-
-/***/ }),
-/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -607,6 +497,125 @@ var Async = exports.Async = function () {
 }();
 
 /***/ }),
+/* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+exports.array = array;
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Methods = function () {
+	function Methods(arr) {
+		_classCallCheck(this, Methods);
+
+		this.arr = arr;
+	}
+
+	_createClass(Methods, [{
+		key: "have",
+		value: function have(value) {
+			var index = this.arr.indexOf(value);
+			return index == -1 ? false : { index: index };
+		}
+	}, {
+		key: "copy",
+		value: function copy() {
+			return this.arr.slice().sort();
+		}
+	}, {
+		key: "subtract",
+		value: function subtract(arr) {
+			return this.arr.filter(function (item) {
+				return arr.indexOf(item) < 0;
+			});
+		}
+	}, {
+		key: "difference",
+		value: function difference(arr) {
+			var _this = this;
+
+			return this.arr.filter(function (item) {
+				return arr.indexOf(item) < 0;
+			}).concat(arr.filter(function (item) {
+				return _this.arr.indexOf(item) < 0;
+			}));
+		}
+	}, {
+		key: "compare",
+		value: function compare(arr) {
+			return this.arr.length == arr.length && this.arr.every(function (item, index) {
+				return item === arr[index];
+			});
+		}
+	}, {
+		key: "smartSort",
+		value: function smartSort() {
+			return this.arr.sort(function (prev, next) {
+
+				var result = 0,
+				    regClear = /[^\d+\-,\.]/gm;
+
+				prev = prev.replace(",", ".").replace(regClear, "").split("-").map(function (item) {
+					return +item;
+				});
+				next = next.replace(",", ".").replace(regClear, "").split("-").map(function (item) {
+					return +item;
+				});
+
+				if (prev[0] > next[0]) result = 1;else if (prev[0] < next[0]) result = -1;else if (prev[0] == next[0]) {
+					prev = prev.length > 1 ? prev[1] : prev[0];
+					next = next.length > 1 ? next[1] : next[0];
+					result = prev > next ? 1 : -1;
+				}
+
+				return result;
+			});
+		}
+	}, {
+		key: "removeValue",
+		value: function removeValue(value) {
+			var _this2 = this;
+
+			var list = [].concat(value);
+
+			list.forEach(function (item, i) {
+				var index = _this2.arr.indexOf(item);
+				index != -1 ? _this2.arr.splice(index, 1) : list.splice(i, 1);
+			});
+
+			return list;
+		}
+	}, {
+		key: "removeIndex",
+		value: function removeIndex(index) {
+			var _this3 = this;
+
+			var list = [].concat(index),
+			    saved = list.map(function (i) {
+				return _this3.arr[i];
+			});
+
+			return this.removeValue(saved);
+		}
+	}]);
+
+	return Methods;
+}();
+
+function array(arr) {
+	return new Methods(arr);
+}
+
+/***/ }),
 /* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -627,7 +636,7 @@ var _initObject = __webpack_require__(8);
 
 var _functions = __webpack_require__(0);
 
-var _array = __webpack_require__(1);
+var _array = __webpack_require__(2);
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -912,11 +921,11 @@ var _jsonConverter = __webpack_require__(14);
 
 var _transform = __webpack_require__(15);
 
-var _async = __webpack_require__(2);
+var _async = __webpack_require__(1);
 
 var _functions = __webpack_require__(0);
 
-var _array = __webpack_require__(1);
+var _array = __webpack_require__(2);
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -1541,7 +1550,7 @@ var _functions = __webpack_require__(0);
 
 var func = _interopRequireWildcard(_functions);
 
-var _array = __webpack_require__(1);
+var _array = __webpack_require__(2);
 
 var _object = __webpack_require__(3);
 
@@ -1549,7 +1558,7 @@ var _template = __webpack_require__(9);
 
 var _binder = __webpack_require__(4);
 
-var _async = __webpack_require__(2);
+var _async = __webpack_require__(1);
 
 var _timer = __webpack_require__(10);
 
@@ -1995,7 +2004,7 @@ exports.HTTP = undefined;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _async = __webpack_require__(2);
+var _async = __webpack_require__(1);
 
 var _functions = __webpack_require__(0);
 
@@ -2221,7 +2230,7 @@ var _htmlTools = __webpack_require__(5);
 
 var _stylesheet = __webpack_require__(16);
 
-var _async = __webpack_require__(2);
+var _async = __webpack_require__(1);
 
 var _functions = __webpack_require__(0);
 

@@ -1,5 +1,3 @@
-import {array} from './array';
-
 export function printErrors(data, source = true)
 {
 	var error = "";
@@ -131,14 +129,14 @@ random.key = function(length = 15, types = ["all"])
 		specials = "!?@#$%^&*()*-_+=[]{}<>.,;:/'\"\\",
 		chars = "";
 
-	if (array(types).have("all")) 
+	if (types.indexOf("all") != -1 ) 
 		chars = lower + upper + numbers + specials;
 	else
 	{
-		if (array(types).have("lower")) chars += lower;
-		if (array(types).have("upper")) chars += upper;
-		if (array(types).have("numbers")) chars += numbers;
-		if (array(types).have("specials")) chars += specials;
+		if (types.indexOf("lower") != -1 ) chars += lower;
+		if (types.indexOf("upper") != -1 ) chars += upper;
+		if (types.indexOf("numbers") != -1 ) chars += numbers;
+		if (types.indexOf("specials") != -1 ) chars += specials;
 	}
 
 	var limit = chars.length - 1,
@@ -153,36 +151,21 @@ random.key = function(length = 15, types = ["all"])
 	return result;
 }
 
-function _evoke(shell, id, data)
-{
-	var index = 0;
-
-	if (typeof id == "number") index = id
-		else if (typeof id == "string") index = shell._names[id];
-
-	if (typeof index != "number")
-		return printErrors('Dew megaFunction error: undefined function name "' + id + '"');
-
-	else if (index >= shell._handlers.length || index < 0)
-		return printErrors('Dew megaFunction error: undefined index "' + index + '"');
-
-	shell._data = data;
-	return shell._handlers[index](data);
-}
-
 export function megaFunction(fn, name)
 {
 	var shell = function(data, order)
 	{
 		shell._data = data;
 
-		!order
-		? shell._handlers.forEach( handler => handler(data) )
-		: shell._handlers.forEach( handler => shell._data = handler(shell.data) )
+		order
+		? shell._handlers.forEach( handler => shell._data = handler(shell._data) )
+		: shell._handlers.forEach( handler => handler(data) );
+
+		return shell._data;
 	}
 
 	shell._handlers = [];
-	shell._names = {};
+	shell._names = Object.create(null);
 	shell._data;
 	shell.count = 0;
 
@@ -190,22 +173,37 @@ export function megaFunction(fn, name)
 	{
 		if (typeof fn == "function")
 		{
+			if (name) shell._names[name] = shell.count;
 			shell._handlers.push(fn);
-			shell.count = shell._handlers.length;
+			shell.count++;
 		}
-
-		if (name) shell._names[name] = shell._handlers.length - 1;
 	}
 
-	shell.remove = function(fn)
+	shell.remove = function(id)
 	{
-		array(shell._handlers).removeValue(fn);
-		shell.count = shell._handlers.length;
+		var index = id, handler;
+
+		if (typeof id == "string")
+		{
+			index = shell._names[id];
+			delete shell._names[id];
+		}
+
+		if (shell._handlers[index])
+		{
+			shell._handlers.splice(index, 1);
+			shell.count--;
+		}
 	}
 
 	shell.evoke = function(id, data)
 	{
-		_evoke(shell, id, name);
+		var index = id, handler;
+
+		if (typeof id == "string") index = shell._names[id];
+
+		if (shell._handlers[index]) return shell._handlers[index](data);
+		else printErrors('Dew megaFunction evoke error: undefined function with id "' + id + '"');
 	}
 
 	if (fn) shell.push(fn, name);
