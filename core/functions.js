@@ -153,7 +153,24 @@ random.key = function(length = 15, types = ["all"])
 	return result;
 }
 
-export function megaFunction(fn)
+function _evoke(shell, id, data)
+{
+	var index = 0;
+
+	if (typeof id == "number") index = id
+		else if (typeof id == "string") index = shell._names[id];
+
+	if (typeof index != "number")
+		return printErrors('Dew megaFunction error: undefined function name "' + id + '"');
+
+	else if (index >= shell._handlers.length || index < 0)
+		return printErrors('Dew megaFunction error: undefined index "' + index + '"');
+
+	shell._data = data;
+	return shell._handlers[index](data);
+}
+
+export function megaFunction(fn, name)
 {
 	var shell = function(data, order)
 	{
@@ -165,16 +182,19 @@ export function megaFunction(fn)
 	}
 
 	shell._handlers = [];
+	shell._names = {};
 	shell._data;
 	shell.count = 0;
 
-	shell.push = function(fn)
+	shell.push = function(fn, name)
 	{
 		if (typeof fn == "function")
 		{
 			shell._handlers.push(fn);
 			shell.count = shell._handlers.length;
 		}
+
+		if (name) shell._names[name] = shell._handlers.length - 1;
 	}
 
 	shell.remove = function(fn)
@@ -183,13 +203,12 @@ export function megaFunction(fn)
 		shell.count = shell._handlers.length;
 	}
 
-	shell.index = function(i, data)
+	shell.evoke = function(id, data)
 	{
-		shell._data = data;
-		shell._handlers[i](data);
+		_evoke(shell, id, name);
 	}
 
-	if (fn) shell.push(fn);
+	if (fn) shell.push(fn, name);
 
 	return shell;
 }
