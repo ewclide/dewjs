@@ -38,8 +38,11 @@ $html.ready(function(){
 });
 ```
 
-Enjoy your use!
+-------------
+Thank's for using.  
+Developed by **Ustinov Maxim** - [ewclide][4]
 
-[1]: http://dew.ewclide.com/download/dew.min.js  "download"
-[2]: http://dew.ewclide.com/support/  "support"
-[3]: http://dew.ewclide.com/documentation/  "documentation"
+[1]: https://dew.ewclide.com/download/dew.min.js  "download"
+[2]: https://dew.ewclide.com/support/  "support"
+[3]: https://dew.ewclide.com/documentation/  "documentation"
+[4]: https://vk.com/ewclide  "ewclide"

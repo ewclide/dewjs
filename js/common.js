@@ -16,6 +16,13 @@ log(Dew.array(one).subtract(two));
 log(Dew.array(one).compare(two));
 */
 
+var one = [ "a", "b", "c" ],
+	two = [ "c", "d", "e" ];
+
+var sub = Dew.array(one).subtract(two);
+
+log(sub)
+
 /*
 class Block
 {
