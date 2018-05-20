@@ -59,9 +59,9 @@ class Methods
 	{
 		var list = [].concat(value);
 
-		list.forEach( item => {
+		list.forEach( (item, i) => {
 			var index = this.arr.indexOf(item);
-			if (index != -1) this.arr.splice(index, 1);
+			index != -1 ? this.arr.splice(index, 1) : list.splice(i, 1);
 		});
 
 		return list;
@@ -72,9 +72,7 @@ class Methods
 		var list = [].concat(index),
 			saved = list.map( i => this.arr[i] );
 
-		this.removeValue(saved);
-
-		return saved;
+		return this.removeValue(saved);
 	}
 
 	removeFirst()

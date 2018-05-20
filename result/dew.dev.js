@@ -373,9 +373,9 @@ var Methods = function () {
 
 			var list = [].concat(value);
 
-			list.forEach(function (item) {
+			list.forEach(function (item, i) {
 				var index = _this2.arr.indexOf(item);
-				if (index != -1) _this2.arr.splice(index, 1);
+				index != -1 ? _this2.arr.splice(index, 1) : list.splice(i, 1);
 			});
 
 			return list;
@@ -390,9 +390,7 @@ var Methods = function () {
 				return _this3.arr[i];
 			});
 
-			this.removeValue(saved);
-
-			return saved;
+			return this.removeValue(saved);
 		}
 	}, {
 		key: "removeFirst",
