@@ -79,20 +79,20 @@ class Block2
 
 $html.ready(function(){
 
-log.time
+log.time()
 	var block = new Block({
 		element : "#root",
 		height : 250
 	});
-log.timeEnd
+log.timeEnd()
 
-log.time
+log.time()
 	var block2 = new Block2({
 		element : "#root",
 		// length : 300,
 		// count  : 400
 	});
-log.timeEnd
+log.timeEnd()
 
 log(block, block2)
 
@@ -250,9 +250,9 @@ var template = `
 </ul>
 `;
 
-// log.time
+// log.time()
 var tpl = new Dew.Template(template, ["title", "names"]);
-// log.timeEnd
+// log.timeEnd()
 
 var input = $html.create("input", { type : "text" }),
 	add = $html.create("button").text("add")
@@ -267,12 +267,12 @@ var input = $html.create("input", { type : "text" }),
 	});
 
 $html.ready(function(){
-	log.time
+	log.time()
 	$html.select(".app").tplAppend(tpl).draw(info);
 	$html.select("#in").append(input);
 	$html.select("#in").append(add);
 	// tpl.appendTo(".app").draw(info);
-	log.timeEnd
+	log.timeEnd()
 });
 */
 

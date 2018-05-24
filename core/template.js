@@ -1,4 +1,4 @@
-import {printErrors}  from './functions';
+import {printErr}  from './functions';
 
 export class Template
 {
@@ -25,10 +25,10 @@ export class Template
         try {
             this._htl
             ? this._htl.html(this._render(data))
-            : printErrors('Dew template error: "it must be append to DOM before drawing"');
+            : printErr('Dew template error: "it must be append to DOM before drawing"');
         }
         catch (e) {
-            printErrors('Dew template error: "' + e.message + '"');
+            printErr('Dew template error: "' + e.message + '"');
         }
     }
 
@@ -53,7 +53,7 @@ export class Template
             this._render = new Function("data", fn);
         }
         catch (e) {
-            printErrors('Dew template error: "' + e.message + '"');
+            printErr('Dew template error: "' + e.message + '"');
             this._render = function(){};
         }
     }

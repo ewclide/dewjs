@@ -1,11 +1,11 @@
-export function printErrors(data, source = true)
+export function printErr(data, source = true)
 {
 	var error = "";
 
 	if (Array.isArray(data) && data.length)
 	{
 		error += data.title || "Error list";
-		if (source) error += " ( " + getSourceLog() + " )";
+		if (source) error += " ( " + _getSourceLog() + " )";
 		error += ":\n";
 
 		data.forEach( message => error += "   - " + message + "\n" );
@@ -13,7 +13,7 @@ export function printErrors(data, source = true)
 	else if (typeof data == "string")
 	{
 		error += data;
-		if (source) error += " ( " + getSourceLog() + " )";
+		if (source) error += " ( " + _getSourceLog() + " )";
 	}
 	else return false;
 
@@ -22,7 +22,7 @@ export function printErrors(data, source = true)
 	return false;
 }
 
-function getSourceLog()
+function _getSourceLog()
 {
 	var stack = (new Error()).stack.split("\n");
 
@@ -82,7 +82,7 @@ export function istype(value, type)
 			case "function" : return typeof value == "function" ? true : false;
 			case "DOM"      : return value !== undefined && value.nodeType == 1 ? true : false;
 			case "HTMLTools": return value.isHTMLTools ? true : false;
-			default : printErrors('the type "' + type + '" is unknown!'); return false;
+			default : printErr('the type "' + type + '" is unknown!'); return false;
 		}
 
 	else
@@ -114,7 +114,7 @@ export function strconv(value)
 
 		return value.replace(/^\s+|\s+$/g, "");
 	}
-	else printErrors('strconv function error : type of argument must be "string"')
+	else printErr('strconv function error : type of argument must be "string"')
 }
 
 export function random(min = 0, max = 9999999)
@@ -203,7 +203,7 @@ export function megaFunction(fn, name)
 		if (typeof id == "string") index = shell._names[id];
 
 		if (shell._handlers[index]) return shell._handlers[index](data);
-		else printErrors('Dew megaFunction evoke error: undefined function with id "' + id + '"');
+		else printErr('Dew megaFunction evoke error: undefined function with id "' + id + '"');
 	}
 
 	if (fn) shell.push(fn, name);

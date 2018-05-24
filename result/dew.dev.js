@@ -73,21 +73,21 @@
 Object.defineProperty(exports, "__esModule", {
 	value: true
 });
-exports.printErrors = printErrors;
+exports.printErr = printErr;
 exports.define = define;
 exports.istype = istype;
 exports.strconv = strconv;
 exports.random = random;
 exports.megaFunction = megaFunction;
 exports.log = log;
-function printErrors(data) {
+function printErr(data) {
 	var source = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
 
 	var error = "";
 
 	if (Array.isArray(data) && data.length) {
 		error += data.title || "Error list";
-		if (source) error += " ( " + getSourceLog() + " )";
+		if (source) error += " ( " + _getSourceLog() + " )";
 		error += ":\n";
 
 		data.forEach(function (message) {
@@ -95,7 +95,7 @@ function printErrors(data) {
 		});
 	} else if (typeof data == "string") {
 		error += data;
-		if (source) error += " ( " + getSourceLog() + " )";
+		if (source) error += " ( " + _getSourceLog() + " )";
 	} else return false;
 
 	console.error(error);
@@ -103,7 +103,7 @@ function printErrors(data) {
 	return false;
 }
 
-function getSourceLog() {
+function _getSourceLog() {
 	var stack = new Error().stack.split("\n");
 
 	for (var i = 0; i < stack.length; i++) {
@@ -158,7 +158,7 @@ function istype(value, type) {
 		case "HTMLTools":
 			return value.isHTMLTools ? true : false;
 		default:
-			printErrors('the type "' + type + '" is unknown!');return false;
+			printErr('the type "' + type + '" is unknown!');return false;
 	} else {
 		if (typeof value == "number") return "number";else if (typeof value == "string") return "string";else if (typeof value == "boolean") return "boolean";else if (Array.isArray(value)) return "array";else if (typeof value == "function") return "function";else if (value.nodeType == 1) return "DOM";else if (value.isHTMLTools) return "HTMLTools";else return "object";
 	}
@@ -178,7 +178,7 @@ function strconv(value) {
 		if (value.search(/\{.+\}/g) != -1) return JSON.parse(value);
 
 		return value.replace(/^\s+|\s+$/g, "");
-	} else printErrors('strconv function error : type of argument must be "string"');
+	} else printErr('strconv function error : type of argument must be "string"');
 }
 
 function random() {
@@ -262,7 +262,7 @@ function megaFunction(fn, name) {
 
 		if (typeof id == "string") index = shell._names[id];
 
-		if (shell._handlers[index]) return shell._handlers[index](data);else printErrors('Dew megaFunction evoke error: undefined function with id "' + id + '"');
+		if (shell._handlers[index]) return shell._handlers[index](data);else printErr('Dew megaFunction evoke error: undefined function with id "' + id + '"');
 	};
 
 	if (fn) shell.push(fn, name);
@@ -705,7 +705,7 @@ var Methods = function () {
             var common = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : { errors: true };
 
             if (!values || !settings) {
-                (0, _functions.printErrors)("Dew object.init error: missing required arguments (values or settings)");
+                (0, _functions.printErr)("Dew object.init error: missing required arguments (values or settings)");
                 return false;
             }
 
@@ -718,7 +718,7 @@ var Methods = function () {
                 } else init.checkout(field, settings[field], values[field]);
             }
 
-            return init.errors.length ? (common.errors && (0, _functions.printErrors)(init.errors), false) : true;
+            return init.errors.length ? (common.errors && (0, _functions.printErr)(init.errors), false) : true;
         }
     }]);
 
@@ -1813,9 +1813,9 @@ var Template = exports.Template = function () {
         key: 'draw',
         value: function draw(data) {
             try {
-                this._htl ? this._htl.html(this._render(data)) : (0, _functions.printErrors)('Dew template error: "it must be append to DOM before drawing"');
+                this._htl ? this._htl.html(this._render(data)) : (0, _functions.printErr)('Dew template error: "it must be append to DOM before drawing"');
             } catch (e) {
-                (0, _functions.printErrors)('Dew template error: "' + e.message + '"');
+                (0, _functions.printErr)('Dew template error: "' + e.message + '"');
             }
         }
     }, {
@@ -1836,7 +1836,7 @@ var Template = exports.Template = function () {
             try {
                 this._render = new Function("data", fn);
             } catch (e) {
-                (0, _functions.printErrors)('Dew template error: "' + e.message + '"');
+                (0, _functions.printErr)('Dew template error: "' + e.message + '"');
                 this._render = function () {};
             }
         }
@@ -2064,7 +2064,7 @@ var HTTP = exports.HTTP = function () {
 
 			request.onerror = function () {
 				result.reject(this.statusText);
-				(0, _functions.printErrors)("http.send ajax error (" + this.status + "): " + this.statusText);
+				(0, _functions.printErr)("http.send ajax error (" + this.status + "): " + this.statusText);
 			};
 
 			if (options.progress) request.onprogress = function (e) {
@@ -2097,7 +2097,7 @@ var HTTP = exports.HTTP = function () {
 				for (var key in data) {
 					formData.append(key, data[key]);
 				}
-			} else (0, _functions.printErrors)("http.post must have some data!");
+			} else (0, _functions.printErr)("http.post must have some data!");
 
 			return {
 				to: function to(path, options) {
@@ -2113,7 +2113,7 @@ var HTTP = exports.HTTP = function () {
 
 						request.onerror = function () {
 							async.reject(this.statusText);
-							(0, _functions.printErrors)("$http.send ajax error (" + this.status + "): " + this.statusText);
+							(0, _functions.printErr)("$http.send ajax error (" + this.status + "): " + this.statusText);
 						};
 
 						if (options.progress) request.onprogress = function (e) {
@@ -2125,7 +2125,7 @@ var HTTP = exports.HTTP = function () {
 						};
 
 						return async;
-					} else (0, _functions.printErrors)("http.post must have some path!");
+					} else (0, _functions.printErr)("http.post must have some path!");
 				}
 			};
 		}
@@ -2320,7 +2320,7 @@ $html.parseXML = function (data) {
         return xml;
     };else errors += 'Error in parseXML: not supported by this browser!';
 
-    return !errors ? parse(data) : (0, _functions.printErrors)(errors);
+    return !errors ? parse(data) : (0, _functions.printErr)(errors);
 };
 
 $html.cascad = function () {

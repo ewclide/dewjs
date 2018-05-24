@@ -1,4 +1,4 @@
-import {strconv, istype, printErrors} from './functions';
+import {strconv, istype, printErr} from './functions';
 
 export class InitObject
 {

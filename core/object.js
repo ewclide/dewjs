@@ -1,5 +1,5 @@
 import {InitObject} from './init-object';
-import {printErrors} from './functions';
+import {printErr} from './functions';
 import {array} from './array';
 
 function join(list, target, method)
@@ -94,7 +94,7 @@ class Methods
     {
         if (!values || !settings)
         {
-            printErrors("Dew object.init error: missing required arguments (values or settings)");
+            printErr("Dew object.init error: missing required arguments (values or settings)");
             return false;
         }
 
@@ -111,7 +111,7 @@ class Methods
         }
 
         return init.errors.length
-        ? (common.errors && printErrors(init.errors), false) : true;
+        ? (common.errors && printErr(init.errors), false) : true;
     }
 }
 

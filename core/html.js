@@ -1,7 +1,7 @@
 import {HTMLTools}  from './html-tools';
 import {StyleSheet} from './stylesheet';
 import {Async} from './async';
-import {printErrors} from './functions';
+import {printErr} from './functions';
 
 var proto = HTMLTools.prototype,
     $html = new HTMLTools(document);
@@ -96,7 +96,7 @@ $html.parseXML = function(data)
 
     else errors += 'Error in parseXML: not supported by this browser!';
 
-    return !errors ? parse(data) : printErrors(errors);
+    return !errors ? parse(data) : printErr(errors);
 }
 
 $html.cascad = function()

@@ -1,5 +1,5 @@
 import {Async} from './async';
-import {printErrors} from './functions';
+import {printErr} from './functions';
 import {object} from './object';
 
 export class HTTP
@@ -34,7 +34,7 @@ export class HTTP
 		
 		request.onerror = function(){
 			result.reject(this.statusText);
-			printErrors("http.send ajax error (" + this.status + "): " + this.statusText);
+			printErr("http.send ajax error (" + this.status + "): " + this.statusText);
 		}
 
 		if (options.progress)
@@ -70,7 +70,7 @@ export class HTTP
 			formData = new FormData();
 			for (var key in data) formData.append(key, data[key]);
 		}
-		else printErrors("http.post must have some data!");
+		else printErr("http.post must have some data!");
 
 		return {
 			to : function(path, options)
@@ -88,7 +88,7 @@ export class HTTP
 
 					request.onerror = function(){
 						async.reject(this.statusText);
-						printErrors("$http.send ajax error (" + this.status + "): " + this.statusText);
+						printErr("$http.send ajax error (" + this.status + "): " + this.statusText);
 					}
 
 					if (options.progress)
@@ -102,7 +102,7 @@ export class HTTP
 
 					return async;
 				}
-				else printErrors("http.post must have some path!");
+				else printErr("http.post must have some path!");
 			}
 		}
 	}
