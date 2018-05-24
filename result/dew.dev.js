@@ -225,22 +225,16 @@ function megaFunction(fn, name) {
 			return handler(data);
 		});
 
-		// if (order) for (var i in shell._handlers) shell._data = shell._handlers[i](shell.data);
-		// else for (var i in shell._handlers) shell._handlers[i](data);
-
 		return shell._data;
 	};
 
 	shell._handlers = [];
 	shell._names = Object.create(null);
-	// shell._handlers = Object.create(null);
 	shell._data;
 	shell.count = 0;
 
 	shell.push = function (fn, name) {
 		if (typeof fn == "function") {
-			// if (!name) name = shell.count;
-			// shell._handlers["_" + name] = fn;
 			if (name) shell._names[name] = shell.count;
 			shell._handlers.push(fn);
 			shell.count++;
@@ -260,13 +254,6 @@ function megaFunction(fn, name) {
 			shell._handlers.splice(index, 1);
 			shell.count--;
 		}
-
-		// var name = "_" + id;
-		// if (shell._handlers[name])
-		// {
-		// 	delete shell._handlers[name];
-		// 	shell.count--;
-		// }
 	};
 
 	shell.evoke = function (id, data) {
@@ -276,10 +263,6 @@ function megaFunction(fn, name) {
 		if (typeof id == "string") index = shell._names[id];
 
 		if (shell._handlers[index]) return shell._handlers[index](data);else printErrors('Dew megaFunction evoke error: undefined function with id "' + id + '"');
-
-		// var fn = shell._handlers["_" + id];
-		// if (fn) return fn(data)
-		// else printErrors('Dew megaFunction evoke error: undefined function with id "' + id + '"');
 	};
 
 	if (fn) shell.push(fn, name);
@@ -1045,18 +1028,18 @@ var HTMLTools = exports.HTMLTools = function (_Async) {
         value: function visible() {
             var maxDepth = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 3;
 
-            return this._checkVisible(this.elements[0], maxDepth);
+            var found = this._findHidden(this.elements[0], maxDepth, 0);
+            return found ? { element: found } : {};
         }
     }, {
-        key: '_checkVisible',
-        value: function _checkVisible(element, maxDepth) {
-            var depth = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+        key: '_findHidden',
+        value: function _findHidden(element, maxDepth, depth) {
+            if (depth >= maxDepth) return false;
 
-            if (depth >= maxDepth) return result;
+            var result = false,
+                parent = element.parentElement || element.parentNode || null;
 
-            var parent = element.parentElement || element.parentNode || null;
-
-            if (parent && parent != document) this.display(parent) ? result = parent : result = this._checkVisible(parent, maxDepth, depth++);
+            if (parent && parent != document) result = !this.display(parent) ? parent : this._findHidden(parent, maxDepth, ++depth);
 
             return result;
         }
@@ -1067,7 +1050,7 @@ var HTMLTools = exports.HTMLTools = function (_Async) {
 
             if (!element) element = this.elements[0];
 
-            element.style.display ? display = element.style.display : display = element.getComputedStyle().display;
+            element.style.display ? display = element.style.display : display = getComputedStyle(element).display;
 
             return display == "none" ? false : true;
         }
@@ -1282,8 +1265,10 @@ var HTMLTools = exports.HTMLTools = function (_Async) {
     }, {
         key: 'width',
         value: function width(value) {
+            var units = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "px";
+
             if (typeof value == "number") this.elements.forEach(function (element) {
-                return element.style.width = value + "px";
+                return element.style.width = value + units;
             });else return this.elements[0].offsetWidth;
 
             return this;
@@ -1291,12 +1276,47 @@ var HTMLTools = exports.HTMLTools = function (_Async) {
     }, {
         key: 'height',
         value: function height(value) {
+            var units = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "px";
+
             if (typeof value == "number") this.elements.forEach(function (element) {
-                return element.style.height = value + "px";
+                return element.style.height = value + units;
             });else return this.elements[0].offsetHeight;
 
             return this;
         }
+    }, {
+        key: 'offsetParent',
+        value: function offsetParent() {
+            var element = this.elements[0];
+            return {
+                top: element.offsetTop,
+                left: element.offsetLeft
+            };
+        }
+    }, {
+        key: 'offsetWindow',
+        value: function offsetWindow() {
+            var offset = this.elements[0].getBoundingClientRect();
+
+            return {
+                top: offset.top,
+                left: offset.left,
+                right: offset.right,
+                bottom: offset.bottom
+            };
+        }
+    }, {
+        key: 'offsetScroll',
+        value: function offsetScroll() {
+            var element = this.elements[0];
+            return {
+                top: element.scrollTop,
+                left: element.scrollLeft
+            };
+        }
+    }, {
+        key: 'scroll',
+        value: function scroll() {}
     }, {
         key: 'wrap',
         value: function wrap(classList) {
@@ -1363,7 +1383,7 @@ var HTMLTools = exports.HTMLTools = function (_Async) {
         key: 'getAttr',
         value: function getAttr(name) {
             var element = this.elements[0],
-                result = false;
+                result;
 
             if (element !== undefined && element.nodeType == 1 && element.attributes.length) {
                 result = {};
@@ -1456,10 +1476,8 @@ var HTMLTools = exports.HTMLTools = function (_Async) {
         value: function eventDetach(name) {
             var list = $html._eventList[this._id];
 
-            if (name) {
-                for (var event in list) {
-                    this.elements.unsetAttr(event.substr(0, 2));
-                }
+            if (name) for (var event in list) {
+                this.elements.unsetAttr(event.substr(0, 2));
             } else $html._eventList[this._id][name] = undefined;
 
             return this;

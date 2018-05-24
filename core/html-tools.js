@@ -133,19 +133,19 @@ export class HTMLTools extends Async
 
     visible(maxDepth = 3)
     {
-        return this._checkVisible(this.elements[0], maxDepth);
+        var found = this._findHidden(this.elements[0], maxDepth, 0)
+        return found ? { element : found } : {}
     }
 
-    _checkVisible(element, maxDepth, depth = 0)
+    _findHidden(element, maxDepth, depth)
     {
-        if (depth >= maxDepth) return result;
+        if (depth >= maxDepth) return false;
 
-        var parent = element.parentElement || element.parentNode || null;
+        var result = false,
+            parent = element.parentElement || element.parentNode || null;
 
         if (parent && parent != document)
-            this.display(parent)
-            ? result = parent
-            : result = this._checkVisible(parent, maxDepth, depth++);
+            result = !this.display(parent) ? parent : this._findHidden(parent, maxDepth, ++depth);
 
         return result;
     }
@@ -158,7 +158,7 @@ export class HTMLTools extends Async
 
         element.style.display
         ? display = element.style.display
-        : display = element.getComputedStyle().display;
+        : display = getComputedStyle(element).display;
 
         return display == "none" ? false : true;
     }
@@ -375,24 +375,59 @@ export class HTMLTools extends Async
         return this;
     }
 
-    width(value)
+    width(value, units = "px")
     {
         if (typeof value == "number")
-            this.elements.forEach( element => element.style.width = value + "px" );
+            this.elements.forEach( element => element.style.width = value + units );
 
         else return this.elements[0].offsetWidth;
 
         return this;
     }
 
-    height(value)
+    height(value, units = "px")
     {
         if (typeof value == "number")
-            this.elements.forEach( element => element.style.height = value + "px" );
+            this.elements.forEach( element => element.style.height = value + units );
 
         else return this.elements[0].offsetHeight;
 
         return this;
+    }
+
+    offsetParent()
+    {
+        var element = this.elements[0];
+        return {
+            top  : element.offsetTop,
+            left : element.offsetLeft
+        }
+    }
+
+    offsetWindow()
+    {
+        var offset = this.elements[0].getBoundingClientRect();
+
+        return {
+            top    : offset.top,
+            left   : offset.left,
+            right  : offset.right,
+            bottom : offset.bottom
+        }
+    }
+
+    offsetScroll()
+    {
+        var element = this.elements[0];
+        return {
+            top  : element.scrollTop,
+            left : element.scrollLeft
+        }
+    }
+
+    scroll()
+    {
+
     }
 
     wrap(classList)
@@ -461,7 +496,7 @@ export class HTMLTools extends Async
     getAttr(name)
     {
         var element = this.elements[0],
-            result = false;
+            result;
 
         if (element !== undefined && element.nodeType == 1 && element.attributes.length)
         {
@@ -566,10 +601,9 @@ export class HTMLTools extends Async
         var list = $html._eventList[this._id];
 
         if (name)
-        {
             for (var event in list)
                 this.elements.unsetAttr(event.substr(0, 2));
-        }
+        
         else $html._eventList[this._id][name] = undefined;
 
         return this;
@@ -590,9 +624,8 @@ export class HTMLTools extends Async
 
     each(fn)
     {
-        this.elements.forEach(
-            (element, index, array) => fn($html.convert(element), index, array)
-        );
+        this.elements.forEach((element, index, array) =>
+            fn($html.convert(element), index, array));
 
         return this;
     }
