@@ -77,6 +77,7 @@ exports.printErr = printErr;
 exports.define = define;
 exports.istype = istype;
 exports.strconv = strconv;
+exports.jsonParse = jsonParse;
 exports.random = random;
 exports.megaFunction = megaFunction;
 exports.log = log;
@@ -175,10 +176,42 @@ function strconv(value) {
 				return strconv(val);
 			});
 		}
-		if (value.search(/\{.+\}/g) != -1) return JSON.parse(value);
+		if (value.search(/\{.+\}/g) != -1) return jsonParse(value);
 
 		return value.replace(/^\s+|\s+$/g, "");
 	} else printErr('strconv function error : type of argument must be "string"');
+}
+
+function jsonParse(str) {
+	var devs = '{}[],:',
+	    quot = '',
+	    word = '',
+	    isString = false,
+	    left = false,
+	    reg = /^[\s*"']+|['"\s*]+$/gm,
+	    result = '';
+
+	for (var i = 0; i < str.length; i++) {
+		if (isString && str[i] == quot) isString = false, i++;
+		if (str[i] == "'" || str[i] == '"') isString = true, quot = str[i], i++;
+
+		left = str[i] == ":";
+
+		if (devs.indexOf(str[i]) != -1 && !isString) {
+			word = word.replace(reg, '');
+
+			if (word) {
+				if (word == 'true') word = true;else if (word == 'false') word = false;
+
+				result += typeof word == 'boolean' && !left || +word && !left ? word : '"' + word + '"';
+			}
+
+			result += str[i];
+			word = '';
+		} else word += str[i];
+	}
+
+	return JSON.parse(result);
 }
 
 function random() {
@@ -1593,6 +1626,7 @@ var Dew = {
 	define: func.define,
 	istype: func.istype,
 	strconv: func.strconv,
+	jsonParse: func.jsonParse,
 	random: func.random,
 
 	object: _object.object,

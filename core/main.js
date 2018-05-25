@@ -12,10 +12,11 @@ import {$html} from './html';
 
 var Dew = {
 	megaFunction : func.megaFunction,
-	define  : func.define,
-	istype  : func.istype,
+	define : func.define,
+	istype : func.istype,
 	strconv : func.strconv,
-	random  : func.random,
+	jsonParse : func.jsonParse,
+	random : func.random,
 
 	object : object,
 	array  : array,
