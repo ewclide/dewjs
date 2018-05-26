@@ -101,11 +101,10 @@ log(block, block2)
 
 /*
 var info = {
-	template : `
-	<div class="info-block">
-		<p><b>{name}</b> : {test} <span>{age}</span></p>
-		{node[1]}
-	</div>`,
+	template : '<div class="info-block">'+
+		'<p><b>{name}</b> : {test} <span>{age}</span></p>'+
+		'{node[1]}'+
+	'</div>',
 	content : {
 		name : "name",
 		age : "age"
@@ -188,24 +187,27 @@ $html.ready(function(){
 });
 */
 
-/*class Loader extends Dew.Async
+/*
+class Loader extends Dew.Async
 {
 	constructor(bar)
 	{
 		super();
 
-		var img1  = Dew.http.get('/assets/bigimage.bmp', { progress : true }),
-			img2  = Dew.http.get('/assets/bigimage.bmp', { progress : true });
+		var imgList = [];
+
+		imgList.push(Dew.http.get('/assets/big.bmp', { progress : true }));
+		imgList.push(Dew.http.get('/assets/big.bmp', { progress : true }));
 
 		this.progress(function(e){
+			log(e)
 			bar.transform({
 				scale : e.ready
 			})
 		});
 
-		this.wait([img1, img2], true).then(function(){
+		this.wait(imgList, true).then(function(){
 			log("loaded!")
-			log(img1)
 		});
 	}
 }
@@ -240,15 +242,13 @@ var info = {
 	title : "names-list"
 };
 
-var template = `
-<h2><& :=title &></h2>
-<ul class="names-list">
-<& names.forEach( name => { &>
-	<li class="item"><& :=name &></li>
-<& }) &>
-<& //echo(names) &>
-</ul>
-`;
+var template = '<h2><& :=title &></h2>'+
+'<ul class="names-list">'+
+'<& names.forEach( name => { &>'+
+	'<li class="item"><& :=name &></li>'+
+'<& }) &>'+
+'<& //echo(names) &>'+
+'</ul>';
 
 // log.time()
 var tpl = new Dew.Template(template, ["title", "names"]);

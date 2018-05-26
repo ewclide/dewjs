@@ -2,10 +2,12 @@ export function printErr(data, source = true)
 {
 	var error = "";
 
+	if (source) source = _getSourceLog();
+
 	if (Array.isArray(data) && data.length)
 	{
 		error += data.title || "Error list";
-		if (source) error += " ( " + _getSourceLog() + " )";
+		if (source) error += " ( " + source + " )";
 		error += ":\n";
 
 		data.forEach( message => error += "   - " + message + "\n" );
@@ -13,7 +15,7 @@ export function printErr(data, source = true)
 	else if (typeof data == "string")
 	{
 		error += data;
-		if (source) error += " ( " + _getSourceLog() + " )";
+		if (source) error += " ( " + source + " )";
 	}
 	else return false;
 
@@ -24,7 +26,10 @@ export function printErr(data, source = true)
 
 function _getSourceLog()
 {
-	var stack = (new Error()).stack.split("\n");
+	var stack = (new Error()).stack;
+
+	if (stack) stack = stack.split("\n");
+	else return "";
 
 	for (var i = 0; i < stack.length; i++)
 		if (stack[i].search(/dew\.(min|dev)\.js|anonymous/g) == -1)
@@ -252,12 +257,5 @@ export function log()
 	console.log.apply(window, arguments);
 }
 
-define(log, "time", {
-	get : console.time,
-	set : function(){}
-});
-
-define(log, "timeEnd", {
-	get : console.timeEnd,
-	set : function(){}
-});
+log.time = console.time;
+log.timeEnd = console.timeEnd;

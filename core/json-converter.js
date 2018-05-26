@@ -155,8 +155,9 @@ export class JsonConverter
                             json._htl.eventAttach({
                                 input : function(e)
                                 {
-                                    json._value = e.srcElement.value;
-                                    json._htl.value(e.srcElement.value);
+                                    var target = e.srcElement || e.target;
+                                    json._value = target.value;
+                                    json._htl.value(target.value);
                                 }
                             });
                         break;
@@ -170,8 +171,9 @@ export class JsonConverter
                             json._htl.eventAttach({
                                 change : function(e)
                                 {
-                                    json._checked = e.srcElement.checked;
-                                    json._htl.checked(e.srcElement.checked);
+                                    var target = e.srcElement || e.target;
+                                    json._checked = target.checked;
+                                    json._htl.checked(target.checked);
                                 }
                             });
                         break;

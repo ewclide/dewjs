@@ -86,9 +86,11 @@ function printErr(data) {
 
 	var error = "";
 
+	if (source) source = _getSourceLog();
+
 	if (Array.isArray(data) && data.length) {
 		error += data.title || "Error list";
-		if (source) error += " ( " + _getSourceLog() + " )";
+		if (source) error += " ( " + source + " )";
 		error += ":\n";
 
 		data.forEach(function (message) {
@@ -96,7 +98,7 @@ function printErr(data) {
 		});
 	} else if (typeof data == "string") {
 		error += data;
-		if (source) error += " ( " + _getSourceLog() + " )";
+		if (source) error += " ( " + source + " )";
 	} else return false;
 
 	console.error(error);
@@ -105,7 +107,9 @@ function printErr(data) {
 }
 
 function _getSourceLog() {
-	var stack = new Error().stack.split("\n");
+	var stack = new Error().stack;
+
+	if (stack) stack = stack.split("\n");else return "";
 
 	for (var i = 0; i < stack.length; i++) {
 		if (stack[i].search(/dew\.(min|dev)\.js|anonymous/g) == -1) {
@@ -307,15 +311,8 @@ function log() {
 	console.log.apply(window, arguments);
 }
 
-define(log, "time", {
-	get: console.time,
-	set: function set() {}
-});
-
-define(log, "timeEnd", {
-	get: console.timeEnd,
-	set: function set() {}
-});
+log.time = console.time;
+log.timeEnd = console.timeEnd;
 
 /***/ }),
 /* 1 */
@@ -2529,8 +2526,9 @@ var JsonConverter = exports.JsonConverter = function () {
 
                         if (json.tag == "input" && json.attrs.type == "text" || json.tag == "textarea") json._htl.eventAttach({
                             input: function input(e) {
-                                json._value = e.srcElement.value;
-                                json._htl.value(e.srcElement.value);
+                                var target = e.srcElement || e.target;
+                                json._value = target.value;
+                                json._htl.value(target.value);
                             }
                         });
                         break;
@@ -2542,8 +2540,9 @@ var JsonConverter = exports.JsonConverter = function () {
 
                         if (json.tag == "input" && (json.attrs.type == "checkbox" || json.attrs.type == "radio")) json._htl.eventAttach({
                             change: function change(e) {
-                                json._checked = e.srcElement.checked;
-                                json._htl.checked(e.srcElement.checked);
+                                var target = e.srcElement || e.target;
+                                json._checked = target.checked;
+                                json._htl.checked(target.checked);
                             }
                         });
                         break;
