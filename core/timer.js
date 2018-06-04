@@ -1,4 +1,5 @@
 import {megaFunction} from './functions';
+import {bind} from './binder';
 
 export class Timer
 {
@@ -13,9 +14,9 @@ export class Timer
 		this.delay = options.delay || 0;
 		this.step = options.step || 0;
 
-		this.onTick   = megaFunction(options.onTick);
-		this.onStart  = megaFunction(options.onStart);
-		this.onStop   = megaFunction(options.onStop);
+		this._onTick   = megaFunction(options.onTick);
+		this._onStart  = megaFunction(options.onStart);
+		this._onStop   = megaFunction(options.onStop);
 
 		this._state = {
 			timePassed : 0,
@@ -42,94 +43,76 @@ export class Timer
 		}
 
 		if (this.count) this.count--;
-
-		this._tick = $bind.context(this._tick, this);
-		this._stepTick = $bind.context(this._stepTick, this);
 	}
 
-	get on()
+	onTick(fn)
 	{
-		var self = this;
-		return {
-			tick : function(fn)
-			{
-				self.onTick.push(fn);
-			},
-			start : function(fn)
-			{
-				self.onStart.push(fn);
-			},
-			stop : function(fn)
-			{
-				self.onStop.push(fn);
-			}
-		}
+		self._onTick.push(fn);
 	}
 
-	_common(time)
+	onStart(fn)
+	{
+		self._onStart.push(fn);
+	}
+
+	onStop(fn)
+	{
+		self._onStop.push(fn);
+	}
+
+	_stepTick(time)
 	{
 		this._state.timePassed = time - this._state.startTime;
 
 		if (this.count && this._state.iteration++ >= this.count)
 			this._stop = true;
-	}
 
-	_stepTick(time)
-	{
-		var self = this;
+		this._onTick(this._state.timePassed);
 
-		this._common(time);
-
-		this.onTick(this._state.timePassed);
-
-		if (!this._stop)
-			setTimeout(function(){
-				self._stepTick(performance.now());
-			}, this.step);
-
-		else this.stop();
+		this._stop ? this.stop() : setTimeout(() => this._stepTick(performance.now()), this.step);
 	}
 
 	_tick(time)
 	{
-		var state = this._state;
+		this._state.timePassed = time - this._state.startTime;
 
-		this._common(time);
-
-		if (this.duration && state.timePassed >= this.duration)
+		if (this.count && this._state.iteration++ >= this.count)
 			this._stop = true;
 
-		this.onTick(state.timePassed);
+		if (this.duration && this._state.timePassed >= this.duration)
+			this._stop = true;
 
-		if (!this._stop) requestAnimationFrame(this._tick);
-		else this.stop();
+		this._onTick(this._state.timePassed);
+
+		this._stop ? this.stop() : requestAnimationFrame(this._tick);
+	}
+
+	_infinityTick(time)
+	{
+		this._state.timePassed = time - this._state.startTime;
+		this._onTick(this._state.timePassed);
+		this._stop ? this.stop() : requestAnimationFrame(this._tick);
 	}
 
 	start()
 	{
-		var self = this;
-
 		this._stop = false;
-
-		if (self.delay)
-			setTimeout(function(){
-				self._startTimer();
-			}, self.delay);
-
-		else self._startTimer();
+		
+		this.delay
+		? setTimeout(() => this._start(), this.delay)
+		: this._start();
 	}
 
-	_startTimer()
+	_start()
 	{
-		var tick, state = this._state;
+		var tick = this.step ? this._stepTick : this._tick;
 
-		state.startTime = performance.now();
-		state.timePassed = 0;
+		tick = bind.context(tick, this);
 
-		if (this.onStart.count) this.onStart();
+		this._state.startTime = performance.now();
+		this._state.timePassed = 0;
 
-		if (this.step) tick = this._stepTick;
-		else tick = this._tick;
+		if (this._onStart.count) this._onStart();
 
 		tick(state.startTime);
 	}
@@ -145,7 +128,7 @@ export class Timer
 
 	stop()
 	{
-		if (this.onStop.count) this.onStop();
+		if (this._onStop.count) this._onStop();
 		this._stop = true;
 	}
 }

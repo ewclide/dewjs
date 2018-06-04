@@ -236,19 +236,19 @@ $html.ready(function(){
 
 // Dew.url.setParams({ t : 2, s : "test" });
 
-/*
+
 var info = {
 	names : ["max", "alex", "serj"],
 	title : "names-list"
 };
 
-var template = '<h2><& :=title &></h2>'+
-'<ul class="names-list">'+
-'<& names.forEach( name => { &>'+
-	'<li class="item"><& :=name &></li>'+
-'<& }) &>'+
-'<& //echo(names) &>'+
-'</ul>';
+var template = `<h2><& :=title &></h2>
+<ul class='names-list'>
+<& names.forEach( name => { &>
+	<li class="item"><& :=name &></li>
+<& }) &>
+<& //echo(names) &>
+</ul>`;
 
 // log.time()
 var tpl = new Dew.Template(template, ["title", "names"]);
@@ -274,7 +274,7 @@ $html.ready(function(){
 	// tpl.appendTo(".app").draw(info);
 	log.timeEnd()
 });
-*/
+
 
 /*
 var jq = $html.script("https://code.jquery.com/jquery-3.2.1.min.js")

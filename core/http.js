@@ -1,8 +1,9 @@
 import {Async} from './async';
 import {printErr} from './functions';
 import {object} from './object';
+import {url} from './url';
 
-export class HTTP
+class HTTP
 {
 	constructor()
 	{
@@ -25,7 +26,7 @@ export class HTTP
 		if (options.uncache)
 			!data ? data = { с : Math.random() } : data.с = Math.random();
 
-		request.open("GET", path + this.serialize(data), true);
+		request.open("GET", path + url.serialize(data), true);
 		request.send();
 
 		request.onload = function(){
@@ -47,17 +48,6 @@ export class HTTP
 			}
 
 		return result;
-	}
-
-	serialize(data)
-	{
-		var request = "?";
-
-		for (var i in data)
-			if (typeof data[i] == "number" || typeof data[i] == "string" || typeof data[i] == "boolean")
-				request += i + "=" + data[i] + "&";
-
-		return request.slice(0, -1);
 	}
 
 	post(data)
@@ -107,3 +97,6 @@ export class HTTP
 		}
 	}
 }
+
+export var http = new HTTP();
+

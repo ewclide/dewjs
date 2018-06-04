@@ -1,6 +1,8 @@
-﻿export class Animation
+﻿import {StyleSheet} from './stylesheet';
+
+export class Animation
 {
-	constructor($element)
+	constructor(element)
 	{
 		
 	}
@@ -10,12 +12,12 @@
 	
 	}
 
-	stop()
+	pause()
 	{
-	
+
 	}
 
-	reset()
+	start()
 	{
 	
 	}
@@ -25,7 +27,20 @@
 		
 	}
 
+	reset()
+	{
+	
+	}
+
 	addKey(key, settings)
+	{
+		
+	}
+}
+
+class Element
+{
+	constructor(element)
 	{
 		
 	}
@@ -33,7 +48,7 @@
 
 class KeyFrame
 {
-	constructor($element, keys, settings)
+	constructor(element, keys, settings)
 	{
 		
 	}
@@ -41,6 +56,14 @@ class KeyFrame
 	apply()
 	{
 
+	}
+}
+
+class CSSManager
+{
+	constructor()
+	{
+		
 	}
 }
 

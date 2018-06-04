@@ -6,8 +6,8 @@ import {Template} from './template';
 import {bind} from './binder';
 import {Async} from './async';
 import {Timer} from './timer';
-import {HTTP} from './http';
-import {URLmanager} from './url';
+import {http} from './http';
+import {url} from './url';
 import {$html} from './html';
 
 var Dew = {
@@ -26,8 +26,8 @@ var Dew = {
 	Timer : Timer,
 
 	bind  : bind,
-	http  : new HTTP,
-	url   : new URLmanager
+	http  : http,
+	url   : url
 }
 
 func.define(window, "log", {

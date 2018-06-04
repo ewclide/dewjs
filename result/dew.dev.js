@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 6);
+/******/ 	return __webpack_require__(__webpack_require__.s = 7);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -645,7 +645,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
 exports.object = object;
 
-var _initObject = __webpack_require__(8);
+var _initObject = __webpack_require__(9);
 
 var _functions = __webpack_require__(0);
 
@@ -916,6 +916,149 @@ exports.bind = bind;
 
 /***/ }),
 /* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Url = function () {
+	function Url() {
+		_classCallCheck(this, Url);
+
+		this._search = this._getSearch(location.search);
+		this._path = this._getPath(location.pathname);
+		this._strPath = location.pathname;
+		this._strSearch = location.search;
+	}
+
+	_createClass(Url, [{
+		key: "_getSearch",
+		value: function _getSearch(search) {
+			var result = {};
+
+			if (search) {
+				search = search.replace("?", "").split("&");
+				search.forEach(function (p) {
+					var p = p.split("=");
+					result[p[0].replace("-", "_")] = p[1];
+				});
+			}
+
+			return result;
+		}
+	}, {
+		key: "_getPath",
+		value: function _getPath(path) {
+			return path.replace(/^\/|\/$/g, "").split("/");
+		}
+	}, {
+		key: "changeState",
+		value: function changeState() {
+			history.replaceState(null, document.title, this._strPath + this._strSearch);
+		}
+	}, {
+		key: "addState",
+		value: function addState() {
+			history.pushState(null, document.title, this._strPath + this._strSearch);
+		}
+	}, {
+		key: "getPath",
+		value: function getPath() {
+			return this._path;
+		}
+	}, {
+		key: "setPath",
+		value: function setPath(path, changeState) {
+			if (Array.isArray(path)) path = "/" + path.join("/") + "/";
+
+			this._strPath = path;
+
+			if (changeState) this.changeState();
+
+			return this;
+		}
+	}, {
+		key: "getSearch",
+		value: function getSearch(name) {
+			var _this = this;
+
+			if (name === undefined) return this._search;else if (typeof name == "string") return this._search[name];else if (Array.isArray(name)) {
+				var result = {};
+
+				name.forEach(function (p) {
+					if (p in _this._search) result[p] = _this._search[p];
+				});
+
+				return result;
+			}
+		}
+	}, {
+		key: "setSearch",
+		value: function setSearch(params, changeState) {
+			for (var i in params) {
+				this._search[i] = params[i];
+			}this._strSearch = this.serialize(this._search);
+
+			if (changeState) this.changeState();
+
+			return this;
+		}
+	}, {
+		key: "removeSearch",
+		value: function removeSearch(name, changeState) {
+			var _this2 = this;
+
+			if (name === undefined) this._search = {};else if (typeof name == "string") delete this._search[name];else if (Array.isArray(name)) name.forEach(function (p) {
+				if (p in _this2._search) delete _this2._search[p];
+			});
+
+			this._strSearch = this.serialize(this._search);
+
+			if (changeState) this.changeState();
+
+			return this;
+		}
+	}, {
+		key: "setFullPath",
+		value: function setFullPath(path, search, changeState) {
+			if (path) this.setPath(path);
+			if (search) this.setSearch(search);
+			if (changeState) this.changeState();
+		}
+	}, {
+		key: "go",
+		value: function go(path) {
+			if (!path) path = this._strPath;
+			location.href = path + this._strSearch;
+		}
+	}, {
+		key: "serialize",
+		value: function serialize(data) {
+			var request = "?";
+
+			for (var i in data) {
+				if (typeof data[i] == "number" || typeof data[i] == "string" || typeof data[i] == "boolean") request += i + "=" + data[i] + "&";
+			}
+
+			return request.slice(0, -1);
+		}
+	}]);
+
+	return Url;
+}();
+
+var url = exports.url = new Url();
+
+/***/ }),
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1586,13 +1729,13 @@ var HTMLTools = exports.HTMLTools = function (_Async) {
 }(_async.Async);
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-__webpack_require__(7);
+__webpack_require__(8);
 
 var _functions = __webpack_require__(0);
 
@@ -1602,17 +1745,17 @@ var _array = __webpack_require__(2);
 
 var _object = __webpack_require__(3);
 
-var _template = __webpack_require__(9);
+var _template = __webpack_require__(10);
 
 var _binder = __webpack_require__(4);
 
 var _async = __webpack_require__(1);
 
-var _timer = __webpack_require__(10);
+var _timer = __webpack_require__(11);
 
-var _http = __webpack_require__(11);
+var _http = __webpack_require__(12);
 
-var _url = __webpack_require__(12);
+var _url = __webpack_require__(5);
 
 var _html = __webpack_require__(13);
 
@@ -1634,8 +1777,8 @@ var Dew = {
 	Timer: _timer.Timer,
 
 	bind: _binder.bind,
-	http: new _http.HTTP(),
-	url: new _url.URLmanager()
+	http: _http.http,
+	url: _url.url
 };
 
 func.define(window, "log", {
@@ -1650,7 +1793,7 @@ func.define(window, {
 });
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1726,7 +1869,7 @@ if (!("from" in Array)) Object.defineProperty(Array, "from", {
 });
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1808,7 +1951,7 @@ var InitObject = exports.InitObject = function () {
 }();
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1859,8 +2002,9 @@ var Template = exports.Template = function () {
                 return fn += arg + "=data." + arg + ",";
             });
 
-            fn += "echo=function(s){_r+=s},_r='';", tokens.forEach(function (token) {
-                token[0] == "#" ? fn += token.slice(1).replace(/:=/g, "_r+=") + ";\n" : fn += "_r+=`" + token + "`;";
+            fn += "_r='';";
+            tokens.forEach(function (token) {
+                token[0] == "#" ? fn += token.slice(1).replace(/:=/g, "_r+=") + ";\n" : fn += "_r+='" + token.replace(/('|\n)/g, "\\$1") + "';";
             });
             fn += " return _r";
 
@@ -1882,7 +2026,7 @@ var Template = exports.Template = function () {
 }();
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1896,6 +2040,8 @@ exports.Timer = undefined;
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _functions = __webpack_require__(0);
+
+var _binder = __webpack_require__(4);
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -1912,9 +2058,9 @@ var Timer = exports.Timer = function () {
 		this.delay = options.delay || 0;
 		this.step = options.step || 0;
 
-		this.onTick = (0, _functions.megaFunction)(options.onTick);
-		this.onStart = (0, _functions.megaFunction)(options.onStart);
-		this.onStop = (0, _functions.megaFunction)(options.onStop);
+		this._onTick = (0, _functions.megaFunction)(options.onTick);
+		this._onStart = (0, _functions.megaFunction)(options.onStart);
+		this._onStop = (0, _functions.megaFunction)(options.onStop);
 
 		this._state = {
 			timePassed: 0,
@@ -1935,66 +2081,79 @@ var Timer = exports.Timer = function () {
 			}
 
 			if (this.count) this.count--;
-
-			this._tick = $bind.context(this._tick, this);
-			this._stepTick = $bind.context(this._stepTick, this);
 		}
 	}, {
-		key: '_common',
-		value: function _common(time) {
-			this._state.timePassed = time - this._state.startTime;
-
-			if (this.count && this._state.iteration++ >= this.count) this._stop = true;
+		key: 'onTick',
+		value: function onTick(fn) {
+			self._onTick.push(fn);
+		}
+	}, {
+		key: 'onStart',
+		value: function onStart(fn) {
+			self._onStart.push(fn);
+		}
+	}, {
+		key: 'onStop',
+		value: function onStop(fn) {
+			self._onStop.push(fn);
 		}
 	}, {
 		key: '_stepTick',
 		value: function _stepTick(time) {
-			var self = this;
+			var _this = this;
 
-			this._common(time);
+			this._state.timePassed = time - this._state.startTime;
 
-			this.onTick(this._state.timePassed);
+			if (this.count && this._state.iteration++ >= this.count) this._stop = true;
 
-			if (!this._stop) setTimeout(function () {
-				self._stepTick(performance.now());
-			}, this.step);else this.stop();
+			this._onTick(this._state.timePassed);
+
+			this._stop ? this.stop() : setTimeout(function () {
+				return _this._stepTick(performance.now());
+			}, this.step);
 		}
 	}, {
 		key: '_tick',
 		value: function _tick(time) {
-			var state = this._state;
+			this._state.timePassed = time - this._state.startTime;
 
-			this._common(time);
+			if (this.count && this._state.iteration++ >= this.count) this._stop = true;
 
-			if (this.duration && state.timePassed >= this.duration) this._stop = true;
+			if (this.duration && this._state.timePassed >= this.duration) this._stop = true;
 
-			this.onTick(state.timePassed);
+			this._onTick(this._state.timePassed);
 
-			if (!this._stop) requestAnimationFrame(this._tick);else this.stop();
+			this._stop ? this.stop() : requestAnimationFrame(this._tick);
+		}
+	}, {
+		key: '_infinityTick',
+		value: function _infinityTick(time) {
+			this._state.timePassed = time - this._state.startTime;
+			this._onTick(this._state.timePassed);
+			this._stop ? this.stop() : requestAnimationFrame(this._tick);
 		}
 	}, {
 		key: 'start',
 		value: function start() {
-			var self = this;
+			var _this2 = this;
 
 			this._stop = false;
 
-			if (self.delay) setTimeout(function () {
-				self._startTimer();
-			}, self.delay);else self._startTimer();
+			this.delay ? setTimeout(function () {
+				return _this2._start();
+			}, this.delay) : this._start();
 		}
 	}, {
-		key: '_startTimer',
-		value: function _startTimer() {
-			var tick,
-			    state = this._state;
+		key: '_start',
+		value: function _start() {
+			var tick = this.step ? this._stepTick : this._tick;
 
-			state.startTime = performance.now();
-			state.timePassed = 0;
+			tick = _binder.bind.context(tick, this);
 
-			if (this.onStart.count) this.onStart();
+			this._state.startTime = performance.now();
+			this._state.timePassed = 0;
 
-			if (this.step) tick = this._stepTick;else tick = this._tick;
+			if (this._onStart.count) this._onStart();
 
 			tick(state.startTime);
 		}
@@ -2010,7 +2169,7 @@ var Timer = exports.Timer = function () {
 	}, {
 		key: 'stop',
 		value: function stop() {
-			if (this.onStop.count) this.onStop();
+			if (this._onStop.count) this._onStop();
 			this._stop = true;
 		}
 	}, {
@@ -2018,29 +2177,13 @@ var Timer = exports.Timer = function () {
 		get: function get() {
 			return this._state;
 		}
-	}, {
-		key: 'on',
-		get: function get() {
-			var self = this;
-			return {
-				tick: function tick(fn) {
-					self.onTick.push(fn);
-				},
-				start: function start(fn) {
-					self.onStart.push(fn);
-				},
-				stop: function stop(fn) {
-					self.onStop.push(fn);
-				}
-			};
-		}
 	}]);
 
 	return Timer;
 }();
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2049,7 +2192,7 @@ var Timer = exports.Timer = function () {
 Object.defineProperty(exports, "__esModule", {
 	value: true
 });
-exports.HTTP = undefined;
+exports.http = undefined;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -2059,9 +2202,11 @@ var _functions = __webpack_require__(0);
 
 var _object = __webpack_require__(3);
 
+var _url = __webpack_require__(5);
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var HTTP = exports.HTTP = function () {
+var HTTP = function () {
 	function HTTP() {
 		_classCallCheck(this, HTTP);
 
@@ -2086,7 +2231,7 @@ var HTTP = exports.HTTP = function () {
 
 			if (options.uncache) !data ? data = { с: Math.random() } : data.с = Math.random();
 
-			request.open("GET", path + this.serialize(data), true);
+			request.open("GET", path + _url.url.serialize(data), true);
 			request.send();
 
 			request.onload = function () {
@@ -2107,15 +2252,6 @@ var HTTP = exports.HTTP = function () {
 			};
 
 			return result;
-		}
-	}, {
-		key: 'serialize',
-		value: function serialize(data) {
-			var request = "?";
-
-			for (var i in data) {
-				if (typeof data[i] == "number" || typeof data[i] == "string" || typeof data[i] == "boolean") request += i + "=" + data[i] + "&";
-			}return request.slice(0, -1);
 		}
 	}, {
 		key: 'post',
@@ -2165,101 +2301,7 @@ var HTTP = exports.HTTP = function () {
 	return HTTP;
 }();
 
-/***/ }),
-/* 12 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var URLmanager = exports.URLmanager = function () {
-	function URLmanager() {
-		_classCallCheck(this, URLmanager);
-
-		this.params = this._getSearchParams();
-		this.search = location.search;
-		this.path = location.pathname;
-	}
-
-	_createClass(URLmanager, [{
-		key: "getParams",
-		value: function getParams(name) {
-			var _this = this;
-
-			if (name === undefined) return this.params;else if (typeof name == "string") return this.params[name];else if (Array.isArray(name)) {
-				var result = {};
-
-				this.name.forEach(function (p) {
-					if (p in _this.params) result[p] = _this.params[p];
-				});
-
-				return result;
-			}
-		}
-	}, {
-		key: "setParams",
-		value: function setParams(params) {
-			var clear = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-
-			if (clear) this.clear();
-
-			for (var i in params) {
-				this.params[i] = params[i];
-			}history.pushState({ foo: "bar" }, "page", this.path + this.serialize(this.params));
-
-			return this;
-		}
-	}, {
-		key: "clear",
-		value: function clear() {
-			this.params = {};
-			return this;
-		}
-	}, {
-		key: "go",
-		value: function go(path) {
-			if (!path) path = location.pathname;
-			location.href = path + this.serialize(this.params);
-		}
-	}, {
-		key: "_getSearchParams",
-		value: function _getSearchParams() {
-			var request = location.search,
-			    result = {};
-
-			if (request) {
-				request = request.replace("?", "").split("&");
-				request.forEach(function (p) {
-					var p = p.split("=");
-					result[p[0].replace("-", "_")] = p[1];
-				});
-			}
-
-			return result;
-		}
-	}, {
-		key: "serialize",
-		value: function serialize(data) {
-			var request = "?";
-
-			for (var i in data) {
-				if (typeof data[i] == "number" || typeof data[i] == "string" || typeof data[i] == "boolean") request += i + "=" + data[i] + "&";
-			}
-
-			return request.slice(0, -1);
-		}
-	}]);
-
-	return URLmanager;
-}();
+var http = exports.http = new HTTP();
 
 /***/ }),
 /* 13 */
@@ -2275,7 +2317,7 @@ exports.$html = undefined;
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-var _htmlTools = __webpack_require__(5);
+var _htmlTools = __webpack_require__(6);
 
 var _stylesheet = __webpack_require__(16);
 
@@ -2380,7 +2422,7 @@ exports.JsonConverter = undefined;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _htmlTools = __webpack_require__(5);
+var _htmlTools = __webpack_require__(6);
 
 var _binder = __webpack_require__(4);
 

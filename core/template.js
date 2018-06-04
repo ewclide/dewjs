@@ -40,12 +40,11 @@ export class Template
         if (Array.isArray(args))
             args.forEach( arg => fn += arg + "=data." + arg + "," );
 
-        fn += "echo=function(s){_r+=s},_r='';",
-
+        fn += "_r='';";
         tokens.forEach( token => {
             token[0] == "#"
             ? fn += token.slice(1).replace(/:=/g, "_r+=") + ";\n"
-            : fn += "_r+=`" + token + "`;";
+            : fn += "_r+='" + token.replace(/('|\n)/g, "\\$1") + "';";
         })
         fn += " return _r";
 
