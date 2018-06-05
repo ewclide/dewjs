@@ -2,8 +2,8 @@
 import * as func from './functions';
 import {array} from'./array';
 import {object} from './object';
-import {Template} from './template';
 import {bind} from './binder';
+import {Template} from './template';
 import {Async} from './async';
 import {Timer} from './timer';
 import {http} from './http';

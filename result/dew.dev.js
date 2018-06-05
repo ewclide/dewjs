@@ -252,59 +252,70 @@ random.key = function () {
 	return result;
 };
 
-function megaFunction(fn, name) {
-	var shell = function shell(data, order) {
-		shell._data = data;
+var megaMethods = {
+	_call: function _call(target, data, order) {
+		var result = data;
 
-		order ? shell._handlers.forEach(function (handler) {
-			return shell._data = handler(shell._data);
-		}) : shell._handlers.forEach(function (handler) {
+		target._data = data;
+
+		order ? target._handlers.forEach(function (handler) {
+			return target._data = handler(target._data);
+		}) : target._handlers.forEach(function (handler) {
 			return handler(data);
 		});
 
-		return shell._data;
-	};
+		result = target._data;
+		target._data = null;
 
-	shell._handlers = [];
-	shell._names = Object.create(null);
-	shell._data;
-	shell.count = 0;
-
-	shell.push = function (fn, name) {
+		return result;
+	},
+	push: function push(fn, name) {
 		if (typeof fn == "function") {
-			if (name) shell._names[name] = shell.count;
-			shell._handlers.push(fn);
-			shell.count++;
+			if (name) this._names[name] = this.count;
+			this._handlers.push(fn);
+			this.count++;
 		}
-	};
-
-	shell.remove = function (id) {
+	},
+	remove: function remove(id) {
 		var index = id,
 		    handler;
 
 		if (typeof id == "string") {
-			index = shell._names[id];
-			delete shell._names[id];
+			index = this._names[id];
+			delete this._names[id];
 		}
 
-		if (shell._handlers[index]) {
-			shell._handlers.splice(index, 1);
-			shell.count--;
+		if (this._handlers[index]) {
+			this._handlers.splice(index, 1);
+			this.count--;
 		}
-	};
-
-	shell.evoke = function (id, data) {
+	},
+	evoke: function evoke(id, data) {
 		var index = id,
 		    handler;
 
-		if (typeof id == "string") index = shell._names[id];
+		if (typeof id == "string") index = this._names[id];
 
-		if (shell._handlers[index]) return shell._handlers[index](data);else printErr('Dew megaFunction evoke error: undefined function with id "' + id + '"');
+		if (this._handlers[index]) return this._handlers[index](data);else printErr('Dew megaFunction evoke error: undefined function with id "' + id + '"');
+	}
+};
+
+function megaFunction(fn, name) {
+	var mega = function mega(data, order) {
+		return megaMethods._call(mega, data, order);
 	};
 
-	if (fn) shell.push(fn, name);
+	mega._handlers = [];
+	mega._names = Object.create(null);
+	mega._data;
+	mega.count = 0;
+	mega.push = megaMethods.push;
+	mega.remove = megaMethods.remove;
+	mega.evoke = megaMethods.evoke;
 
-	return shell;
+	if (typeof fn == "function") mega.push(fn, name);
+
+	return mega;
 }
 
 function log() {
@@ -1745,9 +1756,9 @@ var _array = __webpack_require__(2);
 
 var _object = __webpack_require__(3);
 
-var _template = __webpack_require__(10);
-
 var _binder = __webpack_require__(4);
+
+var _template = __webpack_require__(10);
 
 var _async = __webpack_require__(1);
 

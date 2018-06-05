@@ -4,6 +4,26 @@ $html.ready(function(){
 });
 
 /*
+var mega = Dew.megaFunction();
+
+mega.push(function(data){
+	return data + 1;
+}, "first");
+
+mega.push(function(data){
+	return data + 2;
+});
+
+mega.push(function(data){
+	return data + 3;
+});
+
+log(mega(2, true));
+log(mega(5));
+log(mega.evoke("first", 10));
+*/
+
+/*
 var arr = [ "4-5 t", "3-7.5 t", "3", "7-8,5 t", "12 - 20.5 t", "12 - 20 t"];
 
 log(Dew.array(arr).smartSort());
@@ -236,7 +256,7 @@ $html.ready(function(){
 
 // Dew.url.setParams({ t : 2, s : "test" });
 
-
+/*
 var info = {
 	names : ["max", "alex", "serj"],
 	title : "names-list"
@@ -274,7 +294,7 @@ $html.ready(function(){
 	// tpl.appendTo(".app").draw(info);
 	log.timeEnd()
 });
-
+*/
 
 /*
 var jq = $html.script("https://code.jquery.com/jquery-3.2.1.min.js")

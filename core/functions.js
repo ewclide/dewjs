@@ -192,64 +192,76 @@ random.key = function(length = 15, types = ["all"])
 	return result;
 }
 
-export function megaFunction(fn, name)
-{
-	var shell = function(data, order)
+var megaMethods = {
+	_call : function(target, data, order)
 	{
-		shell._data = data;
+		var result = data;
+
+		target._data = data;
 
 		order
-		? shell._handlers.forEach( handler => shell._data = handler(shell._data) )
-		: shell._handlers.forEach( handler => handler(data) );
+		? target._handlers.forEach( handler => target._data = handler(target._data) )
+		: target._handlers.forEach( handler => handler(data) );
 
-		return shell._data;
-	}
+		result = target._data;
+		target._data = null;
 
-	shell._handlers = [];
-	shell._names = Object.create(null);
-	shell._data;
-	shell.count = 0;
-
-	shell.push = function(fn, name)
+		return result;
+	},
+	push : function(fn, name)
 	{
 		if (typeof fn == "function")
 		{
-			if (name) shell._names[name] = shell.count;
-			shell._handlers.push(fn);
-			shell.count++;
+			if (name) this._names[name] = this.count;
+			this._handlers.push(fn);
+			this.count++;
 		}
-	}
-
-	shell.remove = function(id)
+	},
+	remove : function(id)
 	{
 		var index = id, handler;
 
 		if (typeof id == "string")
 		{
-			index = shell._names[id];
-			delete shell._names[id];
+			index = this._names[id];
+			delete this._names[id];
 		}
 
-		if (shell._handlers[index])
+		if (this._handlers[index])
 		{
-			shell._handlers.splice(index, 1);
-			shell.count--;
+			this._handlers.splice(index, 1);
+			this.count--;
 		}
-	}
-
-	shell.evoke = function(id, data)
+	},
+	evoke : function(id, data)
 	{
 		var index = id, handler;
 
-		if (typeof id == "string") index = shell._names[id];
+		if (typeof id == "string") index = this._names[id];
 
-		if (shell._handlers[index]) return shell._handlers[index](data);
+		if (this._handlers[index]) return this._handlers[index](data);
 		else printErr('Dew megaFunction evoke error: undefined function with id "' + id + '"');
 	}
+}
 
-	if (fn) shell.push(fn, name);
+export function megaFunction(fn, name)
+{
+	var mega = function(data, order)
+	{
+		return megaMethods._call(mega, data, order);
+	}
 
-	return shell;
+	mega._handlers = [];
+	mega._names = Object.create(null);
+	mega._data;
+	mega.count = 0;
+	mega.push = megaMethods.push;
+	mega.remove = megaMethods.remove;
+	mega.evoke = megaMethods.evoke;
+
+	if (typeof fn == "function") mega.push(fn, name);
+
+	return mega;
 }
 
 export function log()
