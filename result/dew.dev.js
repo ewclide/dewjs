@@ -537,6 +537,23 @@ exports.array = array;
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+function checkInclude(first, second, settings) {
+	if (!second) return true;
+
+	if (!settings.caseSens) {
+		first = first.toUpperCase();
+		second = second.toUpperCase();
+	}
+
+	if (settings.whole) return first == second ? true : false;else {
+		var index = first.indexOf(second);
+
+		if (settings.begin) return index != -1 && (index == 0 || first[index - 1] == " ") ? true : false;else return index != -1 ? true : false;
+	}
+
+	return;
+}
+
 var Methods = function () {
 	function Methods(arr) {
 		_classCallCheck(this, Methods);
@@ -549,11 +566,6 @@ var Methods = function () {
 		value: function have(value) {
 			var index = this.arr.indexOf(value);
 			return index == -1 ? false : { index: index };
-		}
-	}, {
-		key: "copy",
-		value: function copy() {
-			return this.arr.slice().sort();
 		}
 	}, {
 		key: "subtract",
@@ -603,6 +615,19 @@ var Methods = function () {
 
 				return result;
 			});
+		}
+	}, {
+		key: "search",
+		value: function search(val) {
+			var settings = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+			var result = settings.inside ? this.arr.filter(function (item) {
+				return checkInclude(item[settings.inside], val, settings);
+			}) : this.arr.filter(function (item) {
+				return checkInclude(item, val, settings);
+			});
+
+			return result.length ? result : false;
 		}
 	}, {
 		key: "removeValue",

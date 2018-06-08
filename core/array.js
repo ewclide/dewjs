@@ -1,3 +1,29 @@
+function checkInclude(first, second, settings)
+{
+	if (!second) return true;
+
+	if (!settings.caseSens)
+	{
+		first = first.toUpperCase();
+		second = second.toUpperCase();
+	}
+
+	if (settings.whole)
+		return first == second  ? true : false;
+
+	else
+	{
+		var index = first.indexOf(second);
+
+		if (settings.begin)
+			return index != -1 && ( index == 0 || first[index - 1] == " " ) ? true : false;
+
+		else return index != -1 ? true : false;
+	}
+
+	return;
+}
+
 class Methods
 {
 	constructor(arr)
@@ -9,11 +35,6 @@ class Methods
 	{
 		var index = this.arr.indexOf(value);
 		return index == -1 ? false : { index : index };
-	}
-
-	copy()
-	{
-		return this.arr.slice().sort();
 	}
 
 	subtract(arr)
@@ -53,6 +74,15 @@ class Methods
 
 			return result;
 		});
+	}
+
+	search(val, settings = {})
+	{
+		var result = settings.inside
+			? this.arr.filter( item => checkInclude(item[settings.inside], val, settings) )
+			: this.arr.filter( item => checkInclude(item, val, settings) );
+
+		return result.length ? result : false;
 	}
 
 	removeValue(value)
