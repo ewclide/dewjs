@@ -554,6 +554,22 @@ function checkInclude(first, second, settings) {
 	return;
 }
 
+function natConv(value) {
+	var dot = '',
+	    range;
+
+	if (!isNaN(+value)) return value;
+
+	range = parseInt(value.replace(/\-\s+\.,/g, ''), 10);
+
+	if (!isNaN(range)) return +value.replace(/[^\d+]/g, function (str) {
+		if (str == "," || str == "." || str == "-") {
+			dot = dot ? "0" : ".";
+			return dot;
+		} else return '';
+	});else return value.replace(/\s+/g, '').toUpperCase();
+}
+
 var Methods = function () {
 	function Methods(arr) {
 		_classCallCheck(this, Methods);
@@ -562,20 +578,20 @@ var Methods = function () {
 	}
 
 	_createClass(Methods, [{
-		key: "have",
+		key: 'have',
 		value: function have(value) {
 			var index = this.arr.indexOf(value);
 			return index == -1 ? false : { index: index };
 		}
 	}, {
-		key: "subtract",
+		key: 'subtract',
 		value: function subtract(arr) {
 			return this.arr.filter(function (item) {
 				return arr.indexOf(item) < 0;
 			});
 		}
 	}, {
-		key: "difference",
+		key: 'difference',
 		value: function difference(arr) {
 			var _this = this;
 
@@ -586,38 +602,35 @@ var Methods = function () {
 			}));
 		}
 	}, {
-		key: "compare",
+		key: 'compare',
 		value: function compare(arr) {
 			return this.arr.length == arr.length && this.arr.every(function (item, index) {
 				return item === arr[index];
 			});
 		}
 	}, {
-		key: "smartSort",
-		value: function smartSort() {
-			return this.arr.sort(function (prev, next) {
+		key: 'naturalSort',
+		value: function naturalSort() {
+			var settings = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-				var result = 0,
-				    regClear = /[^\d+\-,\.]/gm;
+			return this.arr.sort(function (cur, next) {
 
-				prev = prev.replace(",", ".").replace(regClear, "").split("-").map(function (item) {
-					return +item;
-				});
-				next = next.replace(",", ".").replace(regClear, "").split("-").map(function (item) {
-					return +item;
-				});
+				var result = 0;
 
-				if (prev[0] > next[0]) result = 1;else if (prev[0] < next[0]) result = -1;else if (prev[0] == next[0]) {
-					prev = prev.length > 1 ? prev[1] : prev[0];
-					next = next.length > 1 ? next[1] : next[0];
-					result = prev > next ? 1 : -1;
+				if (settings.inside) {
+					cur = cur[settings.inside];
+					next = next[settings.inside];
 				}
+
+				result = natConv(next) > natConv(cur) ? -1 : 1;
+
+				if (settings.reverse) result *= -1;
 
 				return result;
 			});
 		}
 	}, {
-		key: "search",
+		key: 'search',
 		value: function search(val) {
 			var settings = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
@@ -630,30 +643,30 @@ var Methods = function () {
 			return result.length ? result : false;
 		}
 	}, {
-		key: "removeValue",
+		key: 'removeValue',
 		value: function removeValue(value) {
 			var _this2 = this;
 
-			var list = [].concat(value);
+			var list = Array.isArray(value) ? value : [value];
 
-			list.forEach(function (item, i) {
+			return list.filter(function (item) {
 				var index = _this2.arr.indexOf(item);
-				index != -1 ? _this2.arr.splice(index, 1) : list.splice(i, 1);
+				if (index != -1) {
+					_this2.arr.splice(index, 1);
+					return true;
+				} else return false;
 			});
-
-			return list;
 		}
 	}, {
-		key: "removeIndex",
+		key: 'removeIndex',
 		value: function removeIndex(index) {
 			var _this3 = this;
 
-			var list = [].concat(index),
-			    saved = list.map(function (i) {
+			var values = Array.isArray(index) ? index.map(function (i) {
 				return _this3.arr[i];
-			});
+			}) : this.arr[index];
 
-			return this.removeValue(saved);
+			return this.removeValue(values);
 		}
 	}]);
 
@@ -1870,7 +1883,7 @@ if (!("from" in Array)) Object.defineProperty(Array, "from", {
 			var length = 0;
 
 			if ("length" in obj) {
-				length = parseInt(obj.length);
+				length = parseInt(obj.length, 10);
 				if (isNaN(length) || length < 0) length = 0;
 			}
 

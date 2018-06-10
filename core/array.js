@@ -24,6 +24,27 @@ function checkInclude(first, second, settings)
 	return;
 }
 
+function natConv(value)
+{
+	var dot = '', range;
+	
+	if (!isNaN(+value)) return value;
+
+	range = parseInt(value.replace(/\-\s+\.,/g, ''), 10);
+
+	if (!isNaN(range))
+		return +value.replace(/[^\d+]/g, function(str){
+			if (str == "," || str == "." || str == "-")
+			{
+				dot = dot ? "0" : ".";
+				return dot;
+			}
+			else return '';
+		});
+
+	else return value.replace(/\s+/g, '').toUpperCase();
+}
+
 class Methods
 {
 	constructor(arr)
@@ -54,23 +75,21 @@ class Methods
 			   this.arr.every( (item, index) => item === arr[index] );
 	}
 
-	smartSort()
+	naturalSort(settings = {})
 	{
-		return this.arr.sort(function(prev, next){
+		return this.arr.sort( (cur, next) => {
 
-			var result = 0, regClear = /[^\d+\-,\.]/gm;
+			var result = 0;
 
-			prev = prev.replace(",", ".").replace(regClear, "").split("-").map( item => +item );
-			next = next.replace(",", ".").replace(regClear, "").split("-").map( item => +item );
-
-			if (prev[0] > next[0]) result = 1;
-			else if (prev[0] < next[0]) result = -1;
-			else if (prev[0] == next[0])
+			if (settings.inside)
 			{
-				prev = prev.length > 1 ? prev[1] : prev[0];
-				next = next.length > 1 ? next[1] : next[0];
-				result = prev > next ? 1 : -1;
+				cur = cur[settings.inside];
+				next = next[settings.inside];
 			}
+
+			result = natConv(next) > natConv(cur) ? -1 : 1;
+
+			if (settings.reverse) result *= -1
 
 			return result;
 		});
@@ -87,22 +106,26 @@ class Methods
 
 	removeValue(value)
 	{
-		var list = [].concat(value);
+		var list = Array.isArray(value) ? value : [value];
 
-		list.forEach( (item, i) => {
+		return list.filter( item => {
 			var index = this.arr.indexOf(item);
-			index != -1 ? this.arr.splice(index, 1) : list.splice(i, 1);
+			if (index != -1)
+			{
+				this.arr.splice(index, 1);
+				return true;
+			}
+			else return false;
 		});
-
-		return list;
 	}
 
 	removeIndex(index)
 	{
-		var list = [].concat(index),
-			saved = list.map( i => this.arr[i] );
+		var values = Array.isArray(index)
+			? index.map( i => this.arr[i] )
+			: this.arr[index];
 
-		return this.removeValue(saved);
+		return this.removeValue(values);
 	}
 }
 

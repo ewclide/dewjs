@@ -40,7 +40,7 @@ if (!("from" in Array))
 
 				if ("length" in obj)
 				{
-					length = parseInt(obj.length);
+					length = parseInt(obj.length, 10);
 					if (isNaN(length) || length < 0) length = 0;
 				}
 				
