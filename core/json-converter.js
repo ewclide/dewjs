@@ -123,9 +123,6 @@ export class JsonConverter
                 		json._htl.html(self._getTemplate(json));
                 	}
                 );
-    
-        if (json.tag == "input" && json.attrs.type == "text")
-            json.value = "";
 
         if (json.bind)
             for (var i = 0; i < json.bind.length; i++)
@@ -156,8 +153,7 @@ export class JsonConverter
                                 input : function(e)
                                 {
                                     var target = e.srcElement || e.target;
-                                    json._value = target.value;
-                                    json._htl.value(target.value);
+                                    json.value = target.value;
                                 }
                             });
                         break;
@@ -172,8 +168,7 @@ export class JsonConverter
                                 change : function(e)
                                 {
                                     var target = e.srcElement || e.target;
-                                    json._checked = target.checked;
-                                    json._htl.checked(target.checked);
+                                    json.checked = target.checked; 
                                 }
                             });
                         break;
@@ -249,3 +244,5 @@ export class JsonConverter
         else return false;
 	}
 }
+
+export var jsonConverter = new JsonConverter();

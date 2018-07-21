@@ -1,12 +1,10 @@
-import {JsonConverter} from './json-converter';
+import {jsonConverter} from './json-converter';
 import {Transform} from './transform';
 import {Async} from './async';
 import {MegaFunction} from './mega-function';
 import {random} from './functions';
 import {array} from './array';
 // import {Animation}     from './animation';
-
-var jsonConverter = new JsonConverter();
 
 export class HTMLTools extends Async
 {
