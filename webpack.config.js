@@ -1,28 +1,26 @@
-var path = require('path').resolve(__dirname, 'result'),
+const output = "dew";
+const entry  = "./core/main.js";
+const result = "result";
+
+var min = process.argv.indexOf('-p') !== -1,
 	UglifyJsPlugin = require('uglifyjs-webpack-plugin'),
-	output = "dew",
-	babel = {
-		test: /\.js$/,
-		use: { loader: 'babel-loader?presets[]=env' }
+	path = require('path').resolve(__dirname, result);
+
+module.exports = {
+	entry: entry,
+	output: {
+		path: path,
+		filename: output + (min ? '.min.js' : '.dev.js')
+	},
+	plugins: min ? [ new UglifyJsPlugin() ] : [],
+	module: {
+		rules: [
+			{
+				test: /\.js$/,
+				use: {
+					loader: 'babel-loader?presets[]=env'
+				}
+			}
+		]
 	}
-
-const dev = {
-	entry: "./core/main.js",
-	output: {
-		path: path,
-		filename: output + '.dev.js'
-	},
-	module: { rules: [ babel ] }
-}
-
-const min = {
-	entry: "./core/main.js",
-	output: {
-		path: path,
-		filename: output + '.min.js'
-	},
-	plugins: [ new UglifyJsPlugin() ],
-	module: { rules: [ babel ] }
-}
-
-module.exports = dev;
+};
