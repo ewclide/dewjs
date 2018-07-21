@@ -51,7 +51,9 @@ export function define(obj, fields, options = {})
 
 	if (typeof fields == "string")
 	{
-		if (options.value) desc.value = options.value;
+		if (options.value !== undefined)
+			desc.value = options.value;
+		
 		else if (options.get && options.set)
 		{
 			desc.get = options.get;
@@ -61,7 +63,7 @@ export function define(obj, fields, options = {})
 
 		Object.defineProperty(obj, fields, desc);
 
-		if (options.set && options.value != undefined)
+		if (options.set && options.value !== undefined)
 			obj[fields] = options.value;
 	}
 	else for (var key in fields)
