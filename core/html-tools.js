@@ -6,28 +6,7 @@ import {random} from './functions';
 import {array} from './array';
 // import {Animation}     from './animation';
 
-var jsonConverter = new JsonConverter(),
-
-insertMethods = {
-    before : function(element, current)
-    {
-        if (current.parentNode)
-            current.parentNode.insertBefore(element, current);
-    },
-    after : function(element, current)
-    {
-        if (current.parentNode)
-            current.parentNode.insertBefore(element, current.nextSibling);
-    },
-    append : function(element, current)
-    {
-        current.appendChild(element, current);
-    },
-    prepend : function(element, current)
-    {
-        current.insertBefore(element, current.childNodes[0]);
-    }
-}
+var jsonConverter = new JsonConverter();
 
 export class HTMLTools extends Async
 {
@@ -181,17 +160,17 @@ export class HTMLTools extends Async
 
     before(htl, rm = true)
     {
-        return this._insert(htl, rm, insertMethods["before"]);
+        return this._insert(htl, rm, "beforebegin");
     }
 
     after(htl, rm = true)
     {
-        return this._insert(htl, rm, insertMethods["after"]);
+        return this._insert(htl, rm, "afterend");
     }
 
     append(htl, rm = true)
     {
-        return this._insert(htl, rm, insertMethods["append"]);
+        return this._insert(htl, rm, "beforeend");
     }
 
     appendTo(target, rm = true)
@@ -202,10 +181,10 @@ export class HTMLTools extends Async
 
     prepend(htl, rm = true)
     {
-        return this._insert(htl, rm, insertMethods["prepend"]);
+        return this._insert(htl, rm, "afterbegin");
     }
 
-    _insert(htl, rm, method)
+    _insert(htl, rm, position)
     {
         var self = this, result = [];
 
@@ -218,7 +197,7 @@ export class HTMLTools extends Async
                 htl.elements.forEach( insertElement => {
                     var clone = insertElement.cloneNode(true);
                     clones.push(clone);
-                    method(clone, element);
+                    element.insertAdjacentElement(position, clone);
                 });
                 result = result.concat(clones);
             });
@@ -234,22 +213,22 @@ export class HTMLTools extends Async
 
     jsonBefore(json)
     {
-        return this._insertJson(json, insertMethods["before"]);
+        return this._insertJson(json, "beforebegin");
     }
 
     jsonAfter(json)
     {
-        return this._insertJson(json, insertMethods["after"]);
-    }
-
-    jsonPrepend(json)
-    {
-        return this._insertJson(json, insertMethods["prepend"]);
+        return this._insertJson(json, "afterend");
     }
 
     jsonAppend(json)
     {
-        return this._insertJson(json, insertMethods["append"]);
+        return this._insertJson(json, "beforeend");
+    }
+
+    jsonPrepend(json)
+    {
+        return this._insertJson(json, "afterbegin");
     }
 
     jsonGet(element)
@@ -269,7 +248,7 @@ export class HTMLTools extends Async
         return result;
     }
 
-    _insertJson(json, method)
+    _insertJson(json, position)
     {
         var clones = [];
 
@@ -278,7 +257,7 @@ export class HTMLTools extends Async
         this.elements.forEach( current => {
             var element = jsonConverter.build(json);
             clones.push(element);
-            method(element, current);
+            current.insertAdjacentElement(position, element);
         });
 
         return new HTMLTools(clones);
@@ -407,14 +386,7 @@ export class HTMLTools extends Async
 
     offsetWindow()
     {
-        var offset = this.elements[0].getBoundingClientRect();
-
-        return {
-            top    : offset.top,
-            left   : offset.left,
-            right  : offset.right,
-            bottom : offset.bottom
-        }
+        return this.elements[0].getBoundingClientRect();
     }
 
     offsetScroll()
@@ -423,6 +395,22 @@ export class HTMLTools extends Async
         return {
             top  : element.scrollTop,
             left : element.scrollLeft
+        }
+    }
+
+    offsetPage()
+    {
+        var element = this.elements[0],
+            rect = element.getBoundingClientRect(),
+            doc  = document.documentElement,
+            top  = rect.top + window.pageYOffset - doc.clientTop,
+            left = rect.left + window.pageXOffset - doc.clientLeft;
+        
+        return {
+            top   : Math.round(top),
+            left  : Math.round(left),
+            bottom: Math.round(top + element.offsetHeight),
+            right : Math.round(left + element.offsetWidth)
         }
     }
 
@@ -482,8 +470,7 @@ export class HTMLTools extends Async
 
     _getParent(element)
     { 
-        var parent = element.parentElement || element.parentNode || null;
-        return parent;
+        return element.parentElement || element.parentNode || null;
     }
 
     transform(data)
@@ -526,9 +513,10 @@ export class HTMLTools extends Async
 
     setAttr(attrs, value)
     {
-        typeof attrs == "string" && value !== undefined
-        ? this.elements.forEach( element => element.setAttribute(attrs, value) )
-        : this.elements.forEach( element => {
+        if (typeof attrs == "string" && value !== undefined)
+            this.elements.forEach( element => element.setAttribute(attrs, value) )
+
+        else this.elements.forEach( element => {
             for (var i in attrs) element.setAttribute(i, attrs[i])
         });
 
@@ -541,7 +529,9 @@ export class HTMLTools extends Async
             this.elements.forEach( element => element.removeAttribute(name) )
 
         else if (Array.isArray(name))
-            this.elements.forEach( element => name.forEach( attr => element.removeAttribute(attr) ) )
+            this.elements.forEach( element => {
+                name.forEach( attr => element.removeAttribute(attr) )
+            })
 
         else if (name == undefined)
         {
