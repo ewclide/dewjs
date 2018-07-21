@@ -3,6 +3,12 @@ $html.ready(function(){
 	$html.body.append(hello);
 });
 
+var mega = new Dew.MegaFunction();
+mega.push(function(e){ log(e, "second") });
+mega.push(function(e){ log(e, "third") });
+
+mega("good");
+
 /*
 var mega = Dew.megaFunction();
 

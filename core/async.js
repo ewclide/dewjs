@@ -1,4 +1,4 @@
-import {megaFunction} from './functions';
+import {MegaFunction} from './mega-function';
 
 export class Async
 {
@@ -6,10 +6,10 @@ export class Async
 	{
 		this._async_waiters  = [];
 		this._async_status   = 0;
-		this._async_calls    = megaFunction();
-		this._async_fails    = megaFunction();
-		this._async_progress = megaFunction();
-		this._async_refresh  = megaFunction();
+		this._async_calls    = new MegaFunction();
+		this._async_fails    = new MegaFunction();
+		this._async_progress = new MegaFunction();
+		this._async_refresh  = new MegaFunction();
 		this._async_ready    = 0;
 		this._async_subReady = false;
 		this._async_strict   = true;

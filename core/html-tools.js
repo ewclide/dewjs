@@ -1,7 +1,8 @@
 import {JsonConverter} from './json-converter';
 import {Transform} from './transform';
 import {Async} from './async';
-import {random, megaFunction} from './functions';
+import {MegaFunction} from './mega-function';
+import {random} from './functions';
 import {array} from './array';
 // import {Animation}     from './animation';
 
@@ -615,7 +616,7 @@ export class HTMLTools extends Async
 
         list[name]
         ? list[name].push(fn)
-        : list[name] = megaFunction(fn);
+        : list[name] = new MegaFunction(fn);
 
         evAttr["on" + name] = "$html._eventFunction(" + this._id + ", '" + name + "', event)";
 

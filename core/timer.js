@@ -1,4 +1,4 @@
-import {megaFunction} from './functions';
+import {MegaFunction} from './mega-function';
 import {bind} from './binder';
 
 export class Timer
@@ -14,9 +14,9 @@ export class Timer
 		this.delay = options.delay || 0;
 		this.step = options.step || 0;
 
-		this._onTick   = megaFunction(options.onTick);
-		this._onStart  = megaFunction(options.onStart);
-		this._onStop   = megaFunction(options.onStop);
+		this._onTick   = new MegaFunction(options.onTick);
+		this._onStart  = new MegaFunction(options.onStart);
+		this._onStop   = new MegaFunction(options.onStop);
 
 		this._state = {
 			timePassed : 0,

@@ -3,6 +3,7 @@ import * as func from './functions';
 import {array} from'./array';
 import {object} from './object';
 import {bind} from './binder';
+import {MegaFunction} from './mega-function';
 import {Template} from './template';
 import {Async} from './async';
 import {Timer} from './timer';
@@ -11,7 +12,6 @@ import {url} from './url';
 import {$html} from './html';
 
 var Dew = {
-	megaFunction : func.megaFunction,
 	define : func.define,
 	istype : func.istype,
 	strconv : func.strconv,
@@ -21,6 +21,7 @@ var Dew = {
 	object : object,
 	array  : array,
 
+	MegaFunction : MegaFunction,
 	Template : Template,
 	Async : Async,
 	Timer : Timer,
