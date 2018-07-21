@@ -6,7 +6,7 @@ class Binder
 
 	change(object, field, trigger)
 	{
-		var hidden = "_" + field;
+		var hidden = "_bind_" + field;
 		// object[hidden] = object[field];
 
 		define(object, hidden, { value : object[field] });
@@ -36,13 +36,13 @@ class Binder
 	fields(data)
 	{
 		var left = data.left,
-		right = data.right,
-		modifier = data.modifier,
-		trigger = data.trigger;
+			right = data.right,
+			modifier = data.modifier,
+			trigger = data.trigger;
 
 		switch (data.type)
 		{
-			case "left" : this._attach(left, right, modifier, trigger); break;
+			case "left"  : this._attach(left, right, modifier, trigger); break;
 			case "right" : this._attach(right, left, modifier, trigger); break;
 			case "cross" :
 				this._attach(left, right, right.modifier, left.trigger);
@@ -61,10 +61,11 @@ class Binder
 		this._genGetSet(current.object, current.field, trigger);
 
 		this._addJoint(
-			current.object, current.field,
+			current.object,
+			current.field,
 			{
-				object : target.object,
-				field : target.field,
+				object   : target.object,
+				field    : target.field,
 				modifier : modifier
 			}
 		);
@@ -73,19 +74,19 @@ class Binder
 	_genGetSet(object, field, trigger)
 	{
 		var self = this,
-			hidden = "_" + field;
+			binded = "_bind_" + field;
 
-		if (!(hidden in object))
+		if (!(binded in object))
 		{
-			object[hidden] = {
-				joints : [],
-				value : object[field],
+			object[binded] = {
+				joints  : [],
+				value   : object[field],
 				trigger : trigger
 			}
 
 			define(object, field, {
 				get : function(){
-					return object[hidden].value;
+					return object[binded].value;
 				},
 				set : function(value){
 					self._setData(object, field, value);
@@ -98,8 +99,8 @@ class Binder
 
 	_addJoint(object, field, joint)
 	{
-		object["_" + field].joints.push(joint);
-		this._applyValue(joint.object, joint.field, object["_" + field].value, joint.modifier);
+		object["_bind_" + field].joints.push(joint);
+		this._applyValue(joint.object, joint.field, object["_bind_" + field].value, joint.modifier);
 	}
 
 	_removeJoint()
@@ -109,18 +110,19 @@ class Binder
 
 	_applyValue(object, field, value, modifier)
 	{
-		var hidden = "_" + field;
+		var binded = "_bind_" + field;
 
 		if (modifier) value = modifier(value);
 
-		if (hidden in object) object[hidden].value = value;
-		else object[field] = value;
+		binded in object
+		? object[binded].value = value
+		: object[field] = value;
 	}
 
 	_setData(object, field, data)
 	{
 		var sourseValue = data.value || data,
-			binded = object["_" + field];
+			binded = object["_bind_" + field];
 			binded.value = sourseValue;
 
 		if (!data.value && binded.trigger)
@@ -132,7 +134,7 @@ class Binder
 
 			if (joint.object == data.object && joint.field == data.field) return;
 
-			else if (("_" + joint.field) in joint.object)
+			else if (("_bind_" + joint.field) in joint.object)
 				joint.object[joint.field] = {
 					value : value,
 					object : object,
