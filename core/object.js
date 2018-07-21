@@ -1,6 +1,5 @@
 import {InitObject} from './init-object';
 import {printErr} from './functions';
-import {array} from './array';
 
 function join(list, target, method)
 {
@@ -32,7 +31,7 @@ function clone(object, full)
     }
 
     if (Array.isArray(object))
-        return array(object).copy();
+        return object.slice();
 
     else if (typeof object == "object")
     {
