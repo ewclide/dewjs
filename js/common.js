@@ -1,16 +1,11 @@
 var hello = $html.create("h1").text("Hello world!");
 $html.ready(function(){
-	$html.body.append(hello);
+	// $html.body.append(hello);
+	$html.select(".app").append(hello);
 });
 
-var mega = new Dew.MegaFunction();
-mega.push(function(e){ log(e, "second") });
-mega.push(function(e){ log(e, "third") });
-
-mega("good");
-
 /*
-var mega = Dew.megaFunction();
+var mega = new Dew.MegaFunction();
 
 mega.push(function(data){
 	return data + 1;
