@@ -1,4 +1,4 @@
-import {strconv, istype, printErr} from './functions';
+import {strParse, isType, printErr} from './functions';
 
 export class InitObject
 {
@@ -47,7 +47,7 @@ export class InitObject
 		}
 		else
 		{
-			if (settings.type && !istype(value, settings.type))
+			if (settings.type && !isType(value, settings.type))
 			{
 				this.errors.push('value of "' + field + '" option must be a "' + settings.type + '" type');
 				value = undefined;
@@ -70,10 +70,10 @@ export class InitObject
 
 			if (settings.only)
 				!attr ? ( value = undefined, this.errors.push('empty required attribute of option "' + field + '"') )
-				: value = strconv(attr);
+				: value = strParse(attr);
 
 			else if (value == undefined && attr)
-				value = strconv(attr);
+				value = strParse(attr);
 		}
 		else this.errors.push('setting "attr" of option "' + field + '" must have element');
 

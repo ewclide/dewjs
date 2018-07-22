@@ -75,8 +75,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.printErr = printErr;
 exports.define = define;
-exports.istype = istype;
-exports.strconv = strconv;
+exports.isType = isType;
+exports.strParse = strParse;
 exports.jsonParse = jsonParse;
 exports.construct = construct;
 exports.publish = publish;
@@ -145,9 +145,9 @@ function define(obj, fields) {
 	}
 };
 
-function istype(value, type) {
+function isType(value, type) {
 	if (Array.isArray(type)) return type.some(function (t) {
-		return istype(value, t) ? true : false;
+		return isType(value, t) ? true : false;
 	});else if (type !== undefined) switch (type) {
 		case "number":
 			return typeof value == "number" ? true : false;
@@ -170,7 +170,7 @@ function istype(value, type) {
 	}
 }
 
-function strconv(value) {
+function strParse(value) {
 	if (typeof value == "string") {
 		if (+value) return +value;
 		if (value == "true" || value == "TRUE") return true;
@@ -178,13 +178,13 @@ function strconv(value) {
 		if (value.search(/\[.+\]/g) != -1) {
 			value = value.replace(/\[|\]/g, "").split(",");
 			return value.map(function (val) {
-				return strconv(val);
+				return strParse(val);
 			});
 		}
 		if (value.search(/\{.+\}/g) != -1) return jsonParse(value);
 
 		return value.replace(/^\s+|\s+$/g, "");
-	} else printErr('strconv function error : type of argument must be "string"');
+	} else printErr('strParse function error : type of argument must be "string"');
 }
 
 function jsonParse(str) {
@@ -1882,8 +1882,8 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 var Dew = {
 	define: func.define,
-	istype: func.istype,
-	strconv: func.strconv,
+	isType: func.isType,
+	strParse: func.strParse,
 	jsonParse: func.jsonParse,
 	random: func.random,
 	publish: func.publish,
@@ -2043,7 +2043,7 @@ var InitObject = exports.InitObject = function () {
 			if (value === undefined) {
 				if (settings.required) this.errors.push('empty required option "' + field + '"');else if (settings.def) value = settings.def;
 			} else {
-				if (settings.type && !(0, _functions.istype)(value, settings.type)) {
+				if (settings.type && !(0, _functions.isType)(value, settings.type)) {
 					this.errors.push('value of "' + field + '" option must be a "' + settings.type + '" type');
 					value = undefined;
 				}
@@ -2061,7 +2061,7 @@ var InitObject = exports.InitObject = function () {
 
 				var attr = $html.convert(settings.element).getAttr(settings.prefix + field);
 
-				if (settings.only) !attr ? (value = undefined, this.errors.push('empty required attribute of option "' + field + '"')) : value = (0, _functions.strconv)(attr);else if (value == undefined && attr) value = (0, _functions.strconv)(attr);
+				if (settings.only) !attr ? (value = undefined, this.errors.push('empty required attribute of option "' + field + '"')) : value = (0, _functions.strParse)(attr);else if (value == undefined && attr) value = (0, _functions.strParse)(attr);
 			} else this.errors.push('setting "attr" of option "' + field + '" must have element');
 
 			return value;

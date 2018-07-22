@@ -74,10 +74,10 @@ export function define(obj, fields, options = {})
 	
 };
 
-export function istype(value, type)
+export function isType(value, type)
 {
 	if (Array.isArray(type))
-		return type.some( t => istype(value, t) ? true : false );
+		return type.some( t => isType(value, t) ? true : false );
 
 	else if (type !== undefined)
 		switch (type)
@@ -105,7 +105,7 @@ export function istype(value, type)
 	}
 }
 
-export function strconv(value)
+export function strParse(value)
 {
 	if (typeof value == "string")
 	{
@@ -115,13 +115,13 @@ export function strconv(value)
 		if (value.search(/\[.+\]/g) != -1)
 		{
 			value = value.replace(/\[|\]/g, "").split(",");
-			return value.map(val => strconv(val));
+			return value.map(val => strParse(val));
 		}
 		if (value.search(/\{.+\}/g) != -1) return jsonParse(value);
 
 		return value.replace(/^\s+|\s+$/g, "");
 	}
-	else printErr('strconv function error : type of argument must be "string"')
+	else printErr('strParse function error : type of argument must be "string"')
 }
 
 export function jsonParse(str)

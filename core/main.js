@@ -13,8 +13,8 @@ import {$html} from './html';
 
 var Dew = {
 	define    : func.define,
-	istype    : func.istype,
-	strconv   : func.strconv,
+	isType    : func.isType,
+	strParse  : func.strParse,
 	jsonParse : func.jsonParse,
 	random    : func.random,
 	publish   : func.publish,
