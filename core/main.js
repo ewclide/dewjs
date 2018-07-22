@@ -19,6 +19,7 @@ var Dew = {
 	random    : func.random,
 	publish   : func.publish,
 	construct : func.construct,
+	configure : func.configure,
 
 	object : object,
 	array  : array,

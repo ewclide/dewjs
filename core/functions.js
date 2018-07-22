@@ -199,6 +199,31 @@ export function publish(TheClass, fields, methods)
     return Output;
 }
 
+export function configure(settings, defaults, attributes, element)
+{
+	for (var i in defaults)
+		if (settings[i] === undefined)
+		{
+			var attr = 'data-' + (attributes[i] || i), num;
+
+			attr = element ? element.getAttribute(attr) : null;
+			num = +attr;
+
+			if (attr === "" || attr === "true")
+				attr = true;
+
+			else if (attr === "false")
+				attr = false;
+
+			else if (attr !== null && !isNaN(num))
+				attr = num;
+
+			settings[i] = attr !== null ? attr : defaults[i];
+		}
+
+	return settings;
+}
+
 export function random(min = 0, max = 9999999)
 {
 	return Math.floor(Math.random() * (max - min)) + min;

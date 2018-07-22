@@ -80,6 +80,7 @@ exports.strParse = strParse;
 exports.jsonParse = jsonParse;
 exports.construct = construct;
 exports.publish = publish;
+exports.configure = configure;
 exports.random = random;
 exports.log = log;
 function printErr(data) {
@@ -253,6 +254,22 @@ function publish(TheClass, fields, methods) {
 	});
 
 	return Output;
+}
+
+function configure(settings, defaults, attributes, element) {
+	for (var i in defaults) {
+		if (settings[i] === undefined) {
+			var attr = 'data-' + (attributes[i] || i),
+			    num;
+
+			attr = element ? element.getAttribute(attr) : null;
+			num = +attr;
+
+			if (attr === "" || attr === "true") attr = true;else if (attr === "false") attr = false;else if (attr !== null && !isNaN(num)) attr = num;
+
+			settings[i] = attr !== null ? attr : defaults[i];
+		}
+	}return settings;
 }
 
 function random() {
@@ -1888,6 +1905,7 @@ var Dew = {
 	random: func.random,
 	publish: func.publish,
 	construct: func.construct,
+	configure: func.configure,
 
 	object: _object.object,
 	array: _array.array,

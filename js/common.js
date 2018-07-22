@@ -4,6 +4,7 @@ $html.ready(function(){
 	$html.select(".app").append(hello);
 });
 
+/*
 class Test
 {
 	constructor(a, b)
@@ -41,6 +42,7 @@ log(test.a)
 test.a = "A10";
 test.b = "B2";
 test.getUnited();
+*/
 
 /*
 var mega = new Dew.MegaFunction();
