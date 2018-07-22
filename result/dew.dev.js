@@ -78,6 +78,8 @@ exports.define = define;
 exports.istype = istype;
 exports.strconv = strconv;
 exports.jsonParse = jsonParse;
+exports.construct = construct;
+exports.publish = publish;
 exports.random = random;
 exports.log = log;
 function printErr(data) {
@@ -215,6 +217,42 @@ function jsonParse(str) {
 	}
 
 	return JSON.parse(result);
+}
+
+function construct(Cls, args) {
+	args = Array.from(args);
+	args.unshift(0);
+	return new (Function.bind.apply(Cls, args))();
+}
+
+function publish(TheClass, fields, methods) {
+	var list = {};
+
+	function Output() {
+		var id = Math.random();
+		list[id] = construct(TheClass, arguments);
+		this.id = id;
+	}
+
+	fields.forEach(function (field) {
+		define(Output.prototype, field, {
+			get: function get() {
+				return list[this.id][field];
+			},
+			set: function set(value) {
+				list[this.id][field] = value;
+			}
+		});
+	});
+
+	methods.forEach(function (method) {
+		Output.prototype[method] = function () {
+			var obj = list[this.id];
+			obj[method].apply(obj, arguments);
+		};
+	});
+
+	return Output;
 }
 
 function random() {
@@ -1848,6 +1886,8 @@ var Dew = {
 	strconv: func.strconv,
 	jsonParse: func.jsonParse,
 	random: func.random,
+	publish: func.publish,
+	construct: func.construct,
 
 	object: _object.object,
 	array: _array.array,

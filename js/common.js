@@ -4,6 +4,44 @@ $html.ready(function(){
 	$html.select(".app").append(hello);
 });
 
+class Test
+{
+	constructor(a, b)
+	{
+		this.a = a;
+		this.b = b;
+	}
+
+	getA()
+	{
+		log(this.a)
+	}
+
+	setA(val)
+	{
+		this.a = val
+	}
+
+	getUnited()
+	{
+		log(this.a + " " + this.b)
+	}
+
+	getB()
+	{
+		log(this.b)
+	}
+}
+
+var PTest = Dew.publish(Test, ["a"], ["getA", "setA", "getUnited"]);
+
+var test = new PTest("A", "B");
+
+log(test.a)
+test.a = "A10";
+test.b = "B2";
+test.getUnited();
+
 /*
 var mega = new Dew.MegaFunction();
 
