@@ -1,15 +1,21 @@
 {
   "name": "dew",
   "version": "1.0.0",
-  "description": "open source javascript library",
+  "description": "Experimental JavaScript library for UI programming",
   "author": "ewclide",
   "license": "MIT",
+  "scripts": {
+    "dev" : "webpack-dev-server --mode development",
+    "build": "webpack --mode production"
+  },
   "devDependencies": {
-    "babel-core": "^6.25.0",
-    "babel-loader": "^7.1.2",
+    "babel-core": "^6.26.3",
+    "babel-loader": "^7.1.5",
     "babel-polyfill": "^6.26.0",
-    "babel-preset-env": "^1.6.1",
-    "uglifyjs-webpack-plugin": "^1.1.6",
-    "webpack": "^3.10.0"
+    "babel-preset-env": "^1.7.0",
+    "uglifyjs-webpack-plugin": "^1.2.7",
+    "webpack": "^4.16.3",
+    "webpack-cli": "^3.1.0",
+    "webpack-dev-server": "^3.1.5"
   }
 }
