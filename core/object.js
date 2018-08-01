@@ -44,23 +44,18 @@ function clone(object, full)
     else return object;
 }
 
-class Methods
-{
-    constructor(target)
-    {
-        this.target = target;
-    }
+export var objectExtends = {
 
-    clone(full)
+    clone(target, full)
     {
-        return this.target.constructor != Object
-        ? Object.assign((new this.target.constructor()), this.target)
-        : clone(this.target, full)
-    }
+        return target.constructor != Object
+        ? Object.assign((new target.constructor()), target)
+        : clone(target, full)
+    },
 
-    joinLeft(list, copy)
+    joinLeft(target, list, copy)
     {
-        var target = copy ? Object.assign({}, this.target) : this.target;
+        target = copy ? Object.assign({}, target) : target;
 
         join(list, target, (item, target) => {
             for (var i in item)
@@ -68,11 +63,11 @@ class Methods
         });
 
         return target;
-    }
+    },
 
-    joinRight(list, copy)
+    joinRight(target, list, copy)
     {
-        var target = copy ? Object.assign({}, this.target) : this.target;
+        target = copy ? Object.assign({}, target) : target;
 
         join(list, target, (item, target) => {
             for (var i in item)
@@ -80,16 +75,16 @@ class Methods
         });
 
         return target;
-    }
+    },
 
-    joinFull(list, copy)
+    joinFull(target, list, copy)
     {
-        var target = copy ? defineProperties(this.target, {}) : this.target;
+        target = copy ? defineProperties(target, {}) : target;
         join(list, target, item => defineProperties(item, target));
         return target;
-    }
+    },
 
-    init(values, settings, common = { errors : true })
+    init(target, values, settings, common = { errors : true })
     {
         if (!values || !settings)
         {
@@ -97,7 +92,7 @@ class Methods
             return false;
         }
 
-        var init = new InitObject(this.target);
+        var init = new InitObject(target);
 
         for (var field in settings)
         {
@@ -112,9 +107,4 @@ class Methods
         return init.errors.length
         ? (common.errors && printErr(init.errors), false) : true;
     }
-}
-
-export function object(obj)
-{
-    return new Methods(obj);
 }
