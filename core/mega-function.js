@@ -46,7 +46,7 @@ export class MegaFunction
 
 		if (typeof fn == "function")
 		{
-			if (name) self._names[name] = self.count;
+			if (name) self._names[name] = this.count;
 			self._handlers.push(fn);
 			this.count = self._handlers.length;
 		}
