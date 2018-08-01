@@ -45,39 +45,43 @@ function natConv(value)
 	else return value.replace(/\s+/g, '').toUpperCase();
 }
 
-class Methods
-{
-	constructor(arr)
-    {
-        this.arr = arr;
-    }
+export var arrayExtends = {
 
-    have(value)
+    have : function(arr, value)
 	{
-		var index = this.arr.indexOf(value);
+		var index = arr.indexOf(value);
 		return index == -1 ? false : { index : index };
-	}
+	},
 
-	subtract(arr)
+	subtract : function(arr, arrSub)
 	{
-		return this.arr.filter( item => arr.indexOf(item) < 0 );
-	}
+		return arr.filter( item => arrSub.indexOf(item) < 0 );
+	},
 
-	difference(arr)
+	difference : function(arr, arrDiff)
 	{
-		return this.arr.filter( item => arr.indexOf(item) < 0 )
-			   .concat( arr.filter( item => this.arr.indexOf(item) < 0 ) );
-	}
+		return arr.filter( item => arrDiff.indexOf(item) < 0 )
+			   .concat( arrDiff.filter( item => arr.indexOf(item) < 0 ) );
+	},
 
-	compare(arr)
+	compare : function(arr, arrComp)
 	{
-		return this.arr.length == arr.length &&
-			   this.arr.every( (item, index) => item === arr[index] );
-	}
+		return arr.length == arrComp.length &&
+			   arr.every( (item, index) => item === arrComp[index] );
+	},
 
-	naturalSort(settings = {})
+	unique : function(arr)
 	{
-		return this.arr.sort( (cur, next) => {
+		for (var i = 0; i < arr.length; ++i)
+		{
+			for (var j = i+1; j < arr.length; ++j)
+				if (arr[i] === arr[j]) arr.splice(j--, 1);
+		}
+	},
+
+	naturalSort : function(arr, settings = {})
+	{
+		return arr.sort( (cur, next) => {
 
 			var result = 0;
 
@@ -93,43 +97,37 @@ class Methods
 
 			return result;
 		});
-	}
+	},
 
-	search(val, settings = {})
+	search : function(arr, val, settings = {})
 	{
 		var result = settings.inside
-			? this.arr.filter( item => checkInclude(item[settings.inside], val, settings) )
-			: this.arr.filter( item => checkInclude(item, val, settings) );
+			? arr.filter( item => checkInclude(item[settings.inside], val, settings) )
+			: arr.filter( item => checkInclude(item, val, settings) );
 
 		return result.length ? result : false;
-	}
+	},
 
-	removeValue(value)
+	removeValue : function(arr, value)
 	{
 		var list = Array.isArray(value) ? value : [value];
 
 		return list.filter( item => {
-			var index = this.arr.indexOf(item);
+			var index = arr.indexOf(item);
 			if (index != -1)
 			{
-				this.arr.splice(index, 1);
+				arr.splice(index, 1);
 				return true;
 			}
 			else return false;
 		});
-	}
+	},
 
-	removeIndex(index)
+	removeIndex : function(arr, index)
 	{
 		var values = Array.isArray(index)
-			? index.map( i => this.arr[i] )
-			: this.arr[index];
+			? index.map( i => arr[i] ) : arr[index];
 
-		return this.removeValue(values);
+		return arrayExtends.removeValue(arr, values);
 	}
-}
-
-export function array(arr)
-{
-    return new Methods(arr);
 }

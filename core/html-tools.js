@@ -3,8 +3,7 @@ import {Transform} from './transform';
 import {Async} from './async';
 import {MegaFunction} from './mega-function';
 import {random} from './functions';
-import {array} from './array';
-// import {Animation}     from './animation';
+import {arrayExtends} from './array';
 
 export class HTMLTools extends Async
 {
@@ -645,7 +644,7 @@ export class HTMLTools extends Async
             if (element.parentNode)
                 element.parentNode.removeChild(element);
 
-            array(this.elements).removeIndex(index);
+            arrayExtends.removeIndex(this.elements, index);
         });
     }
 }

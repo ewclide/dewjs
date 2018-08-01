@@ -1,6 +1,6 @@
 ﻿import './polyfill';
 import * as func from './functions';
-import {array} from'./array';
+import {arrayExtends} from'./array';
 import {object} from './object';
 import {bind} from './binder';
 import {MegaFunction} from './mega-function';
@@ -22,7 +22,10 @@ var Dew = {
 	configure : func.configure,
 
 	object : object,
-	array  : array,
+
+	get array(){
+		return arrayExtends;
+	},
 
 	MegaFunction : MegaFunction,
 	Template : Template,
