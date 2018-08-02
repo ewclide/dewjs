@@ -16,7 +16,7 @@ All detailed **documentation** you can read [there][3].
 The easiest way to get started is to drop the CDN hosted library into your page:
 
 ```html
-<script src="https://cdn.some-address.com/libs/dew/1.3.1/dew.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/ewclide/dewjs@1.0.0-beta/result/dew.min.js"></script>
 ```
 
 Using npm:
