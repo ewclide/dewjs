@@ -2,7 +2,6 @@ import {jsonConverter} from './json-converter';
 import {Transform} from './transform';
 import {Async} from './async';
 import {MegaFunction} from './mega-function';
-import {random} from './functions';
 import {arrayExtends} from './array';
 
 export class HTMLTools extends Async
@@ -13,7 +12,7 @@ export class HTMLTools extends Async
 
         this.elements = [];
         this.length = 0;
-        this._id = random();
+        this._id = Math.random();
         this._query = '';
 
         this.addElements(elements);
