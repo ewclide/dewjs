@@ -30,6 +30,11 @@ export class HTMLTools extends Async
         this.length = this.elements.length;
     }
 
+    native()
+    {
+        return this.elements.length ? this.elements[0] : this.elements;
+    }
+
     get tag()
     {
         return this.elements[0].tagName.toLowerCase();
