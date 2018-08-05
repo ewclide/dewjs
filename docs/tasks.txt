@@ -1,0 +1,26 @@
+$html
+1) append support array
+2) prependTo
+3) transform save his state into htmlTool object
+
+bind
+1) unbind
+2) bind onchange = bind trigger
+3) add bind filter
+4) replace bind metadata into hidden object and add bind id
+
+object init
+1) split attr option to
+attr ~ "on-change"
+element -> </>
+prefix ~ "app-"
+range - list of the valid values
+
+MegaFunction
+1) add third argument - filter function
+filter(firstData, prevFnresult, prevFnLink)
+if filter return undefined then next function not evoke
+
+Async
+1) add supporting Promise in wait method
+2) add static wait method wich return async object
