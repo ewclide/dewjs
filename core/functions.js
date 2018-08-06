@@ -260,7 +260,9 @@ random.key = function(length = 15, types = ["all"])
 
 export function log()
 {
-	console.log.apply(window, arguments);
+	var args = Array.from(arguments);
+	args.unshift(_getSourceLog() + "\n\n");
+	console.log.apply(window, args);
 }
 
 log.time = console.time;
