@@ -124,7 +124,7 @@ export class Async
 		var part = 1 / this._async_waiters.length,
 			ready = 0;
 
-		this._async_waiters.forEach(function(waiter){
+		this._async_waiters.forEach( waiter => {
 			ready += waiter._async_ready * part;
 		});
 
