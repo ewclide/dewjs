@@ -42,12 +42,12 @@ export class Async
 
 	get _canStart()
 	{
-		var waited = true;
+		var pending = true;
 
 		if (this._async_strict && this._async_waiters.length && !this._async_subReady)
-			waited = false;
+			pending = false;
 
-		return this._async_status == 0 && waited ? true : false;
+		return this._async_status == 0 && pending;
 	}
 
 	then(fn)
@@ -166,6 +166,11 @@ export class Async
 	get strict()
 	{
 		return this._async_strict;
+	}
+
+	get status()
+	{
+		return this._async_status;
 	}
 
 	get completed()
