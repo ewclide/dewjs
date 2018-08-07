@@ -4,34 +4,34 @@ import {Async} from './async';
 import {MegaFunction} from './mega-function';
 import {arrayExtends} from './array';
 
-export class HTMLTools extends Async
+export class HTMLTools
 {
     constructor(elements)
     {
-        super();
-
-        this.elements = [];
-        this.length = 0;
+        this.elements = elements.length > 1 ? elements : [elements];
+        this.query = '';
         this._id = Math.random();
-        this._query = '';
-
-        this.addElements(elements);
+        this._ready = false;
     }
 
-    addElements(elements)
+    joinElements(list)
     {
-        if (!Array.isArray(elements) && elements.length)
-            for (var i = 0; i < elements.length; i++)
-                this.elements.push(elements[i]);
+        var index = this.elements.length;
 
-        else this.elements = this.elements.concat(elements);
-        
-        this.length = this.elements.length;
+        for (var i = 0; i < list.length; i++)
+            this.elements[index + i] = list[i];
+
+        return this;
     }
 
     native()
     {
         return this.elements.length ? this.elements[0] : this.elements;
+    }
+
+    get length()
+    {
+        return this.elements.length;
     }
 
     get tag()
@@ -148,13 +148,20 @@ export class HTMLTools extends Async
     {
         var elements = [], result;
 
-        this.elements.forEach( element => {
-            var search = element.querySelectorAll(query);
-            elements = elements.concat(Array.from(search));
-        });
+        if (this.elements.length == 1)
+            elements = this.elements[0].querySelectorAll(query);
+
+        else for (var i = 0; i < this.elements.length; i++)
+        {
+            var search = this.elements[i].querySelectorAll(query),
+                index = elements.length;
+
+            for (var j = 0; j < search.length; j++)
+                elements[index + j] = search[j];
+        }
 
         result = new HTMLTools(elements);
-        result._query = query;
+        result.query = query;
 
         return result;
     }
@@ -205,7 +212,7 @@ export class HTMLTools extends Async
 
             if (rm) htl.remove();
 
-            htl.addElements(result);
+            htl.elements = htl.elements.concat(result);
 
             return htl;
         }

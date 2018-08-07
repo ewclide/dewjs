@@ -21,8 +21,9 @@ $html.extend = function(name, method)
 
 $html.ready = function(fn)
 {
-    this.then(fn);
-    return $html;
+    if (this._ready) fn()
+    else document.addEventListener("DOMContentLoaded", fn);
+    // this.then(fn);
 }
 
 $html.script = function(source, add = true)
@@ -106,7 +107,8 @@ $html.cascad = function()
 
 document.addEventListener("DOMContentLoaded", function(e){
     $html.body = new HTMLTools(document.body);
-    $html.resolve();
+    $html._ready = true;
+    // $html.resolve();
     // $html.wait($html._scripts).then($html.resolve);
 });
 
