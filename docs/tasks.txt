@@ -23,5 +23,4 @@ if filter return undefined then next function not evoke
 
 Async
 1) add supporting Promise in wait method
-2) add static wait method wich return async object
 3) progress - checkout ready status. If it is 1 then resolve;

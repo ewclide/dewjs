@@ -188,3 +188,10 @@ export class Async
 		return true;
 	}
 }
+
+Async.wait = function(list, progress)
+{
+	var async = new Async();
+	async.wait(list, progress);
+	return async;
+}
