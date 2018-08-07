@@ -8,8 +8,8 @@ export class Async
 		this._async_status   = 0;
 		this._async_calls    = new MegaFunction();
 		this._async_fails    = new MegaFunction();
-		this._async_progress = new MegaFunction();
-		this._async_refresh  = new MegaFunction();
+		this._async_progress = null;
+		this._async_refresh  = null;
 		this._async_ready    = 0;
 		this._async_subReady = false;
 		this._async_strict   = true;
@@ -68,6 +68,9 @@ export class Async
 
 	progress(fn)
 	{
+		if (!this._async_progress)
+			this._async_progress = new MegaFunction();
+
 		this._async_progress.push(fn);
 	}
 
@@ -142,6 +145,9 @@ export class Async
 
 	onRefresh(fn)
 	{
+		if (!this._async_refresh)
+			this._async_refresh  = new MegaFunction();
+
 		this._async_refresh.push(fn);
 	}
 
