@@ -20,6 +20,7 @@ var Dew = {
 	publish   : func.publish,
 	construct : func.construct,
 	configure : func.configure,
+	printErr  : func.printErr,
 
 	get object(){
 		return objectExtends;
