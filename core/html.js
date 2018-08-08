@@ -23,30 +23,21 @@ $html.ready = function(fn)
 {
     if (this._ready) fn()
     else document.addEventListener("DOMContentLoaded", fn);
-    // this.then(fn);
 }
 
-$html.script = function(source, add = true)
+$html.script = function(source, add)
 {
-    var script = document.createElement("script"),
+    var result = new Async(),
+        element = document.createElement("script");
 
-    $script = new HTMLTools(script);
-    $script.ready = function(fn){
-        $script.then(fn);
-        return $script;
-    }
-
-    script.src = source;
-    script.onload = function(){
-        $script.resolve();
+    element.src = source;
+    element.onload = function(){
+        result.resolve(element);
     };
 
-    if (add) document.body.appendChild(script)
-    else $script.eventAttach("load", function(){
-        $script.resolve();
-    })
+    document.body.appendChild(element);
 
-    return $script;
+    return result;
 }
 
 $html.create = function(tag, attr, css)
@@ -108,8 +99,6 @@ $html.cascad = function()
 document.addEventListener("DOMContentLoaded", function(e){
     $html.body = new HTMLTools(document.body);
     $html._ready = true;
-    // $html.resolve();
-    // $html.wait($html._scripts).then($html.resolve);
 });
 
 export {$html}

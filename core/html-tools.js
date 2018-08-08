@@ -3,30 +3,37 @@ import {Transform} from './transform';
 import {Async} from './async';
 import {MegaFunction} from './mega-function';
 import {arrayExtends} from './array';
+import {printErr} from './functions';
+
+function joinElements(source, list, clone)
+{
+    var result = Array.from(source);
+
+    for (var i = 0; i < list.length; i++)
+        result.push(list[i]);
+
+    return result;
+}
 
 export class HTMLTools
 {
     constructor(elements)
     {
-        this.elements = elements.length > 1 ? elements : [elements];
+        this.elements = elements.length >= 1 ? elements : [elements];
         this.query = '';
         this._id = Math.random();
         this._ready = false;
     }
 
-    joinElements(list)
+    join(elements)
     {
-        var index = this.elements.length;
-
-        for (var i = 0; i < list.length; i++)
-            this.elements[index + i] = list[i];
-
+        this.elements = joinElements(this.elements, elements);
         return this;
     }
 
     native()
     {
-        return this.elements.length ? this.elements[0] : this.elements;
+        return this.elements.length ? this.elements[0] : Array.from(this.elements);
     }
 
     get length()
@@ -44,38 +51,23 @@ export class HTMLTools
         return true;
     }
 
-    ready()
-    {
-        var fn, sub, list = this.elements;
-
-        arguments.length == 1
-        ? fn = arguments[0]
-        : (sub = arguments[0], fn = arguments[1]);
-
-        if (sub)
-        {
-            sub = this.select("img, link, script, iframe");
-            list = list.concat(sub.elements);
-        }
-
-        this.then(fn);
-        this._observReady(list);
-
-        return this;
-    }
-
-    _observReady(list)
+    ready(fn)
     {
         var self = this,
-
-        checkout = function(){
-            list._countReady++;
-            if (list._countReady == list.length)
-                self.resolve();
-        }
-
+            result = new Async(),
+            list = this.select("img, link, script, iframe"),
+            checkout = function()
+            {
+                list._countReady++;
+                if (list._countReady == list.length)
+                {
+                    result.resolve();
+                    if (typeof fn == "function") fn();
+                }
+            }
+        
+        list = joinElements(list.elements, this.elements);
         list._countReady = 0;
-
         list.forEach( element => {
 
             var tag = element.tagName.toLowerCase(),
@@ -89,7 +81,9 @@ export class HTMLTools
 
             complete ? checkout() : element.addEventListener("load", checkout);
 
-        }); 
+        });
+
+        return result;
     }
 
     mutation(fn, options)
