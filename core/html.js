@@ -22,7 +22,9 @@ $html.extend = function(name, method)
 $html.ready = function(fn)
 {
     if (this._ready) fn()
-    else document.addEventListener("DOMContentLoaded", fn);
+    else document.addEventListener("DOMContentLoaded", function(){
+        fn()
+    });
 }
 
 $html.script = function(source, add)
@@ -33,6 +35,9 @@ $html.script = function(source, add)
     element.src = source;
     element.onload = function(){
         result.resolve(element);
+    };
+    element.onerror = function(){
+        result.reject("Can't load the script - " + source);
     };
 
     document.body.appendChild(element);

@@ -1,21 +1,22 @@
 export function printErr(data, source = true)
 {
-	var error = "";
+	var error = "Error: ";
 
 	if (source) source = _getSourceLog();
 
 	if (Array.isArray(data) && data.length)
 	{
 		error += data.title || "Error list";
-		if (source) error += " ( " + source + " )";
-		error += ":\n";
+		error += "\n";
 
-		data.forEach( message => error += "   - " + message + "\n" );
+		data.forEach( message => error += "  --> " + message + "\n" );
+
+        if (source) error += "  -----\n  Source: " + source;
 	}
 	else if (typeof data == "string")
 	{
 		error += data;
-		if (source) error += " ( " + source + " )";
+		if (source) error += " (" + source + ")";
 	}
 	else return false;
 
@@ -260,9 +261,12 @@ random.key = function(length = 15, types = ["all"])
 
 export function log()
 {
-	var args = Array.from(arguments);
-	args.unshift(_getSourceLog() + "\n\n");
-	console.log.apply(window, args);
+	var args = Array.from(arguments),
+		source = _getSourceLog();
+
+    if (source) args.push("\n-----\nSource: " + source);
+
+	console.log.apply(null, args);
 }
 
 log.time = console.time;
