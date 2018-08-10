@@ -44,6 +44,7 @@ $html.ready(function(){
             }
         })
 
+
     $html.body.append(bar);
 
     var loader = new Loader(bar);

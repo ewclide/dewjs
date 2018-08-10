@@ -2,7 +2,6 @@ import {jsonConverter} from './json-converter';
 import {Transform} from './transform';
 import {Async} from './async';
 import {MegaFunction} from './mega-function';
-import {arrayExtends} from './array';
 import {printErr} from './functions';
 
 function joinElements(source, list, clone)
@@ -160,57 +159,65 @@ export class HTMLTools
         return result;
     }
 
-    before(htl, rm = true)
+    before(htl, remove)
     {
-        return this._insert(htl, rm, "beforebegin");
-    }
-
-    after(htl, rm = true)
-    {
-        return this._insert(htl, rm, "afterend");
-    }
-
-    append(htl, rm = true)
-    {
-        return this._insert(htl, rm, "beforeend");
-    }
-
-    appendTo(target, rm = true)
-    {
-        target.append(this, rm);
+        this._insert(htl, remove, "beforebegin");
         return this;
     }
 
-    prepend(htl, rm = true)
+    after(htl, remove)
     {
-        return this._insert(htl, rm, "afterbegin");
+        this._insert(htl, remove, "afterend");
+        return this;
     }
 
-    _insert(htl, rm, position)
+    append(htl, remove)
     {
-        var self = this, result = [];
+        this._insert(htl, remove, "beforeend");
+        return this;
+    }
 
-        htl = $html.convert(htl);
+    appendTo(target, remove)
+    {
+        target.append(this, remove);
+        return this;
+    }
 
-        if (htl)
+    prepend(htl, remove)
+    {
+        this._insert(htl, remove, "afterbegin");
+        return this;
+    }
+
+    _insert(htl, remove, position)
+    {
+        if (htl.isHTMLTools)
         {
-            this.elements.forEach( element => {
-                var clones = [];
-                htl.elements.forEach( insertElement => {
-                    var clone = insertElement.cloneNode(true);
-                    clones.push(clone);
-                    element.insertAdjacentElement(position, clone);
-                });
-                result = result.concat(clones);
-            });
+            if (!Array.isArray(htl.elements))
+                htl.elements = Array.from(htl.elements);
 
-            if (rm) htl.remove();
+            if (!htl._srcElements)
+                htl._srcElements = htl.elements.slice();
 
-            htl.elements = htl.elements.concat(result);
+            for (var i = 0; i < this.elements.length; i++)
+            for (var j = 0; j < htl._srcElements.length; j++)
+            {
+                let element = htl._srcElements[j];
 
-            return htl;
+                if (!remove)
+                {
+                    element = htl._srcElements[j].cloneNode(true);
+                    htl.elements.push(element);
+                }
+
+                this.elements[i].insertAdjacentElement(position, element);
+            }
         }
-        else return false;
+        else if (Array.isArray(htl))
+        {
+            for (var i = 0; i < htl.length; i++)
+                this._insert(htl[i], remove, position);
+        }
     }
 
     jsonBefore(json)
@@ -645,11 +652,16 @@ export class HTMLTools
 
     remove()
     {
-        this.elements.forEach( (element, index) => {
+        for (var i = 0; i < this.elements.length; i++)
+        {
+            let element = this.elements[i];
+
             if (element.parentNode)
                 element.parentNode.removeChild(element);
+        }
 
-            arrayExtends.removeIndex(this.elements, index);
-        });
+        this.elements = [];
+
+        return this;
     }
 }
