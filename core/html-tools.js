@@ -378,22 +378,30 @@ export class HTMLTools
         return this;
     }
 
-    width(value, units = "px")
+    width(value)
     {
+        if (value === undefined)
+            return this.elements[0].offsetWidth;
+
         if (typeof value == "number")
-            this.elements.forEach( element => element.style.width = value + units );
+            value += "px";
 
-        else return this.elements[0].offsetWidth;
-
+        for (var i = 0; i < this.elements.length; i++)
+            this.elements[i].style.width = value;
+        
         return this;
     }
 
-    height(value, units = "px")
+    height(value)
     {
-        if (typeof value == "number")
-            this.elements.forEach( element => element.style.height = value + units );
+        if (value === undefined)
+            return this.elements[0].offsetHeight;
 
-        else return this.elements[0].offsetHeight;
+        if (typeof value == "number")
+            value += "px";
+
+        for (var i = 0; i < this.elements.length; i++)
+            this.elements[i].style.height = value;
 
         return this;
     }
