@@ -1,7 +1,7 @@
 import {HTMLTools}  from './html-tools';
 import {StyleSheet} from './stylesheet';
 import {Async} from './async';
-import {printErr} from './functions';
+import {printErr, define} from './functions';
 
 var proto = HTMLTools.prototype,
     $html = new HTMLTools(document);
@@ -101,8 +101,21 @@ $html.cascad = function()
     return new StyleSheet(); 
 }
 
-document.addEventListener("DOMContentLoaded", function(e){
-    $html.body = new HTMLTools(document.body);
+define($html, "body", {
+    get : function()
+    {
+        if (!this._body && document.body)
+            this._body = new HTMLTools(document.body);
+
+        else if (!document.body)
+            printErr("body element is currently unavailable!");
+
+        return this._body;
+    },
+    set : function(){}
+})
+
+document.addEventListener("DOMContentLoaded", function(){
     $html._ready = true;
 });
 
