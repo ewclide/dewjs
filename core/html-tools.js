@@ -289,16 +289,18 @@ export class HTMLTools
     {
         for (var i = 0; i < this.elements.length; i++)
             this.elements[i].classList.remove(name);
-        
+
         return this;
     }
 
     html(str, clear = true)
     {
         if (str !== undefined)
-            this.elements.forEach( element => {
-                clear ? element.innerHTML = str : element.innerHTML += str
-            })
+            for (var i = 0; i < this.elements.length; i++)
+            {
+                if (clear) this.elements[i].innerHTML = str;
+                else this.elements[i].innerHTML += str;
+            }
 
         else return this.elements[0].innerHTML;
 
