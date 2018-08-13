@@ -369,9 +369,11 @@ export class HTMLTools
 
     choose(index)
     {
-        this.elements.forEach( element => {
-            if ("selectedIndex" in element) element.selectedIndex = index;
-        });
+        for (var i = 0; i < this.elements.length; i++)
+        {
+            if ("selectedIndex" in this.elements[i])
+                this.elements[i].selectedIndex = index;
+        }
 
         return this;
     }
