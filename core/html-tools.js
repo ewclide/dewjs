@@ -353,10 +353,11 @@ export class HTMLTools
 
     toogle()
     {
-        this.elements.forEach( element => {
-            if ("checked" in element)
-                element.checked = element.checked ? false : true;
-        });
+        for (var i = 0; i < this.elements.length; i++)
+        {
+            if ("checked" in this.elements[i])
+                this.elements[i].checked = !this.elements[i].checked;
+        }
 
         return this;
     }
