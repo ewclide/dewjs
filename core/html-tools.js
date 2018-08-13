@@ -279,13 +279,17 @@ export class HTMLTools
 
     addClass(name)
     {
-        this.elements.forEach( element => element.classList.add(name) );
+        for (var i = 0; i < this.elements.length; i++)
+            this.elements[i].classList.add(name);
+
         return this;
     }
 
     removeClass(name)
     {
-        this.elements.forEach( element => element.classList.remove(name) );
+        for (var i = 0; i < this.elements.length; i++)
+            this.elements[i].classList.remove(name);
+        
         return this;
     }
 
