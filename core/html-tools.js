@@ -312,7 +312,7 @@ export class HTMLTools
         if (str !== undefined)
             for (var i = 0; i < this.elements.length; i++)
                 this.elements[i].innerText = str;
-            
+
         else return this.elements[0].innerText;
 
         return this;
@@ -321,7 +321,9 @@ export class HTMLTools
     value(data)
     {
         if (data !== undefined)
-            this.elements.forEach( element => element.value = data );
+            for (var i = 0; i < this.elements.length; i++)
+                this.elements[i].value = data;
+
         else return this.elements[0].value;
 
         return this;
