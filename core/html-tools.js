@@ -310,8 +310,9 @@ export class HTMLTools
     text(str)
     {
         if (str !== undefined)
-            this.elements.forEach( element => element.innerText = str );
-
+            for (var i = 0; i < this.elements.length; i++)
+                this.elements[i].innerText = str;
+            
         else return this.elements[0].innerText;
 
         return this;
