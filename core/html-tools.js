@@ -339,9 +339,11 @@ export class HTMLTools
     checked(yes)
     {
         if (typeof yes == "boolean")
-            this.elements.forEach( element => {
-                if ("checked" in element) element.checked = yes
-            });
+            for (var i = 0; i < this.elements.length; i++)
+            {
+                if ("checked" in this.elements[i])
+                    this.elements[i].checked = yes;
+            }
 
         else if (yes == undefined)
             return this.elements[0].checked;
