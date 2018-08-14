@@ -157,11 +157,11 @@ export class HTMLTools
 
         if (!element) element = this.elements[0]
 
-        element.style.display
-        ? display = element.style.display
-        : display = getComputedStyle(element).display;
+        display = element.style.display
+        ? element.style.display
+        : getComputedStyle(element).display;
 
-        return display == "none" ? false : true;
+        return display !== "none";
     }
 
     select(query)

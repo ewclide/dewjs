@@ -16,7 +16,7 @@ $html._eventFunction = function(id, type, e)
 $html.extend = function(name, method)
 {
     proto[name] = method;
-    return $html;
+    return this;
 }
 
 $html.ready = function(fn)
@@ -37,7 +37,7 @@ $html.script = function(source, add)
         result.resolve(element);
     };
     element.onerror = function(){
-        result.reject("Can't load the script - " + source);
+        result.reject("can't load the script - " + source);
     };
 
     document.body.appendChild(element);
@@ -66,7 +66,7 @@ $html.convert = function(elements)
         return new HTMLTools(elements);
 
     else if (typeof elements == "string")
-        return $html.select(elements);
+        return this.select(elements);
 
     else if (elements.isHTMLTools)
         return elements;
@@ -91,7 +91,7 @@ $html.parseXML = function(data)
             return xml;
         }
 
-    else errors += 'Error in parseXML: not supported by this browser!';
+    else errors = 'parseXML not supported by this browser!';
 
     return !errors ? parse(data) : printErr(errors);
 }
