@@ -639,7 +639,9 @@ export class HTMLTools
     eventDispatch(type)
     {
         var event = new Event(type);
-        this.elements.forEach( element => element.dispatchEvent(event) );
+
+        for (var i = 0; i < this.elements.length; i++)
+            this.elements[i].dispatchEvent(event)
 
         return this;
     }
@@ -670,10 +672,8 @@ export class HTMLTools
         list[name]
         ? list[name].push(fn)
         : list[name] = new MegaFunction(fn);
-
-        evAttr["on" + name] = "$html._eventFunction(" + this._id + ", '" + name + "', event)";
-
-        this.setAttr(evAttr);
+        
+        this.setAttr("on" + name, "$html._eventFunction(" + this._id + ", '" + name + "', event)");
     }
 
     each(fn)
