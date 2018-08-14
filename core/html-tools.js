@@ -79,24 +79,57 @@ export class HTMLTools
         return result;
     }
 
-    mutation(fn, options)
+    mutation(fn, options, replace)
     {
-        if ("MutationObserver" in window && !element._observer)
+        if (!("MutationObserver" in window))
         {
-            this.mutations = [];
-            this.elements.forEach( element => this._observMutation(element, fn, options) );
+            printErr("Your browser not support observ mutation");
+            return;
+        }
+        
+        if (replace) this.mutationClear();
+
+        this._mutations = [];
+
+        for (var i = 0; i < this.elements.length; i++)
+        {
+            var observer = new MutationObserver(function(data){
+                fn(data[0]);
+            });
+
+            observer.observe(this.elements[i], options);
+
+            this._mutations.push({
+                observer : observer, 
+                element  : this.elements[i],
+                options  : options
+            });
+        }
+        
+        return this;
+    }
+
+    mutationStart()
+    {
+        for (var i = 0; i < this._mutations.length; i++)
+        {
+            let mutation = this._mutations[i];
+            mutation.observer.observe(mutation.element, mutation.options);
         }
     }
 
-    _observMutation(element, fn, options)
+    mutationEnd()
     {
-        var mutation = new MutationObserver(function(mutations){
-            fn(mutations);
-        });
+        for (var i = 0; i < this._mutations.length; i++)
+            this._mutations[i].observer.disconnect();
+    }
 
-        mutation.observe(element, options);
+    mutationClear()
+    {
+        for (var i = 0; i < this._mutations.length; i++)
+            this._mutations[i].observer.disconnect();
 
-        this.mutations.push(mutation);
+        delete this._mutations;
     }
 
     visible(maxDepth = 3)
@@ -547,7 +580,7 @@ export class HTMLTools
                 }
         }
 
-        return result
+        return result;
     }
 
     setAttr(attr, value)
