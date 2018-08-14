@@ -494,13 +494,17 @@ export class HTMLTools
 
     hide()
     {
-        this.css({ display : "none" });
+        for (var i = 0; i < this.elements.length; i++)
+            this.elements[i].style.display = "none";
+
         return this;
     }
 
-    show()
+    show(disp = "block")
     {
-        this.css({ display : "block" });
+        for (var i = 0; i < this.elements.length; i++)
+            this.elements[i].style.display = disp;
+        
         return this;
     }
 
