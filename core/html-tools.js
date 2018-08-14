@@ -450,33 +450,45 @@ export class HTMLTools
 
     }
 
-    wrap(classList)
+    wrap(classList, revOrder)
     {
         if (typeof classList == "string")
         {
-            var wrapper = $html.create("div", classList);
+            var result = [],
+                wrapper = document.createElement("div"); 
+                wrapper.classList.add(classList);
 
-            this.after(wrapper);
-            wrapper.append(this);
+            for (var i = 0; i < this.elements.length; i++)
+            {
+                let element = this.elements[i],
+                    wrapClone = wrapper.cloneNode();
 
-            return wrapper;
+                element.parentNode.insertBefore(wrapClone, element);
+                wrapClone.appendChild(element);
+
+                result.push(wrapClone);
+            }
+
+            return new HTMLTools(result);
         }
         else if (Array.isArray(classList))
         {
-            var wrapper = $html.create("div", classList[0]),
-                inside = "";
+            var result;
 
-            for (var i = 1; i < classList.length; i++)
-                inside += '<div class="' + classList[i] + '">';
+            if (!revOrder)
+            {
+                result = this.wrap(classList[0]);
+                for (var i = 1; i < classList.length; i++)
+                    this.wrap(classList[i]);
+            }
+            else
+            {
+                result = this.wrap(classList[classList.length - 1]);
+                for (var i = classList.length - 2; i >= 0; i--)
+                    this.wrap(classList[i]);
+            }
 
-            for (var i = 1; i < classList.length; i++)
-                inside += '</div>';
-
-            wrapper.html(inside);
-            this.after(wrapper);
-            wrapper.select("." + classList[classList.length - 1]).append(this);
-
-            return wrapper;
+            return result;
         }
     }
 
