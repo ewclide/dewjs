@@ -702,7 +702,8 @@ export class HTMLTools
 
     clear()
     {
-        this.html("");
+        for (var i = 0; i < this.elements.length; i++)
+            this.elements[i].innerHTML = "";
     }
 
     remove()
