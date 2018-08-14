@@ -672,14 +672,14 @@ export class HTMLTools
         list[name]
         ? list[name].push(fn)
         : list[name] = new MegaFunction(fn);
-        
+
         this.setAttr("on" + name, "$html._eventFunction(" + this._id + ", '" + name + "', event)");
     }
 
     each(fn)
     {
-        this.elements.forEach((element, index, array) =>
-            fn($html.convert(element), index, array));
+        for (var i = 0; i < this.elements.length; i++)
+            fn(this.elements[i], i, this);
 
         return this;
     }
