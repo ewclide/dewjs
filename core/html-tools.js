@@ -684,12 +684,13 @@ export class HTMLTools
         return this;
     }
 
-    clone()
+    clone(deep)
     {
         var clones = [];
 
-        this.elements.forEach( element => clones.push(element.cloneNode(true)) );
-
+        for (var i = 0; i < this.elements.length; i++)
+            clones.push(this.elements[i].cloneNode(deep))
+        
         return new HTMLTools(clones);
     }
 
