@@ -24,12 +24,6 @@ export class HTMLTools
         this._ready = false;
     }
 
-    join(elements)
-    {
-        this.elements = joinElements(this.elements, elements);
-        return this;
-    }
-
     native()
     {
         return this.elements.length ? this.elements[0] : Array.from(this.elements);
@@ -690,13 +684,19 @@ export class HTMLTools
 
         for (var i = 0; i < this.elements.length; i++)
             clones.push(this.elements[i].cloneNode(deep))
-        
+
         return new HTMLTools(clones);
+    }
+
+    join(elements)
+    {
+        this.elements = joinElements(this.elements, elements);
+        return this;
     }
 
     merge(htl)
     {
-        this.elements = this.elements.concat(htl.elements);
+        this.elements = joinElements(this.elements, htl.elements);
         return this;
     }
 
