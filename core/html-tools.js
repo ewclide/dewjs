@@ -504,20 +504,18 @@ export class HTMLTools
     {
         for (var i = 0; i < this.elements.length; i++)
             this.elements[i].style.display = disp;
-        
+
         return this;
     }
 
     parent()
     {
         var parents = [];
-        this.elements.forEach( element => parents.push(this._getParent(element)) );
-        return new HTMLTools(parents);
-    }
 
-    _getParent(element)
-    { 
-        return element.parentElement || element.parentNode || null;
+        for (var i = 0; i < this.elements.length; i++)
+            parents.push(this.elements[i].parentElement || this.elements[i].parentNode || null)
+
+        return new HTMLTools(parents);
     }
 
     transform(data)
