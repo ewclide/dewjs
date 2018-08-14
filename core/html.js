@@ -45,17 +45,17 @@ $html.script = function(source, add)
     return result;
 }
 
-$html.create = function(tag, attr, css)
+$html.create = function(tag, attrs, styles)
 {
     var htls = new HTMLTools(document.createElement(tag));
 
-    if (typeof attr == "string")
-        htls.addClass(attr);
+    if (typeof attrs == "string")
+        htls.addClass(attrs);
 
-    else if (typeof attr == "object")
-        htls.setAttr(attr);
+    else if (typeof attrs == "object")
+        htls.setAttr(attrs);
 
-    if (css) htls.css(css);
+    if (styles) htls.style(styles);
 
     return htls;
 }

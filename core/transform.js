@@ -51,27 +51,27 @@ export class Transform
 			transform = "";
 
         if (settings.origin)
-            this.element.css({
+            this.element.style({
             	"transform-origin" : settings.origin[0] + units.origin + " " + settings.origin[1] + units.origin
             });
 
         if (!settings.backface)
-            this.element.css({ "backface-visibility" : "hidden" });
+            this.element.style({ "backface-visibility" : "hidden" });
 
         if (settings.style)
         {
             if (settings.style == "3d")
-                this.element.css({ "transform-style" : "preserve-3d" });
+                this.element.style({ "transform-style" : "preserve-3d" });
 
             else if (settings.style == "flat")
-                this.element.css({ "transform-style" : "flat" });
+                this.element.style({ "transform-style" : "flat" });
         }
 
         if (settings.perspective)
             transform += "perspective(" + settings.perspective + units.perspective + ") ";
 
         this.completed = false;
-        this.element.css({ "transform" : transform + this._build(actions, units) });
+        this.element.style({ "transform" : transform + this._build(actions, units) });
 
         return this;
 	}

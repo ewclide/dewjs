@@ -31,7 +31,7 @@ class Loader extends Dew.Async
 $html.ready(function(){
 
     var bar = $html.create("div", "loadbar");
-        bar.css({
+        bar.style({
             height : "5px",
             width  : "100%",
             background : "#0070ff",

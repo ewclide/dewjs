@@ -27,7 +27,7 @@ export class JsonConverter
                     case "value" : htl.value(json.value); break;
                     case "checked" : htl.checked(json.checked); break;
                     case "attrs" : htl.setAttr(json.attrs); break;
-                    case "css"   : htl.css(json.css); break;
+                    case "styles": htl.style(json.styles); break;
                     case "transform" : htl.transform(json.transform); break;
                     case "nodes" :
                         if (!Array.isArray(json.nodes)) json.nodes = [json.nodes];
@@ -176,18 +176,14 @@ export class JsonConverter
                     case "attrs":
                         for (let name in json.attrs)
                             bind.change( json.attrs, name, function(value){
-                                var attr = {};
-                                attr[name] = value;
-                                json._htl.setAttr(attr);
+                                json._htl.setAttr(name, value);
                             });
                         break;
 
-                    case "css":
-                        for (let name in json.css)
-                            bind.change( json.css, name, function(value){
-                                var style = {};
-                                style[name] = value;
-                                json._htl.css(style);
+                    case "styles":
+                        for (let name in json.styles)
+                            bind.change( json.styles, name, function(value){
+                                json._htl.style(name, value);
                             });
                         break;
 

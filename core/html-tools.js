@@ -600,16 +600,21 @@ export class HTMLTools
         return this;
     }
 
-    css(styles)
+    style(name, value)
     {
-        if (typeof styles == "string")
-            return this.elements[0].style[styles];
+        if (typeof name == "string" && value !== undefined)
+            for (var i = 0; i < this.elements.length; i++)
+                this.elements[i].style[name] = value;
 
-        else for (var i = 0; i < this.elements.length; i++)
-        {
-            for (var name in styles)
-                this.elements[i].style[name] = styles[name];
-        }
+        else if (typeof name == "object")
+            for (var i = 0; i < this.elements.length; i++)
+            {
+                for (var item in name)
+                    this.elements[i].style[item] = name[item];
+            }
+
+        else if (typeof name == "string" && value == undefined)
+            return this.elements[0].style[name];
 
         return this;
     }
