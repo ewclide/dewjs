@@ -24,3 +24,9 @@ if filter return undefined then next function not evoke
 Async
 1) add supporting Promise in wait method
 3) progress - checkout ready status. If it is 1 then resolve;
+
+object clone
+1) check speed of cloning
+
+html
+1) update json convertation
