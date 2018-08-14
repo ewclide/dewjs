@@ -592,9 +592,11 @@ export class HTMLTools
         if (typeof styles == "string")
             return this.elements[0].style[styles];
 
-        else this.elements.forEach( element => {
-            for (var name in styles) element.style[name] = styles[name];
-        });
+        else for (var i = 0; i < this.elements.length; i++)
+        {
+            for (var name in styles)
+                this.elements[i].style[name] = styles[name];
+        }
 
         return this;
     }
