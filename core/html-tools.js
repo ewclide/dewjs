@@ -531,39 +531,43 @@ export class HTMLTools
         var element = this.elements[0],
             result;
 
-        if (element !== undefined && element.nodeType == 1 && element.attributes.length)
+        if (element.nodeType == 1 && element.attributes.length)
         {
-            result = {}
+            result = {};
 
-            if (name)
-            {
-                if (Array.isArray(name))
-                    name.forEach( item => {
-                        var value = element.getAttribute(item);
-                        if (value) result[item] = value;
-                    });
+            if (typeof name == "string")
+                result = element.getAttribute(name);
 
-                else if (typeof name == "string")
-                    result = element.getAttribute(name);
-            }
-            else
-                [].forEach.call(
-                    element.attributes,
-                    attr => result[attr.name] = attr.value
-                );
+            else if (Array.isArray(name))
+                for (var i = 0; i < name.length; i++)
+                {
+                    let attr = element.getAttribute(item);
+                    if (attr) result[item] = attr;
+                }
+            
+            else if (!name)
+                for (var i = 0; i < element.attributes.length; i++)
+                {
+                    let attr = element.attributes[i];
+                    result[attr.name] = attr.value;
+                }
         }
 
-        return result;
+        return result
     }
 
-    setAttr(attrs, value)
+    setAttr(attr, value)
     {
-        if (typeof attrs == "string" && value !== undefined)
-            this.elements.forEach( element => element.setAttribute(attrs, value) )
+        if (typeof attr == "string" && value !== undefined)
+            for (var i = 0; i < this.elements.length; i++)
+                this.elements[i].setAttribute(attr, value)
 
-        else this.elements.forEach( element => {
-            for (var i in attrs) element.setAttribute(i, attrs[i])
-        });
+        else if (typeof attr == "object")
+            for (var i = 0; i < this.elements.length; i++)
+            {
+                for (var n in attr)
+                    this.elements[i].setAttribute(n, attr[n])
+            }
 
         return this;
     }
@@ -571,19 +575,26 @@ export class HTMLTools
     unsetAttr(name)
     {
         if (typeof name == "string")
-            this.elements.forEach( element => element.removeAttribute(name) )
+            for (var i = 0; i < this.elements.length; i++)
+                this.elements[i].removeAttribute(name)
 
         else if (Array.isArray(name))
-            this.elements.forEach( element => {
-                name.forEach( attr => element.removeAttribute(attr) )
-            })
+            for (var i = 0; i < this.elements.length; i++)
+            {
+                for (var j = 0; j < name.length; j++)
+                    this.elements[i].removeAttribute(name[j])
+            }
 
         else if (name == undefined)
         {
             var list = this.getAttr();
-            if (list) this.elements.forEach( element => {
-                for (var i in list) element.removeAttribute(i)
-            });
+            
+            if (list)
+                for (var i = 0; i < this.elements.length; i++)
+                {
+                    for (var item in list)
+                        this.elements[i].removeAttribute(item)
+                }
         }
 
         return this;
