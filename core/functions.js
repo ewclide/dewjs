@@ -269,5 +269,10 @@ export function log()
 	console.log.apply(null, args);
 }
 
+log.json = function(json, spaces = 4)
+{
+    log(JSON.stringify(json, null, spaces));
+}
+
 log.time = console.time;
 log.timeEnd = console.timeEnd;

@@ -1,4 +1,4 @@
-import {HTMLTools}  from './html-tools';
+import {HTMLTools, eventList}  from './html-tools';
 import {StyleSheet} from './stylesheet';
 import {Async} from './async';
 import {printErr, define} from './functions';
@@ -6,11 +6,9 @@ import {printErr, define} from './functions';
 var proto = HTMLTools.prototype,
     $html = new HTMLTools(document);
 
-$html._eventList = {};
-
-$html._eventFunction = function(id, type, e)
+$html._eventStart = function(id, type, e)
 {
-    this._eventList[id][type](e);
+    eventList[id][type](e);
 }
 
 $html.extend = function(name, method)

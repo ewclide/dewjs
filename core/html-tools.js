@@ -1,4 +1,4 @@
-import {jsonConverter} from './json-converter';
+import {jsConv} from './json-converter';
 import {Transform} from './transform';
 import {Async} from './async';
 import {MegaFunction} from './mega-function';
@@ -14,11 +14,13 @@ function joinElements(source, list, clone)
     return result;
 }
 
+export var eventList = {};
+
 export class HTMLTools
 {
     constructor(elements)
     {
-        this.elements = elements.length >= 1 ? elements : [elements];
+        this.elements = elements instanceof NodeList || Array.isArray(elements) ? elements : [elements];
         this.query = '';
         this._id = Math.random();
         this._ready = false;
@@ -26,7 +28,7 @@ export class HTMLTools
 
     native()
     {
-        return this.elements.length ? this.elements[0] : Array.from(this.elements);
+        return this.elements.length == 1 ? this.elements[0] : Array.from(this.elements);
     }
 
     get length()
@@ -220,11 +222,14 @@ export class HTMLTools
     {
         if (htl.isHTMLTools)
         {
-            if (!Array.isArray(htl.elements))
+            if (htl.elements instanceof NodeList)
                 htl.elements = Array.from(htl.elements);
 
             if (!htl._srcElements)
+            {
                 htl._srcElements = htl.elements.slice();
+                htl.elements = [];
+            }
 
             for (var i = 0; i < this.elements.length; i++)
             for (var j = 0; j < htl._srcElements.length; j++)
@@ -239,6 +244,12 @@ export class HTMLTools
 
                 this.elements[i].insertAdjacentElement(position, element);
             }
+
+            if (htl._nodes)
+            {
+                for (var name in htl._nodes)
+                    htl._nodes[name] = htl.select("[node-name='" + name + "']");
+            }
         }
         else if (Array.isArray(htl))
         {
@@ -247,56 +258,43 @@ export class HTMLTools
         }
     }
 
-    jsonBefore(json)
+    node(name)
     {
-        return this._insertJson(json, "beforebegin");
+        var node = this._nodes[name];
+
+        if (!node)
+        {
+            node = this.select("[node-name='" + name + "']");
+            this._nodes[name] = node;
+        }
+
+        return node;
     }
 
-    jsonAfter(json)
+    createFromJson(json)
     {
-        return this._insertJson(json, "afterend");
-    }
-
-    jsonAppend(json)
-    {
-        return this._insertJson(json, "beforeend");
-    }
-
-    jsonPrepend(json)
-    {
-        return this._insertJson(json, "afterbegin");
-    }
-
-    jsonGet(element)
-    {
-        var result = [];
-
-        if (element)
-            result = jsonConverter.getFromHTML(element);
-
-        else if (this.elements.length)
-            this.elements.length == 1
-            ? result = jsonConverter.getFromHTML(this.elements[0])
-            : this.elements.forEach( element => result.push(jsonConverter.getFromHTML(element)) );
-
-        else result = false;
-
+        var element = jsConv.jsonToDOM(json),
+            result = new HTMLTools(element);
+            result._nodes = {};
+            
         return result;
     }
 
-    _insertJson(json, position)
+    convertToJson(htl)
     {
-        var clones = [];
+        var elements = htl ? htl.elements : this.elements,
+            result;
 
-        jsonConverter.toHTML(json);
+        if (elements.length > 1)
+        {
+            result = [];
+            elements.forEach( element => {
+                result.push(jsConv.jsonFromDOM(element))
+            });
+        }
+        else result = jsConv.jsonFromDOM(elements[0]);
 
-        this.elements.forEach( current => {
-            var element = jsonConverter.build(json);
-            clones.push(element);
-            current.insertAdjacentElement(position, element);
-        });
-
-        return new HTMLTools(clones);
+        return result;
     }
 
     tplAppend(tpl)
@@ -348,9 +346,10 @@ export class HTMLTools
     value(data)
     {
         if (data !== undefined)
+        {
             for (var i = 0; i < this.elements.length; i++)
                 this.elements[i].value = data;
-
+        }
         else return this.elements[0].value;
 
         return this;
@@ -648,17 +647,19 @@ export class HTMLTools
 
     eventAttach(data, fn)
     {
-        if (!$html._eventList[this._id])
-            $html._eventList[this._id] = {};
+        if (!eventList[this._id])
+            eventList[this._id] = {};
 
-        var list = $html._eventList[this._id];
+        var list = eventList[this._id];
 
         if (typeof data == "string" && fn !== undefined)
             this._eventAttach(list, data, fn);
 
         else if (typeof data == "object")
+        {
             for (var event in data)
                 this._eventAttach(list, event, data[event]);
+        }
 
         return this;
     }
@@ -673,34 +674,26 @@ export class HTMLTools
         return this;
     }
 
-    eventStart(type)
+    eventDetach(type)
     {
-        $html._eventFunction(this._id, type);
-        return this;
-    }
+        var list = eventList[this._id];
 
-    eventDetach(name)
-    {
-        var list = $html._eventList[this._id];
-
-        if (name)
+        if (type)
+        {
             for (var event in list)
                 this.elements.unsetAttr(event.substr(0, 2));
-        
-        else $html._eventList[this._id][name] = undefined;
+        }
+        else eventList[this._id][type] = undefined;
 
         return this;
     }
 
-    _eventAttach(list, name, fn)
+    _eventAttach(list, type, fn)
     {
-        var evAttr = {}
+        if (list[type]) list[type].push(fn);
+        else list[type] = new MegaFunction(fn);
 
-        list[name]
-        ? list[name].push(fn)
-        : list[name] = new MegaFunction(fn);
-
-        this.setAttr("on" + name, "$html._eventFunction(" + this._id + ", '" + name + "', event)");
+        this.setAttr("on" + type, "$html._eventStart(" + this._id + ",'" + type + "',event)");
     }
 
     each(fn)
