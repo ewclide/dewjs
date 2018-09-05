@@ -1,7 +1,7 @@
-var form = {
+var jsForm = {
     tag : "form",
     attrs : {
-        action : "/"
+        action : ""
     },
     nodes : [
         {
@@ -12,8 +12,10 @@ var form = {
                 type : "text"
             },
             events : {
-                input : function(e){
-                    $form.node("name").value(e.target.value);
+                input : function(e, that, main){
+                    // log(e)
+                    that.value(e.target.value);
+                    // main.style("background", "red");
                 }
             }
         },
@@ -24,13 +26,15 @@ var form = {
     ]
 }
 
-var $form = $html.createFromJson(form);
+var form = $html.createFromJson(jsForm);
 
-$html.select(".app").append($form);
+$html.select(".app").append(form);
 
-$form.node("name").value("one");
+form.node.name.value("one");
 
-$html.select(".more").append($form);
+$html.select(".more").append(form);
 
-// var json = $html.select(".app").convertToJson();
+form.node.name.value("two");
+
+// var json = $html.select(".app").createJson();
 // log.json(json)

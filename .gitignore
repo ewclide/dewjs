@@ -1,4 +1,5 @@
 node_modules
+temp
 test/assets
 diff.txt
 log.txt

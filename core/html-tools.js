@@ -1,4 +1,4 @@
-import {jsConv} from './json-converter';
+import {JSONConv} from './json-converter';
 import {Transform} from './transform';
 import {Async} from './async';
 import {MegaFunction} from './mega-function';
@@ -222,7 +222,13 @@ export class HTMLTools
     {
         if (htl.isHTMLTools)
         {
-            if (htl.elements instanceof NodeList)
+            if (htl._jsConv)
+            {
+                this._insertJson(htl, "beforeend");
+                return;
+            }
+
+            if (!Array.isArray(htl.elements)) // need for speed, because Array.from is very slow
                 htl.elements = Array.from(htl.elements);
 
             if (!htl._srcElements)
@@ -244,12 +250,6 @@ export class HTMLTools
 
                 this.elements[i].insertAdjacentElement(position, element);
             }
-
-            if (htl._nodes)
-            {
-                for (var name in htl._nodes)
-                    htl._nodes[name] = htl.select("[node-name='" + name + "']");
-            }
         }
         else if (Array.isArray(htl))
         {
@@ -258,29 +258,27 @@ export class HTMLTools
         }
     }
 
-    node(name)
+    _insertJson(htl, position)
     {
-        var node = this._nodes[name];
-
-        if (!node)
+        for (var i = 0; i < this.elements.length; i++)
         {
-            node = this.select("[node-name='" + name + "']");
-            this._nodes[name] = node;
+            let element = htl._jsConv.clone();
+            htl.elements.push(element);
+            this.elements[i].insertAdjacentElement(position, element);
         }
-
-        return node;
     }
 
-    createFromJson(json)
+    createFromJSON(json)
     {
-        var element = jsConv.jsonToDOM(json),
-            result = new HTMLTools(element);
-            result._nodes = {};
+        var jsConv = new JSONConv(json),
+            result = jsConv.element;
+            result._jsConv = jsConv;
+            result.node = jsConv.nodes;
             
         return result;
     }
 
-    convertToJson(htl)
+    createJSON(htl)
     {
         var elements = htl ? htl.elements : this.elements,
             result;
@@ -289,10 +287,10 @@ export class HTMLTools
         {
             result = [];
             elements.forEach( element => {
-                result.push(jsConv.jsonFromDOM(element))
+                result.push(JSONConv.createJSON(element))
             });
         }
-        else result = jsConv.jsonFromDOM(elements[0]);
+        else result = JSONConv.createJSON(elements[0]);
 
         return result;
     }
