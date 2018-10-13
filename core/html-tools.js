@@ -1,4 +1,4 @@
-import {JSONConv} from './json-converter';
+import {JSONConverter} from './json-converter';
 import {Transform} from './transform';
 import {Async} from './async';
 import {MegaFunction} from './mega-function';
@@ -222,9 +222,9 @@ export class HTMLTools
     {
         if (htl.isHTMLTools)
         {
-            if (htl._jsConv)
+            if (htl._jsonConv)
             {
-                this._insertJson(htl, "beforeend");
+                this._insertJSON(htl, "beforeend");
                 return;
             }
 
@@ -258,11 +258,14 @@ export class HTMLTools
         }
     }
 
-    _insertJson(htl, position)
+    _insertJSON(htl, position)
     {
+        if (htl.elements.length == 1)
+            htl.elements = [];
+
         for (var i = 0; i < this.elements.length; i++)
         {
-            let element = htl._jsConv.clone();
+            let element = htl._jsonConv.clone();
             htl.elements.push(element);
             this.elements[i].insertAdjacentElement(position, element);
         }
@@ -270,10 +273,10 @@ export class HTMLTools
 
     createFromJSON(json)
     {
-        var jsConv = new JSONConv(json),
-            result = jsConv.element;
-            result._jsConv = jsConv;
-            result.node = jsConv.nodes;
+        var jsonConv = new JSONConverter(json),
+            result = jsonConv.htl;
+            result._jsonConv = jsonConv;
+            result.node = jsonConv.nodes;
             
         return result;
     }
@@ -287,10 +290,10 @@ export class HTMLTools
         {
             result = [];
             elements.forEach( element => {
-                result.push(JSONConv.createJSON(element))
+                result.push(JSONConverter.createJSON(element))
             });
         }
-        else result = JSONConv.createJSON(elements[0]);
+        else result = JSONConverter.createJSON(elements[0]);
 
         return result;
     }

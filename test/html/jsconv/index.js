@@ -6,16 +6,17 @@ var jsForm = {
     },
     nodes : [
         {
+            key  : "phone",
             tag  : "input",
             type : "text",
             name : "phone",
-            nodeName : "phone",
             attrs : {
-                autocomplete : "off"
+                autocomplete : "off",
+                placeholder : "Enter phone"
             },
             events : {
                 input : function(e, that, main){
-                    log(that)
+                    log(that, main)
                     that.value(e.target.value);
                     // main.style("background", "red");
                 }
@@ -35,7 +36,9 @@ var jsForm = {
 }
 
 var form = $html.createFromJSON(jsForm);
+var h1 = $html.create("h1").text("Test JSON converter");
 
+$html.body.prepend(h1);
 $html.select(".app").append(form);
 
 // form.node.phone.value("one");

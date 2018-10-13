@@ -1,11 +1,11 @@
 import {eventList, HTMLTools} from './html-tools';
 
-export class JSONConv
+export class JSONConverter
 {
 	constructor(json)
     {
-        this.srcElement = null;
-        this.element = null;
+        this._srcElement = null;
+        this.htl = null;
         this.nodes = {};
 
         this.createDOM(json);
@@ -17,16 +17,16 @@ export class JSONConv
 
         var element = document.createElement(json.tag);
 
-        if (!this.element)
+        if (!this.htl)
         {
-            this.srcElement = element;
-            this.element = new HTMLTools(element);
+            this._srcElement = element;
+            this.htl = new HTMLTools(element);
         }
 
-        if (json.nodeName)
+        if (json.key)
         {
-            element.setAttribute("node-name", json.nodeName);
-            this.nodes[json.nodeName] = new HTMLTools(element);
+            element.setAttribute("node-key", json.key);
+            this.nodes[json.key] = new HTMLTools(element);
         }
 
         for (var prop in json)
@@ -51,8 +51,8 @@ export class JSONConv
 
                 case "events" :
                     var id = Math.random(),
-                        node = this.nodes[json.nodeName],
-                        main = this.element;
+                        node = this.nodes[json.key],
+                        main = this.htl;
 
                     eventList[id] = {};
 
@@ -90,19 +90,19 @@ export class JSONConv
 
     clone()
     {
-        var element = this.srcElement.cloneNode(true);
+        var element = this._srcElement.cloneNode(true);
 
-        for (var i in this.nodes)
+        for (var key in this.nodes)
         {
-            let node = element.querySelectorAll("[node-name='" + i + "']");
-            this.nodes[i].join(node);
+            let node = element.querySelectorAll("[node-key='" + key + "']");
+            this.nodes[key].join(node);
         }
 
         return element;
     }
 }
 
-JSONConv.createJSON = function(element)
+JSONConverter.createJSON = function(element)
 {
     if (element.nodeType == 1)
     {
@@ -130,7 +130,7 @@ JSONConv.createJSON = function(element)
             for (var i = 0; i < nodes.length; i++)
             {
                 if (nodes[i].nodeType == 1)
-                    result.nodes.push(JSONConv.createJSON(nodes[i]));
+                    result.nodes.push(JSONConverter.createJSON(nodes[i]));
 
                 else if (nodes[i].nodeType == 3)
                     result.text = nodes[i].textContent;
