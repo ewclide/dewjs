@@ -4,29 +4,28 @@ export class JSONConverter
 {
 	constructor(json)
     {
-        this._srcElement = null;
         this.htl = null;
         this.nodes = {};
+        this._struct = {};
 
-        this.createDOM(json);
+        this._createDOM(json, this._struct);
     }
 
-	createDOM(json)
-	{
+    _createDOM(json, struct)
+    {
         if (!json.tag) json.tag = "div";
 
         var element = document.createElement(json.tag);
 
-        if (!this.htl)
-        {
-            this._srcElement = element;
-            this.htl = new HTMLTools(element);
-        }
+        struct.element = element;
 
-        if (json.key)
+        if (!this.htl)
+            this.htl = new HTMLTools(element);
+
+        else if (json.key)
         {
-            element.setAttribute("node-key", json.key);
             this.nodes[json.key] = new HTMLTools(element);
+            struct.key = json.key;
         }
 
         for (var prop in json)
@@ -51,53 +50,57 @@ export class JSONConverter
 
                 case "events" :
                     var id = Math.random(),
-                        node = this.nodes[json.key],
-                        main = this.htl;
+                        self = this;
 
                     eventList[id] = {};
 
                     for (var type in json.events)
                     {
                         eventList[id][type] = function(e){
-                            json.events[type](e, node, main);
+                            json.events[type](e, self.nodes[json.key], self.htl);
                         }
                         
-                        element.setAttribute("on" + type, "$html._eventStart(" + id + ",'" + type + "',event)");
+                        element.setAttribute(`on${type}`, `$html._eventStart(${id},'${type}',event)`);
                     }
 
                     break;
 
                 case "nodes" :
+                    struct.nodes = [];
+
                     if (!Array.isArray(json.nodes))
                         json.nodes = [json.nodes];
 
-                    var frag = document.createDocumentFragment();
-
                     for (var i = 0; i < json.nodes.length; i++)
-                    {
-                        let node = this.createDOM(json.nodes[i])
-                        frag.appendChild(node);
-                    }
-
-                    element.appendChild(frag);
+                        this._createDOM(json.nodes[i], struct.nodes[i] = {})
 
                     break;
             }
         }
+    }
 
-        return element;
-	}
-
-    clone()
+    build(struct = this._struct)
     {
-        var element = this._srcElement.cloneNode(true);
+        var element = struct.element.cloneNode(true);
 
-        for (var key in this.nodes)
+        if (struct.nodes)
         {
-            let node = element.querySelectorAll("[node-key='" + key + "']");
-            this.nodes[key].join(node);
-        }
+            var frag = document.createDocumentFragment();
 
+            for (var i = 0; i < struct.nodes.length; i++)
+            {
+                let structNode = struct.nodes[i],
+                    node = this.build(structNode);
+
+                if (structNode.key)
+                    this.nodes[structNode.key].join(node);
+
+                frag.appendChild(node);
+            }
+
+            element.appendChild(frag);
+        }
+        
         return element;
     }
 }

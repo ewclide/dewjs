@@ -4,9 +4,11 @@ import {Async} from './async';
 import {MegaFunction} from './mega-function';
 import {printErr} from './functions';
 
-function joinElements(source, list, clone)
+function joinElements(source, elements, clone)
 {
-    var result = Array.from(source);
+    var result = Array.from(source),
+        list = elements instanceof NodeList || Array.isArray(elements)
+        ? elements : [elements];
 
     for (var i = 0; i < list.length; i++)
         result.push(list[i]);
@@ -20,7 +22,10 @@ export class HTMLTools
 {
     constructor(elements)
     {
-        this.elements = elements instanceof NodeList || Array.isArray(elements) ? elements : [elements];
+        this.elements = elements instanceof NodeList || Array.isArray(elements)
+        ? elements : [elements];
+
+        this._srcLength = this.elements.length;
         this.query = '';
         this._id = Math.random();
         this._ready = false;
@@ -33,7 +38,9 @@ export class HTMLTools
 
     get length()
     {
-        return this.elements.length;
+        return this.elements.length > this._srcLength
+        ? this.elements.length - this._srcLength
+        : this._srcLength;
     }
 
     get tag()
@@ -231,20 +238,14 @@ export class HTMLTools
             if (!Array.isArray(htl.elements)) // need for speed, because Array.from is very slow
                 htl.elements = Array.from(htl.elements);
 
-            if (!htl._srcElements)
-            {
-                htl._srcElements = htl.elements.slice();
-                htl.elements = [];
-            }
-
             for (var i = 0; i < this.elements.length; i++)
-            for (var j = 0; j < htl._srcElements.length; j++)
+            for (var j = 0; j < htl._srcLength; j++)
             {
-                let element = htl._srcElements[j];
+                let element = htl.elements[j];
 
                 if (!remove)
                 {
-                    element = htl._srcElements[j].cloneNode(true);
+                    element = htl.elements[j].cloneNode(true);
                     htl.elements.push(element);
                 }
 
@@ -260,12 +261,9 @@ export class HTMLTools
 
     _insertJSON(htl, position)
     {
-        if (htl.elements.length == 1)
-            htl.elements = [];
-
         for (var i = 0; i < this.elements.length; i++)
         {
-            let element = htl._jsonConv.clone();
+            let element = htl._jsonConv.build();
             htl.elements.push(element);
             this.elements[i].insertAdjacentElement(position, element);
         }
@@ -744,6 +742,7 @@ export class HTMLTools
         }
 
         this.elements = [];
+        this._srcLength = 0;
 
         return this;
     }

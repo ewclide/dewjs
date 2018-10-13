@@ -41,11 +41,13 @@ var h1 = $html.create("h1").text("Test JSON converter");
 $html.body.prepend(h1);
 $html.select(".app").append(form);
 
-// form.node.phone.value("one");
+form.node.phone.value("one");
 
 $html.select(".more").append(form);
 
-// form.node.phone.value("two");
+form.node.phone.value("two");
+
+log(form.length)
 
 // var json = $html.select(".app").createJSON();
 // log.json(json)
