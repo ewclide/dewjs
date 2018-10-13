@@ -1,23 +1,31 @@
 var jsForm = {
     tag : "form",
+    value : "test",
     attrs : {
         action : ""
     },
     nodes : [
         {
-            tag : "input",
-            nodeName : "name",
+            tag  : "input",
+            type : "text",
+            name : "phone",
+            nodeName : "phone",
             attrs : {
-                name : "name",
-                type : "text"
+                autocomplete : "off"
             },
             events : {
                 input : function(e, that, main){
-                    // log(e)
+                    log(that)
                     that.value(e.target.value);
                     // main.style("background", "red");
                 }
             }
+        },
+        {
+            tag   : "input",
+            type  : "checkbox",
+            name  : "use",
+            value : "yes"
         },
         {
             tag  : "button",
@@ -26,15 +34,15 @@ var jsForm = {
     ]
 }
 
-var form = $html.createFromJson(jsForm);
+var form = $html.createFromJSON(jsForm);
 
 $html.select(".app").append(form);
 
-form.node.name.value("one");
+// form.node.phone.value("one");
 
 $html.select(".more").append(form);
 
-form.node.name.value("two");
+// form.node.phone.value("two");
 
-// var json = $html.select(".app").createJson();
+// var json = $html.select(".app").createJSON();
 // log.json(json)

@@ -37,6 +37,8 @@ export class JSONConv
                 case "html"    : element.innerHTML = json.html; break;
                 case "value"   : element.value = json.value; break;
                 case "checked" : element.checked = json.checked; break;
+                case "type"    : element.type = json.type; break;
+                case "name"    : element.name = json.name; break;
                 case "attrs"   :
                     for (let i in json.attrs)
                         element.setAttribute(i, json.attrs[i]);
