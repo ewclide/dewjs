@@ -12,6 +12,7 @@ import {url} from './url';
 import {$html} from './html';
 
 var Dew = {
+	browser   : func.browser,
 	define    : func.define,
 	isType    : func.isType,
 	strParse  : func.strParse,

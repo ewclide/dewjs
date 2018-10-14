@@ -1,3 +1,18 @@
+function getBrowser()
+{
+    var agent = navigator.userAgent;
+
+    if (agent.search(/Chrome/) > 0)  return 'Chrome';
+    if (agent.search(/Firefox/) > 0) return 'Firefox';
+    if (agent.search(/Opera/) > 0)   return 'Opera';
+    if (agent.search(/Safari/) > 0)  return 'Safari';
+    if (agent.search(/MSIE|\.NET/) > 0) return 'IE';
+
+    return false;
+}
+
+export var browser = getBrowser();
+
 export function printErr(data, source = true)
 {
 	var error = "Error: ";
