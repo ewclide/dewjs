@@ -10,15 +10,17 @@ export class MegaFunction
 		this._names = Object.create(null);
 		this._data;
 
-		var mega = function(data, order){
-			return self._call(data, order);
+		var mega = function(data, order, filter){
+			return self._call(data, order, filter);
 		}
 
-		mega._self = this;
+		mega.__megaInstance = this;
+		mega.isMegaFunction = true;
+		mega.count = 0;
+
 		mega.push = this.push;
 		mega.remove = this.remove;
-		mega.evoke = this.evoke;
-		mega.count = 0;
+		mega.invoke = this.invoke;
 
 		if (typeof fn == "function")
 			mega.push(fn, name);
@@ -26,13 +28,30 @@ export class MegaFunction
 		return mega;
 	}
 
-	_call(data, order)
+	_call(data, order, filter)
 	{
 		this._data = data;
 
-		order
-		? this._handlers.forEach( handler => this._data = handler(this._data) )
-		: this._handlers.forEach( handler => handler(data) );
+		if (order)
+		{
+			if (typeof filter == "function")
+				for (var i = 0; i < this._handlers.length; i++)
+				{
+					let handler = this._handlers[i],
+						skip = filter(this._data, i);
+
+					if (skip) this._data = handler(this._data);
+					else break;
+				}
+
+			else this._handlers.forEach(
+				handler => this._data = handler(this._data)
+			)
+		}
+		else
+		{
+			this._handlers.forEach( handler => handler(data) );
+		}
 
 		var result = this._data;
 		this._data = null;
@@ -42,7 +61,7 @@ export class MegaFunction
 
 	push(fn, name)
 	{
-		var self = this._self;
+		var self = this.__megaInstance;
 
 		if (typeof fn == "function")
 		{
@@ -54,7 +73,7 @@ export class MegaFunction
 
 	remove(id)
 	{
-		var self = this._self, index = id, handler;
+		var self = this.__megaInstance, index = id, handler;
 
 		if (typeof id == "string")
 		{
@@ -69,13 +88,13 @@ export class MegaFunction
 		}
 	}
 
-	evoke(id, data)
+	invoke(id, data)
 	{
-		var self = this._self, index = id, handler;
+		var self = this.__megaInstance, index = id, handler;
 
 		if (typeof id == "string") index = self._names[id];
 
 		if (self._handlers[index]) return self._handlers[index](data);
-		else printErr('Dew MegaFunction evoke error: undefined function with id "' + id + '"');
+		else printErr('Dew MegaFunction invoke error: undefined function with id "' + id + '"');
 	}
 }
