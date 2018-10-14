@@ -525,7 +525,7 @@ export class HTMLTools
         return this;
     }
 
-    show(disp = "block")
+    show(disp = "")
     {
         for (var i = 0; i < this.elements.length; i++)
             this.elements[i].style.display = disp;
