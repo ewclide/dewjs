@@ -19,9 +19,9 @@ var Dew = {
 	jsonParse : func.jsonParse,
 	random    : func.random,
 	publish   : func.publish,
-	construct : func.construct,
-	configure : func.configure,
 	printErr  : func.printErr,
+	construct : func.construct,
+	fetchSettings : func.fetchSettings,
 
 	get object(){
 		return objectExtends;
