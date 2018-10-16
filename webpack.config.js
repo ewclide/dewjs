@@ -22,5 +22,14 @@ module.exports = {
 				}
 			}
 		}]
+	},
+	devServer: {
+		port: 3000,
+		inline: true,
+		open: true,
+		overlay: {
+			warnings: true,
+			errors: true
+		}
 	}
 };
