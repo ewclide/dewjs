@@ -96,22 +96,24 @@ $html.parseXML = function(data)
 
 $html.cascad = function()
 {
-    return new StyleSheet(); 
+    return new StyleSheet();
 }
 
-define($html, "body", {
+$html._body = new HTMLTools();
+
+Object.defineProperty($html, "body", {
+    configurable : false,
     get : function()
     {
-        if (!this._body && document.body)
-            this._body = new HTMLTools(document.body);
+        if (!this._body.length && document.body)
+            this._body.join(document.body);
 
         else if (!document.body)
             printErr("body element is currently unavailable!");
 
         return this._body;
-    },
-    set : function(){}
-})
+    }
+});
 
 document.addEventListener("DOMContentLoaded", function(){
     $html._ready = true;

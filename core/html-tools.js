@@ -4,26 +4,17 @@ import {Async} from './async';
 import {MegaFunction} from './mega-function';
 import {printErr} from './functions';
 
-function joinElements(source, elements, clone)
-{
-    var result = Array.from(source),
-        list = elements instanceof NodeList || Array.isArray(elements)
-        ? elements : [elements];
-
-    for (var i = 0; i < list.length; i++)
-        result.push(list[i]);
-
-    return result;
-}
-
 export var eventList = {};
 
 export class HTMLTools
 {
-    constructor(elements)
+    constructor(source)
     {
-        this.elements = elements instanceof NodeList || Array.isArray(elements)
-        ? elements : [elements];
+        if (source)
+            this.elements = source instanceof NodeList || Array.isArray(source)
+            ? source : [source];
+
+        else this.elements = [];
 
         this._srcLength = this.elements.length;
         this.query = '';
@@ -67,8 +58,8 @@ export class HTMLTools
                     if (typeof fn == "function") fn();
                 }
             }
-        
-        list = joinElements(list.elements, this.elements);
+
+        list = list.join(this.elements).elements;
         list._countReady = 0;
         list.forEach( element => {
 
@@ -713,15 +704,29 @@ export class HTMLTools
         return new HTMLTools(clones);
     }
 
-    join(elements)
+    join(source)
     {
-        this.elements = joinElements(this.elements, elements);
-        return this;
-    }
+        var elemList;
 
-    merge(htl)
-    {
-        this.elements = joinElements(this.elements, htl.elements);
+        if (!source)
+        {
+            printErr(`Can't attach the invalid elements (${source})`);
+            return;
+        }
+
+        this.elements = Array.from(this.elements);
+
+        if (source.isHTMLTools)
+            elemList = source.elements;
+
+        else if (source instanceof NodeList || Array.isArray(source))
+            elemList = source;
+
+        else elemList = [source];
+
+        for (var i = 0; i < elemList.length; i++)
+            this.elements.push(elemList[i]);
+
         return this;
     }
 
