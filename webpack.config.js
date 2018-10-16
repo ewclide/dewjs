@@ -1,15 +1,15 @@
 const output = "dew";
 const entry  = "./core/main.js";
-const result = "result";
+const build = "build";
 
-var path = require('path').resolve(__dirname, result);
+var path = require('path').resolve(__dirname, build);
 
 module.exports = {
 	entry: entry,
 	output: {
 		path: path,
 		filename: output + '.min.js',
-		publicPath: result
+		publicPath: build
 	},
 	module: {
 		rules: [{
