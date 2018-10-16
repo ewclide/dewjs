@@ -2,20 +2,28 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<title>Dewjs</title>
-	<link rel="stylesheet" href="css/style.css">
-	<script src="result/dew.min.js"></script>
-	<script src="js/common.js"></script>
+	<title>Dew.js</title>
+	<script src="/build/dew.min.js"></script>
 </head>
 <body>
-
-	<div id="in"></div>
-	<div class="app"></div>
-	<div class="app"></div>
-
-	<!-- <div class="quad"><div class="circle"></div></div> -->
-
-	<div id="root" data-width="250" data-height="350"></div>
-
+	<style>
+		h1 {
+		    color: white;
+		    font-size: 50px;
+		}
+		body {
+		    font-family: Roboto, Arial;
+		    background: #41c7e9;
+		    display: flex;
+		    align-items: center;
+		    justify-content: center;
+		    height: 100vh;
+		    overflow: hidden;
+		}
+	</style>
+	<script>
+		var hello = $html.create("h1").text("DEW.js main page!");
+		$html.body.append(hello);
+	</script>
 </body>
 </html>
