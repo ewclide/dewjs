@@ -1,9 +1,8 @@
 {
-  "name": "dew",
-  "version": "1.0.0",
-  "description": "Experimental JavaScript library for UI programming",
-  "author": "ewclide",
-  "license": "MIT",
+  "private": true,
+  "workspaces": [
+    "npm/*"
+  ],
   "scripts": {
     "dev" : "webpack-dev-server --mode development",
     "build": "webpack --mode production"
