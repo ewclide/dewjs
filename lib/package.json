@@ -1,0 +1,19 @@
+{
+  "name": "dew",
+  "version": "1.0.0",
+  "description": "Experimental JavaScript library for UI programming",
+  "author": "ewclide",
+  "license": "MIT",
+  "homepage": "https://dew.ewclide.com/",
+  "repository": "ewclide/dewjs",
+  "main": "index.js",
+  "files": [
+    "dew.lib.min.js",
+    "index.js",
+    "LICENSE",
+    "README.md"
+  ],
+  "keywords": [
+    "dew"
+  ]
+}
