@@ -1,5 +1,5 @@
 ﻿import './polyfill';
-import * as func from './functions';
+import * as funcList from './functions';
 import {arrayExtends} from'./array';
 import {objectExtends} from './object';
 import {bind} from './binder';
@@ -11,17 +11,17 @@ import {http} from './http';
 import {url} from './url';
 import {$html} from './html';
 
-var Dew = {
-	browser   : func.browser,
-	define    : func.define,
-	isType    : func.isType,
-	strParse  : func.strParse,
-	jsonParse : func.jsonParse,
-	random    : func.random,
-	publish   : func.publish,
-	printErr  : func.printErr,
-	construct : func.construct,
-	fetchSettings : func.fetchSettings,
+const Dew = {
+	browser   : funcList.browser,
+	define    : funcList.define,
+	isType    : funcList.isType,
+	strParse  : funcList.strParse,
+	jsonParse : funcList.jsonParse,
+	random    : funcList.random,
+	publish   : funcList.publish,
+	printErr  : funcList.printErr,
+	construct : funcList.construct,
+	fetchSettings : funcList.fetchSettings,
 
 	get object(){
 		return objectExtends;
@@ -40,13 +40,13 @@ var Dew = {
 	url   : url
 }
 
-func.define(window, "log", {
-	value  : func.log,
+funcList.define(window, "log", {
+	value  : funcList.log,
 	config : false,
 	write  : false
 });
 
-func.define(window, {
+funcList.define(window, {
 	Dew   : Dew,
 	$html : $html
 })
