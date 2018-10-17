@@ -1,10 +1,13 @@
 {
-  "name": "dew",
+  "name": "dewjs",
   "version": "1.0.0",
   "description": "Experimental JavaScript library for UI programming",
   "author": "ewclide",
   "license": "MIT",
   "homepage": "https://dew.ewclide.com/",
+  "bugs": {
+    "url": "https://github.com/ewclide/dewjs/issues"
+  },
   "repository": "ewclide/dewjs",
   "main": "index.js",
   "files": [
@@ -14,6 +17,6 @@
     "README.md"
   ],
   "keywords": [
-    "dew"
+    "dewjs"
   ]
 }
