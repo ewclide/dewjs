@@ -18,9 +18,10 @@ class HTTP
 			request = new this.XHR();
 
 		objectExtends.joinRight(options, {
-			uncache : true,
+			uncache  : true,
 			progress : false,
-			saveData : false
+			saveData : false,
+			errors   : true
 		});
 
 		if (options.uncache)
@@ -29,13 +30,19 @@ class HTTP
 		request.open("GET", path + url.serialize(data), true);
 		request.send();
 
-		request.onload = function(){
-			result.resolve(this.responseText, options.saveData);
+		request.onload = function()
+		{
+			this.status < 400
+			? result.resolve(this.responseText, options.saveData)
+			: result.reject(this.status);
 		}
 		
-		request.onerror = function(){
+		request.onerror = function()
+		{
 			result.reject(this.statusText);
-			printErr("http.send ajax error (" + this.status + "): " + this.statusText);
+
+			if (options.errors)
+				printErr(`http.send ajax error (${this.status}): ${this.statusText}`);
 		}
 
 		if (options.progress)
@@ -72,17 +79,20 @@ class HTTP
 						request.open("POST", path, true);
 						request.send(formData);
 
-					request.onload = function(){
+					request.onload = function()
+					{
 						async.resolve(this.responseText);
 					}
 
-					request.onerror = function(){
+					request.onerror = function()
+					{
 						async.reject(this.statusText);
 						printErr("$http.send ajax error (" + this.status + "): " + this.statusText);
 					}
 
 					if (options.progress)
-						request.onprogress = function(e){
+						request.onprogress = function(e)
+						{
 							async.shift({
 								loaded : e.loaded,
 								total  : e.total,

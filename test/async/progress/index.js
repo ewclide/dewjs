@@ -11,9 +11,9 @@ class Loader extends Dew.Async
             ref.reject();
         }, 500);
 
-        list.push(Dew.http.get('/test/assets/big.bmp', { progress : true }));
-        list.push(Dew.http.get('/test/assets/big.bmp', { progress : true }));
-        list.push(ref);
+        list.push(Dew.http.get('/test/assets/big.jpg', { progress : true }));
+        list.push(Dew.http.get('/test/assets/big.jpg', { progress : true }));
+        // list.push(ref);
 
         this.progress(function(e){
             // log(e)
