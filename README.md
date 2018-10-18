@@ -1,22 +1,22 @@
 
-# **Dew.js**
+# ```Dew.js```
 
-Dew - Experimental JavaScript library for UI programming.
+![license](img/license.svg) [![download](img/download.svg)][1]
 
-## About project
+Dew is experimental javaScript library for UI programming.
 
-At the moment, the project is being developed by one person. If you liked the project, please [support][2] it.  
+At the moment, the project is being developed by one person. If you liked the project, please **[support][2]** it.  
 
 Initially, the project was conceived as a replacement for jquery, as well as a combination of solutions and ideas accumulated over two years. I would also like to note that some solutions that may have analogues were developed by chance :) but have the right to exist.
 
-All detailed **documentation** you can read [there][3].
+### **[Documentation][3]**
 
-## Quick Start
+### Install
 
 The easiest way to get started is to drop the CDN hosted library into your page:
 
 ```html
-<script src="https://cdn.jsdelivr.net/gh/ewclide/dewjs@1.0.0-beta/result/dew.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/ewclide/dewjs@1.0.0/build/dew.min.js"></script>
 ```
 
 Using npm:
@@ -27,22 +27,29 @@ To get a local copy of the current code, clone it using git:
 
 	$ git clone https://github.com/ewclide/dewjs.git
 
-Also you can simply [download][1] library and linked to your page.
+Also you can simply **[download][1]** library and linked to your page.
 
-Then you're ready to start your application:
+### Usage
+
+Import single solutions from npm package.  
+Or include library to the page as script and use global objects
 
 ```js
+import {$html} from 'dewjs'; // using npm
+
 var hello = $html.create("h1").text("Hello world!");
+
 $html.ready(function(){
 	$html.body.append(hello);
 });
+
 ```
 
--------------
+##
 Thank's for using.  
 Developed by **Ustinov Maxim** - [ewclide][4]
 
-[1]: https://dew.ewclide.com/download/dew.min.js  "download"
-[2]: https://dew.ewclide.com/support/  "support"
-[3]: https://dew.ewclide.com/documentation/  "documentation"
-[4]: https://vk.com/ewclide  "ewclide"
+[1]: https://github.com/ewclide/dewjs/archive/master.zip  "download"
+[2]: https://dew.ewclide.com/support  "support"
+[3]: https://dew.ewclide.com/documentation  "documentation"
+[4]: https://github.com/ewclide  "ewclide"
