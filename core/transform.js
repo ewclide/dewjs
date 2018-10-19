@@ -24,7 +24,7 @@ var defaults = {
 	}
 }
 
-export class Transform
+export default class Transform
 {
 	constructor(element)
 	{

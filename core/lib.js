@@ -2,13 +2,13 @@
 import {arrayExtends} from'../core/array';
 import {objectExtends} from '../core/object';
 import {bind} from '../core/binder';
-import {MegaFunction} from '../core/mega-function';
-import {Template} from '../core/template';
-import {Async} from '../core/async';
-import {Timer} from '../core/timer';
 import {http} from '../core/http';
 import {url} from '../core/url';
 import {$html} from '../core/html';
+import MegaFunction from '../core/mega-function';
+import Template from '../core/template';
+import Timer from '../core/timer';
+import Async from '../core/async';
 
 const Dew = {
 	fetchSettings : funcList.fetchSettings,

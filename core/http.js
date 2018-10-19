@@ -1,7 +1,7 @@
-import {Async} from './async';
 import {printErr} from './functions';
 import {objectExtends} from './object';
 import {url} from './url';
+import Async from './async';
 
 class HTTP
 {

@@ -1,4 +1,4 @@
-﻿import {StyleSheet} from './stylesheet';
+﻿import StyleSheet from './stylesheet';
 
 export class Animation
 {

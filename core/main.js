@@ -3,13 +3,13 @@ import * as funcList from './functions';
 import {arrayExtends} from'./array';
 import {objectExtends} from './object';
 import {bind} from './binder';
-import {MegaFunction} from './mega-function';
-import {Template} from './template';
-import {Async} from './async';
-import {Timer} from './timer';
 import {http} from './http';
 import {url} from './url';
 import {$html} from './html';
+import MegaFunction from './mega-function';
+import Template from './template';
+import Timer from './timer';
+import Async from './async';
 
 const Dew = {
 	browser   : funcList.browser,

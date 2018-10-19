@@ -1,5 +1,5 @@
-import {InitObject} from './init-object';
 import {printErr} from './functions';
+import InitObject from './init-object';
 
 function join(list, target, method)
 {

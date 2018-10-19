@@ -1,4 +1,4 @@
-export class StyleSheet
+export default class StyleSheet
 {
 	constructor()
 	{

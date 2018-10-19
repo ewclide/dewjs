@@ -1,6 +1,6 @@
-import { printErr } from "./functions";
+import {printErr} from "./functions";
 
-export class MegaFunction
+export default class MegaFunction
 {
 	constructor(fn, name)
 	{

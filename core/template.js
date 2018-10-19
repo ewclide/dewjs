@@ -1,6 +1,6 @@
 import {printErr}  from './functions';
 
-export class Template
+export default class Template
 {
     constructor(str, name)
     {

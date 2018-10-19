@@ -1,6 +1,6 @@
 import {strParse, isType, printErr} from './functions';
 
-export class InitObject
+export default class InitObject
 {
 	constructor(object)
 	{

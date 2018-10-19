@@ -1,6 +1,6 @@
-import {MegaFunction} from './mega-function';
+import MegaFunction from './mega-function';
 
-export class Async
+export default class Async
 {
 	constructor()
 	{

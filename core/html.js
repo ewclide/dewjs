@@ -1,7 +1,7 @@
 import {HTMLTools, eventList}  from './html-tools';
-import {StyleSheet} from './stylesheet';
-import {Async} from './async';
 import {printErr, define} from './functions';
+import StyleSheet from './stylesheet';
+import Async from './async';
 
 var proto = HTMLTools.prototype,
     $html = new HTMLTools(document);

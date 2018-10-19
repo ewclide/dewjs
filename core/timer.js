@@ -1,7 +1,7 @@
-import {MegaFunction} from './mega-function';
 import {bind} from './binder';
+import MegaFunction from './mega-function';
 
-export class Timer
+export default class Timer
 {
 	constructor(options)
 	{

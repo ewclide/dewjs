@@ -1,6 +1,6 @@
 import {eventList, HTMLTools} from './html-tools';
 
-export class JSONConverter
+export default class JSONConverter
 {
 	constructor(json)
     {
@@ -103,44 +103,44 @@ export class JSONConverter
         
         return element;
     }
-}
 
-JSONConverter.createJSON = function(element)
-{
-    if (element.nodeType == 1)
+    static createJSON()
     {
-        var result = { tag : element.tagName.toLowerCase() },
+        if (element.nodeType == 1)
+        {
+            var result = { tag : element.tagName.toLowerCase() },
             attrs = element.attributes,
             nodes = element.childNodes;
 
-        if (attrs.length)
-        {
-            result.attrs = {};
-
-            for (var i = 0; i < attrs.length; i++)
+            if (attrs.length)
             {
-                let attr = attrs[i];
+                result.attrs = {};
 
-                if (attr != "tag" && attr != "nodes" && attr != "text")
-                    result.attrs[attr.name.replace("-","_")] = attr.value;
+                for (var i = 0; i < attrs.length; i++)
+                {
+                    let attr = attrs[i];
+
+                    if (attr != "tag" && attr != "nodes" && attr != "text")
+                        result.attrs[attr.name.replace("-","_")] = attr.value;
+                }
             }
-        }
 
-        if (nodes.length)
-        {
-            result.nodes = [];
-
-            for (var i = 0; i < nodes.length; i++)
+            if (nodes.length)
             {
-                if (nodes[i].nodeType == 1)
-                    result.nodes.push(JSONConverter.createJSON(nodes[i]));
+                result.nodes = [];
 
-                else if (nodes[i].nodeType == 3)
-                    result.text = nodes[i].textContent;
+                for (var i = 0; i < nodes.length; i++)
+                {
+                    if (nodes[i].nodeType == 1)
+                        result.nodes.push(this.createJSON(nodes[i]));
+
+                    else if (nodes[i].nodeType == 3)
+                        result.text = nodes[i].textContent;
+                }
             }
-        }
 
-        return result;
+            return result;
+        }
+        else return false;
     }
-    else return false;
 }
