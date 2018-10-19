@@ -1,8 +1,8 @@
-import {JSONConverter} from './json-converter';
-import {Transform} from './transform';
-import {Async} from './async';
-import {MegaFunction} from './mega-function';
 import {printErr} from './functions';
+import JSONConverter from './json-converter';
+import Transform from './transform';
+import MegaFunction from './mega-function';
+import Async from './async';
 
 export var eventList = {};
 
@@ -49,30 +49,46 @@ export class HTMLTools
         var self = this,
             result = new Async(),
             list = this.select("img, link, script, iframe"),
-            checkout = function()
+
+        checkout = function()
+        {
+            list._countReady++;
+
+            if (list._countReady == list.length)
             {
-                list._countReady++;
-                if (list._countReady == list.length)
-                {
-                    result.resolve();
-                    if (typeof fn == "function") fn();
-                }
+                result.resolve();
+                if (typeof fn == "function") fn();
             }
+        }
 
         list = list.join(this.elements).elements;
         list._countReady = 0;
         list.forEach( element => {
 
             var tag = element.tagName.toLowerCase(),
+                errorText = `Can't load resource "${element.src}"`,
                 complete = true;
                 
             if (tag == "img")
+            {
                 complete = element.complete;
+
+                if (complete && !element.width && !element.height)
+                {
+                    result.reject(errorText);
+                    return;
+                }
+            }
 
             else if (tag == "link" || tag == "iframe")
                 complete = false;
 
-            complete ? checkout() : element.addEventListener("load", checkout);
+            if (complete) checkout();
+            else
+            {
+                element.addEventListener("load", checkout);
+                element.addEventListener("error", (e) => result.reject(e));
+            }
 
         });
 

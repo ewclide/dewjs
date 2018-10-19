@@ -1,5 +1,5 @@
 var jq = $html
-	.script("https://code.jquery.com/jquery-3.2.1.min.js_")
+	.script("https://code.jquery.com/jquery-3.2.1.min.js")
 	.then(function(e){
 		log("jquery loaded!");
 	})
@@ -12,8 +12,7 @@ $html.ready(function(){
 });
 
 var bigImages = $html.select(".big-images").ready(function(){
-	log("imgs ready!")
+	log("Images ready!")
 });
 
-// returns async object, wich can used in other async objects
-log(bigImages)
+bigImages.except((e) => log(e));
