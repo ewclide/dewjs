@@ -10,11 +10,12 @@
         <path fill="#555" d="M0 0h69v20H0z"/>
         <path fill="#4c1" d="M69 0h31v20H69z"/>
         <path fill="url(#b)" d="M0 0h100v20H0z"/>
+        <path fill="#010101" fill-opacity=".3" transform="translate(72,4)" d="M11 8l0 3 -8 0 0 -3 -2 0 0 3.5c0,1 0.5,1.5 1.5,1.5l9 0c1,0 1.5,-0.5 1.5,-1.5l0 -3.5 -2 0zm-0.5 -2l-2.5 0 0 -5 -2 0 0 5 -2.5 0 3 3.5c0.36,0.42 0.64,0.42 1,0l3 -3.5z"/>
+        <path fill="#fff" transform="translate(72,4)" d="M11 7l0 3 -8 0 0 -3 -2 0 0 3.5c0,1 0.5,1.5 1.5,1.5l9 0c1,0 1.5,-0.5 1.5,-1.5l0 -3.5 -2 0zm-0.5 -2l-2.5 0 0 -5 -2 0 0 5 -2.5 0 3 3.5c0.36,0.42 0.64,0.42 1,0l3 -3.5z"/>
     </g>
     <g fill="#fff" text-anchor="middle" font-family="DejaVu Sans,Verdana,Geneva,sans-serif" font-size="110">
         <text x="355" y="150" fill="#010101" fill-opacity=".3" transform="scale(.1)" textLength="500">download</text>
         <text x="355" y="140" transform="scale(.1)" textLength="500">download</text>
-        <text x="800" y="150" fill="#010101" fill-opacity=".3" transform="scale(.1)" textLength="320">↵</text>
-        <text x="800" y="140" transform="scale(.1)" textLength="320">↵</text>
     </g>
+
 </svg>

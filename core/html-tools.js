@@ -547,6 +547,12 @@ export class HTMLTools
         var element = this.elements[0],
             result;
 
+        if (!element)
+        {
+            printErr(`Can't get attribute of undefined element`);
+            return;
+        }
+
         if (element.nodeType == 1 && element.attributes.length)
         {
             result = {};
