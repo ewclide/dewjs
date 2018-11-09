@@ -1,7 +1,6 @@
+# Dew.js
 
-# ```Dew.js```
-
-![license](img/license.svg) [![download](img/download.svg)][1]
+![license](img/license.svg)  
 
 Dew is experimental javaScript library for UI programming.
 
