@@ -1,4 +1,4 @@
-import {objectExtends} from './object';
+import {joinLeft, clone} from './object';
 
 var defaults = {
 	units : {
@@ -31,9 +31,9 @@ export default class Transform
 		var self = this;
 
 		this.element = element;
-		this._actions = objectExtends.clone(defaults.actions, true);
-		this._units = objectExtends.clone(defaults.units);
-		this._settings = objectExtends.clone(defaults.settings);
+		this._actions = clone(defaults.actions, true);
+		this._units = clone(defaults.units);
+		this._settings = clone(defaults.settings);
 	}
 
 	apply(data)
@@ -93,7 +93,7 @@ export default class Transform
 	units(data)
 	{
 		if (data.reset) this.reset.units();
-		if (data) objectExtends.joinLeft(this._units, data);
+		if (data) joinLeft(this._units, data);
 	}
 
 	settings(data)
@@ -128,24 +128,24 @@ export default class Transform
 
 	reset()
 	{
-		this._actions = objectExtends.clone(defaults.actions, true);
-		this._units = objectExtends.clone(defaults.units);
-		this._settings = objectExtends.clone(defaults.settings);
+		this._actions = clone(defaults.actions, true);
+		this._units = clone(defaults.units);
+		this._settings = clone(defaults.settings);
 	}
 
 	resetUnits()
 	{
-		this._units = objectExtends.clone(defaults.units);
+		this._units = clone(defaults.units);
 	}
 
 	resetActions()
 	{
-		this._actions = objectExtends.clone(defaults.actions, true);
+		this._actions = clone(defaults.actions, true);
 	}
 
 	resetSettings()
 	{
-		this._settings = objectExtends.clone(defaults.settings);
+		this._settings = clone(defaults.settings);
 	}
 
 	_build(actions, units)

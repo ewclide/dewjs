@@ -1,5 +1,5 @@
 import {printErr} from './functions';
-import {objectExtends} from './object';
+import {joinRight} from './object';
 import {url} from './url';
 import Async from './async';
 
@@ -17,7 +17,7 @@ class HTTP
 			result = new Async(),
 			request = new this.XHR();
 
-		objectExtends.joinRight(options, {
+		joinRight(options, {
 			uncache  : true,
 			progress : false,
 			saveData : false,

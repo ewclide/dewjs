@@ -1,12 +1,12 @@
 import {strParse, isType, printErr} from './functions';
 
-export default class InitObject
+export default class ObjectIniter
 {
 	constructor(object)
 	{
 		this._object = object;
 		this.errors = [];
-		this.errors.title = 'Dew object init error at "' + object.constructor.name + '" constructor';
+		this.errors.title = `Dew object init error at ${object.constructor.name} constructor`;
 	}
 
 	checkout(field, settings, value)
@@ -40,7 +40,7 @@ export default class InitObject
 		if (value === undefined)
 		{
 			if (settings.required)
-				this.errors.push('empty required option "' + field + '"');
+				this.errors.push(`empty required option "${field}"`);
 
 			else if (settings.def)
 				value = settings.def;
@@ -49,7 +49,7 @@ export default class InitObject
 		{
 			if (settings.type && !isType(value, settings.type))
 			{
-				this.errors.push('value of "' + field + '" option must be a "' + settings.type + '" type');
+				this.errors.push(`value of "${field}" option must be a "${settings.type}" type`);
 				value = undefined;
 			}
 
@@ -69,13 +69,13 @@ export default class InitObject
 			var attr = $html.convert(settings.element).getAttr(settings.prefix + field);
 
 			if (settings.only)
-				!attr ? ( value = undefined, this.errors.push('empty required attribute of option "' + field + '"') )
+				!attr ? ( value = undefined, this.errors.push(`empty required attribute of option "${field}"`) )
 				: value = strParse(attr);
 
 			else if (value == undefined && attr)
 				value = strParse(attr);
 		}
-		else this.errors.push('setting "attr" of option "' + field + '" must have element');
+		else this.errors.push(`setting "attr" of option "${field}" must have element`);
 
 		return value;
 	} 

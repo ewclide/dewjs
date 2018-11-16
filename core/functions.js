@@ -1,6 +1,6 @@
 function getBrowser()
 {
-    var agent = navigator.userAgent;
+    let agent = navigator.userAgent;
 
     if (agent.search(/Chrome/) > 0)  return 'Chrome';
     if (agent.search(/Firefox/) > 0) return 'Firefox';
@@ -11,27 +11,27 @@ function getBrowser()
     return false;
 }
 
-export var browser = getBrowser();
+export let browser = getBrowser();
 
 export function printErr(data, source = true)
 {
-	var error = "Error: ";
+	let error = "Error: ";
 
 	if (source) source = _getSourceLog();
 
 	if (Array.isArray(data) && data.length)
 	{
 		error += data.title || "Error list";
-		error += "\n";
+		error += '\n';
 
-		data.forEach( message => error += "  --> " + message + "\n" );
+		data.forEach( message => error += `  --> ${message}\n` );
 
-        if (source) error += "  -----\n  Source: " + source;
+        if (source) error += `  -----\n  Source: ${source}`;
 	}
 	else if (typeof data == "string")
 	{
 		error += data;
-		if (source) error += " (" + source + ")";
+		if (source) error += ` (${source})`;
 	}
 	else return false;
 
@@ -42,27 +42,27 @@ export function printErr(data, source = true)
 
 function _getSourceLog()
 {
-	var stack = (new Error()).stack;
+	let stack = (new Error()).stack;
 
-	if (stack) stack = stack.split("\n");
-	else return "";
+	if (stack) stack = stack.split('\n');
+	else return '';
 
-	for (var i = 0; i < stack.length; i++)
+	for (let i = 0; i < stack.length; i++)
 		if (stack[i].search(/dew\.(min|dev)\.js|anonymous/g) == -1)
 		{
-			var src = stack[i].match(/https?:[^\)]+/g);
+			let src = stack[i].match(/https?:[^\)]+/g);
 			if (src && src[0]) return src[0];
 		}
 
-	return "";
+	return '';
 }
 
 export function define(obj, fields, options = {})
 {
-	var desc = {
-		enumerable   : options.enumer != undefined ? options.enumer : false,
-		configurable : options.config != undefined ? options.config : true,
-		writable     : options.write  != undefined ? options.write  : true
+	let desc = {
+		enumerable   : options.enumer !== undefined ? options.enumer : false,
+		configurable : options.config !== undefined ? options.config : true,
+		writable     : options.write  !== undefined ? options.write  : true
 	};
 
 	if (typeof fields == "string")
@@ -82,32 +82,32 @@ export function define(obj, fields, options = {})
 		if (options.set && options.value !== undefined)
 			obj[fields] = options.value;
 	}
-	else for (var key in fields)
-		 {
+	else for (let key in fields)
+		{
 			desc.value = fields[key];
 			Object.defineProperty(obj, String(key), desc);
-		 }
-	
+		}
 };
 
 export function isType(value, type)
 {
 	if (Array.isArray(type))
-		return type.some( t => isType(value, t) ? true : false );
+		return type.some( t => isType(value, t) );
 
 	else if (type !== undefined)
+	{
 		switch (type)
 		{
-			case "number"   : return typeof value == "number" ? true : false;
-			case "string"   : return typeof value == "string" ? true : false;
-			case "boolean"  : return typeof value == "boolean" ? true : false;
-			case "array"    : return Array.isArray(value) ? true : false;
-			case "function" : return typeof value == "function" ? true : false;
-			case "DOM"      : return value !== undefined && value.nodeType == 1 ? true : false;
-			case "HTMLTools": return value.isHTMLTools ? true : false;
-			default : printErr('the type "' + type + '" is unknown!'); return false;
+			case 'number'   : return typeof value == 'number';
+			case 'string'   : return typeof value == 'string';
+			case 'boolean'  : return typeof value == 'boolean';
+			case 'array'    : return Array.isArray(value);
+			case 'function' : return typeof value == 'function';
+			case 'DOM'      : return value instanceof Element;
+			case 'HTMLTools': return value.isHTMLTools ? true : false;
+			default : printErr(`the type "${type}" is unknown!`); return false;
 		}
-
+	}
 	else
 	{
 		if (typeof value == "number") return "number";
@@ -123,11 +123,11 @@ export function isType(value, type)
 
 export function strParse(value)
 {
-	if (typeof value == "string")
+	if (typeof value == 'string')
 	{
 		if (+value) return +value;
-		if (value == "true" || value == "TRUE") return true;
-		if (value == "false" || value == "FALSE") return false;
+		if (value == 'true' || value == 'TRUE') return true;
+		if (value == 'false' || value == 'FALSE') return false;
 		if (value.search(/\[.+\]/g) != -1)
 		{
 			value = value.replace(/\[|\]/g, "").split(",");
@@ -142,15 +142,15 @@ export function strParse(value)
 
 export function jsonParse(str)
 {
-    var devs = '{}[],:',
+    let devs = '{}[],:',
     	quot = '', word = '', isString = false, left = false,
         reg = /^[\s*"']+|['"\s*]+$/gm,
         result = '';
  
-    for (var i = 0; i < str.length; i++)
+    for (let i = 0; i < str.length; i++)
     {
-    	if (isString && str[i] == quot) (isString = false, i++)
-    	if (str[i] == "'" || str[i] == '"') (isString = true, quot = str[i], i++)
+    	if (isString && str[i] == quot) { isString = false; i++ }
+    	if (str[i] == "'" || str[i] == '"') { isString = true; quot = str[i]; i++ }
 
     	left = str[i] == ":";
 
@@ -185,17 +185,17 @@ export function construct(Cls, args)
 
 export function publish(TheClass, fields, methods)
 {
-    var list = {};
+    let list = {};
 
     function Output()
     {
-        var id = Math.random();
+        let id = Math.random();
         list[id] = construct(TheClass, arguments);
         this.id = id;
     }
 
     if (fields)
-    for (var i = 0; i < fields.length; i++)
+    for (let i = 0; i < fields.length; i++)
     {
         let field = fields[i];
 
@@ -211,11 +211,11 @@ export function publish(TheClass, fields, methods)
     }
 
     if (methods)
-    for (var i = 0; i < methods.length; i++)
+    for (let i = 0; i < methods.length; i++)
     {
         let method = methods[i];
         Output.prototype[method] = function(){
-            var obj = list[this.id];
+            let obj = list[this.id];
             return obj[method].apply(obj, arguments);
         }
     }
@@ -225,21 +225,21 @@ export function publish(TheClass, fields, methods)
 
 export function fetchSettings(settings, defaults, attributes, element)
 {
-	var result = {}
+	let result = {}
 
-    for (var i in defaults)
+    for (let i in defaults)
     {
         if (settings[i] === undefined)
         {
-            var attr = 'data-' + (attributes[i] || i), num;
+            let attr = 'data-' + (attributes[i] || i), num;
 
             attr = element ? element.getAttribute(attr) : null;
             num = +attr;
 
-            if (attr === "" || attr === "true")
+            if (attr === '' || attr === 'true')
                 attr = true;
 
-            else if (attr === "false")
+            else if (attr === 'false')
                 attr = false;
 
             else if (attr !== null && !isNaN(num))
@@ -257,30 +257,30 @@ export function random(min = 0, max = 9999999)
 {
 	return Math.floor(Math.random() * (max - min)) + min;
 }
-random.key = function(length = 15, types = ["all"])
+export function randomKey(length = 15, types = ['all'])
 {
-	var lower = 'abcdefghijklmnopqrstuvwxyz',
+	let lower = 'abcdefghijklmnopqrstuvwxyz',
 		upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
 		numbers = '1234567890',
 		specials = "!?@#$%^&*()*-_+=[]{}<>.,;:/'\"\\",
-		chars = "";
+		chars = '';
 
-	if (types.indexOf("all") != -1 ) 
+	if (types.indexOf('all') != -1 ) 
 		chars = lower + upper + numbers + specials;
 	else
 	{
-		if (types.indexOf("lower") != -1 ) chars += lower;
-		if (types.indexOf("upper") != -1 ) chars += upper;
-		if (types.indexOf("numbers") != -1 ) chars += numbers;
-		if (types.indexOf("specials") != -1 ) chars += specials;
+		if (types.indexOf('lower') != -1 ) chars += lower;
+		if (types.indexOf('upper') != -1 ) chars += upper;
+		if (types.indexOf('numbers') != -1 ) chars += numbers;
+		if (types.indexOf('specials') != -1 ) chars += specials;
 	}
 
-	var limit = chars.length - 1,
-		result = "";
+	let limit = chars.length - 1,
+		result = '';
 
-	for (var i = 1; i < length; i++)
+	for (let i = 1; i < length; i++)
 	{
-		var char = chars[random(0, limit)];
+		let char = chars[random(0, limit)];
 		if (char != result[i - 1]) result += char;
 	}
 
@@ -289,10 +289,10 @@ random.key = function(length = 15, types = ["all"])
 
 export function log()
 {
-	var args = Array.from(arguments),
+	let args = Array.from(arguments),
 		source = _getSourceLog();
 
-    if (source) args.push("\n-----\nSource: " + source);
+    if (source) args.push(`\n-----\nSource: ${source}`);
 
 	console.log.apply(null, args);
 }
@@ -302,5 +302,5 @@ log.json = function(json, spaces = 4)
     log(JSON.stringify(json, null, spaces));
 }
 
-log.time = console.time;
-log.timeEnd = console.timeEnd;
+log.time = (name) => console.time(name);
+log.timeEnd = (name) => console.timeEnd(name);

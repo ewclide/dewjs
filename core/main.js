@@ -1,7 +1,7 @@
 ﻿import './polyfill';
 import * as funcList from './functions';
-import {arrayExtends} from'./array';
-import {objectExtends} from './object';
+import * as arrayExt from'./array';
+import * as objectExt from './object';
 import {bind} from './binder';
 import {http} from './http';
 import {url} from './url';
@@ -18,17 +18,14 @@ const Dew = {
 	strParse  : funcList.strParse,
 	jsonParse : funcList.jsonParse,
 	random    : funcList.random,
+	randomKey : funcList.randomKey,
+	construct : funcList.construct,
 	publish   : funcList.publish,
 	printErr  : funcList.printErr,
-	construct : funcList.construct,
 	fetchSettings : funcList.fetchSettings,
 
-	get object(){
-		return objectExtends;
-	},
-	get array(){
-		return arrayExtends;
-	},
+	array  : arrayExt,
+	object : objectExt,
 
 	MegaFunction : MegaFunction,
 	Template : Template,

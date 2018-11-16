@@ -20,9 +20,7 @@ $html.extend = function(name, method)
 $html.ready = function(fn)
 {
     if (this._ready) fn()
-    else document.addEventListener("DOMContentLoaded", function(){
-        fn()
-    });
+    else document.addEventListener("DOMContentLoaded", function(){ fn() });
 }
 
 $html.script = function(source, add)
@@ -115,8 +113,6 @@ Object.defineProperty($html, "body", {
     }
 });
 
-document.addEventListener("DOMContentLoaded", function(){
-    $html._ready = true;
-});
+document.addEventListener("DOMContentLoaded", () => $html._ready = true );
 
 export {$html}

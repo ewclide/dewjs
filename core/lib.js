@@ -1,14 +1,12 @@
-﻿import * as funcList from '../core/functions';
-import {arrayExtends} from'../core/array';
-import {objectExtends} from '../core/object';
-import {bind} from '../core/binder';
-import {http} from '../core/http';
-import {url} from '../core/url';
-import {$html} from '../core/html';
-import MegaFunction from '../core/mega-function';
-import Template from '../core/template';
-import Timer from '../core/timer';
-import Async from '../core/async';
+﻿import * as funcList from './functions';
+import {bind} from './binder';
+import {http} from './http';
+import {url} from './url';
+import {$html} from './html';
+import MegaFunction from './mega-function';
+import Template from './template';
+import Timer from './timer';
+import Async from './async';
 
 const Dew = {
 	fetchSettings : funcList.fetchSettings,
@@ -18,20 +16,20 @@ const Dew = {
 	strParse  : funcList.strParse,
 	jsonParse : funcList.jsonParse,
 	random    : funcList.random,
+	construct : funcList.construct,
 	publish   : funcList.publish,
 	printErr  : funcList.printErr,
-	construct : funcList.construct,
 	log       : funcList.log,
-	$html     : $html,
-	object    : objectExtends,
-	array     : arrayExtends,
-	bind      : bind,
-	http      : http,
-	url       : url,
+
+	MegaFunction : MegaFunction,
 	Template  : Template,
 	Async     : Async,
 	Timer     : Timer,
-	MegaFunction : MegaFunction
+
+	bind      : bind,
+	http      : http,
+	url       : url,
+	$html     : $html
 }
 
 export default Dew;
