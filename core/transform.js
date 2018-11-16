@@ -1,6 +1,6 @@
 import {joinLeft, clone} from './object';
 
-var defaults = {
+let defaults = {
 	units : {
 		perspective : "px",
 		translate : "px",
@@ -28,7 +28,7 @@ export default class Transform
 {
 	constructor(element)
 	{
-		var self = this;
+		let self = this;
 
 		this.element = element;
 		this._actions = clone(defaults.actions, true);
@@ -45,7 +45,7 @@ export default class Transform
 			if (data.units) this.units(data.units);
 		}
 
-		var units = this._units,
+		let units = this._units,
 			actions = this._actions,
 			settings = this._settings,
 			transform = "";
@@ -78,7 +78,7 @@ export default class Transform
 
 	actions(data)
 	{
-		var actions = this._actions;
+		let actions = this._actions;
 
 		if (data.reset) this.reset.actions();
 
@@ -98,7 +98,7 @@ export default class Transform
 
 	settings(data)
 	{
-		var settings = this._settings;
+		let settings = this._settings;
 
 		if (data.origin && data.origin.length == 2)
 			settings.origin = data.origin;
@@ -115,12 +115,12 @@ export default class Transform
 
 	_join(left, right, mul = false)
 	{
-		var arr = [];
+		let arr = [];
 
 		right = arr.concat(right);
 
 		return left.map(function(item, index){
-			var add = +right[index];
+			let add = +right[index];
 			if (add) return mul ? item * add : item + add;
 			else return item;
 		});
@@ -150,7 +150,7 @@ export default class Transform
 
 	_build(actions, units)
 	{
-		var result = "";
+		let result = "";
 
 		if (actions.matrix2d.length || actions.matrix3d.length)
 		{
@@ -159,9 +159,9 @@ export default class Transform
 		}
 		else
 		{
-	        for (var name in actions)
+	        for (let name in actions)
 	        {
-	            var action = actions[name],
+	            let action = actions[name],
 	                unit = units[name] || "";
 
 	            switch (name)
@@ -192,7 +192,7 @@ export default class Transform
 
 	_empty(array, char = 0)
 	{
-		var result = array.filter( item => item === char ? false : true );
+		let result = array.filter( item => item === char ? false : true );
 		
 		return !result.length ? true : false;
 	}

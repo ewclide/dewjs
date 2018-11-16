@@ -32,7 +32,7 @@ export default class Async
 
 	_canResolve()
 	{
-		var waiting = true;
+		let waiting = true;
 
 		if (this._async_strict && this._async_waiters.length && !this._async_subReady)
 			waiting = false;
@@ -124,7 +124,7 @@ export default class Async
 
 	wait(list, progress = false)
 	{
-		var self = this, count = 0;
+		let self = this, count = 0;
 
 		if (Array.isArray(list))
 			list.forEach( item => {
@@ -163,7 +163,7 @@ export default class Async
 
 	_calcProgress()
 	{
-		var part = 1 / this._async_waiters.length,
+		let part = 1 / this._async_waiters.length,
 			ready = 0;
 
 		this._async_waiters.forEach( waiter => {
@@ -206,7 +206,7 @@ export default class Async
 
 Async.wait = function(list, progress)
 {
-	var async = new Async();
+	let async = new Async();
 	async.wait(list, progress);
 	return async;
 }

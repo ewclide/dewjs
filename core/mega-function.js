@@ -4,13 +4,13 @@ export default class MegaFunction
 {
 	constructor(fn, name)
 	{
-		var self = this;
+		let self = this;
 
 		this._handlers = [];
 		this._names = Object.create(null);
 		this._data;
 
-		var mega = function(data, order, filter){
+		let mega = function(data, order, filter){
 			return self._call(data, order, filter);
 		}
 
@@ -35,7 +35,7 @@ export default class MegaFunction
 		if (order)
 		{
 			if (typeof filter == "function")
-				for (var i = 0; i < this._handlers.length; i++)
+				for (let i = 0; i < this._handlers.length; i++)
 				{
 					let handler = this._handlers[i],
 						skip = filter(this._data, i);
@@ -53,7 +53,7 @@ export default class MegaFunction
 			this._handlers.forEach( handler => handler(data) );
 		}
 
-		var result = this._data;
+		let result = this._data;
 		this._data = null;
 
 		return result;
@@ -61,7 +61,7 @@ export default class MegaFunction
 
 	push(fn, name)
 	{
-		var self = this.__megaInstance;
+		let self = this.__megaInstance;
 
 		if (typeof fn == "function")
 		{
@@ -73,7 +73,7 @@ export default class MegaFunction
 
 	remove(id)
 	{
-		var self = this.__megaInstance, index = id, handler;
+		let self = this.__megaInstance, index = id, handler;
 
 		if (typeof id == "string")
 		{
@@ -90,7 +90,7 @@ export default class MegaFunction
 
 	invoke(id, data)
 	{
-		var self = this.__megaInstance, index = id, handler;
+		let self = this.__megaInstance, index = id, handler;
 
 		if (typeof id == "string") index = self._names[id];
 

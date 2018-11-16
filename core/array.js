@@ -13,7 +13,7 @@ function _checkInclude(first, second, settings)
 
 	else
 	{
-		var index = first.indexOf(second);
+		let index = first.indexOf(second);
 
 		if (settings.begin)
 			return index != -1 && ( index == 0 || first[index - 1] == " " ) ? true : false;
@@ -26,7 +26,7 @@ function _checkInclude(first, second, settings)
 
 function _natConv(value)
 {
-	var dot = '', range;
+	let dot = '', range;
 	
 	if (!isNaN(+value)) return value;
 
@@ -47,7 +47,7 @@ function _natConv(value)
 
 export function contain(arr, value)
 {
-	var index = arr.indexOf(value);
+	let index = arr.indexOf(value);
 	return index == -1 ? false : { index : index };
 }
 
@@ -70,9 +70,9 @@ export function compare(arr, arrComp)
 
 export function unique(arr)
 {
-	var hash = {};
+	let hash = {};
 
-	for (var i = 0; i < arr.length; i++)
+	for (let i = 0; i < arr.length; i++)
 	{
 		!(arr[i] in hash) ?
 		hash[arr[i]] = true : arr.splice(i--, 1);
@@ -83,7 +83,7 @@ export function natSort(arr, settings = {})
 {
 	return arr.sort( (cur, next) => {
 
-		var result = 0;
+		let result = 0;
 
 		if (settings.inside)
 		{
@@ -102,7 +102,7 @@ export function natSort(arr, settings = {})
 
 export function search(arr, val, settings = {})
 {
-	var result = settings.inside
+	let result = settings.inside
 	? arr.filter( item => _checkInclude(item[settings.inside], val, settings) )
 	: arr.filter( item => _checkInclude(item, val, settings) );
 
@@ -111,10 +111,10 @@ export function search(arr, val, settings = {})
 
 export function removeValue(arr, value)
 {
-	var list = Array.isArray(value) ? value : [value];
+	let list = Array.isArray(value) ? value : [value];
 
 	return list.filter( item => {
-		var index = arr.indexOf(item);
+		let index = arr.indexOf(item);
 		if (index != -1)
 		{
 			arr.splice(index, 1);
@@ -126,7 +126,7 @@ export function removeValue(arr, value)
 
 export function removeIndex(arr, index)
 {
-	var values = Array.isArray(index)
+	let values = Array.isArray(index)
 	? index.map( i => arr[i] ) : arr[index];
 
 	return removeValue(arr, values);

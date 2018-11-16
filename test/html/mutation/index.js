@@ -1,4 +1,4 @@
-var h1 = $html.select("h1");
+let h1 = $html.select("h1");
 
 h1.mutation(function(e){
 	log("callback", e)

@@ -4,7 +4,7 @@
 3) supports characters ".,-" and not sensitive to spaces.
 */
 
-var arr = [ "4-5 kg", "4-7 kg", "4-5", "3-7.5 kg", "3 kg", 4.1, "4", "7-8.5 kg", "7-8,05 kg", 2.5 ];
+let arr = [ "4-5 kg", "4-7 kg", "4-5", "3-7.5 kg", "3 kg", 4.1, "4", "7-8.5 kg", "7-8,05 kg", 2.5 ];
 
 Dew.array.natSort(arr);
 log(arr)

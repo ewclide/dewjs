@@ -4,7 +4,7 @@ import Transform from './transform';
 import MegaFunction from './mega-function';
 import Async from './async';
 
-export var eventList = {};
+export let eventList = {};
 
 export class HTMLTools
 {
@@ -46,7 +46,7 @@ export class HTMLTools
 
     ready(fn)
     {
-        var self = this,
+        let self = this,
             result = new Async(),
             list = this.select("img, link, script, iframe"),
 
@@ -65,7 +65,7 @@ export class HTMLTools
         list._countReady = 0;
         list.forEach( element => {
 
-            var tag = element.tagName.toLowerCase(),
+            let tag = element.tagName.toLowerCase(),
                 errorText = `Can't load resource "${element.src}"`,
                 complete = true;
                 
@@ -107,9 +107,9 @@ export class HTMLTools
 
         this._mutations = [];
 
-        for (var i = 0; i < this.elements.length; i++)
+        for (let i = 0; i < this.elements.length; i++)
         {
-            var observer = new MutationObserver(function(data){
+            let observer = new MutationObserver(function(data){
                 fn(data[0]);
             });
 
@@ -127,7 +127,7 @@ export class HTMLTools
 
     mutationStart()
     {
-        for (var i = 0; i < this._mutations.length; i++)
+        for (let i = 0; i < this._mutations.length; i++)
         {
             let mutation = this._mutations[i];
             mutation.observer.observe(mutation.element, mutation.options);
@@ -136,13 +136,13 @@ export class HTMLTools
 
     mutationEnd()
     {
-        for (var i = 0; i < this._mutations.length; i++)
+        for (let i = 0; i < this._mutations.length; i++)
             this._mutations[i].observer.disconnect();
     }
 
     mutationClear()
     {
-        for (var i = 0; i < this._mutations.length; i++)
+        for (let i = 0; i < this._mutations.length; i++)
             this._mutations[i].observer.disconnect();
 
         delete this._mutations;
@@ -150,7 +150,7 @@ export class HTMLTools
 
     visible(maxDepth = 3)
     {
-        var found = this._findHidden(this.elements[0], maxDepth, 0)
+        let found = this._findHidden(this.elements[0], maxDepth, 0)
         return found ? { element : found } : {}
     }
 
@@ -158,7 +158,7 @@ export class HTMLTools
     {
         if (depth >= maxDepth) return false;
 
-        var result = false,
+        let result = false,
             parent = element.parentElement || element.parentNode || null;
 
         if (parent && parent != document)
@@ -169,7 +169,7 @@ export class HTMLTools
 
     display(element)
     {
-        var display;
+        let display;
 
         if (!element) element = this.elements[0]
 
@@ -182,17 +182,17 @@ export class HTMLTools
 
     select(query)
     {
-        var elements = [], result;
+        let elements = [], result;
 
         if (this.elements.length == 1)
             elements = this.elements[0].querySelectorAll(query);
 
-        else for (var i = 0; i < this.elements.length; i++)
+        else for (let i = 0; i < this.elements.length; i++)
         {
-            var search = this.elements[i].querySelectorAll(query),
+            let search = this.elements[i].querySelectorAll(query),
                 index = elements.length;
 
-            for (var j = 0; j < search.length; j++)
+            for (let j = 0; j < search.length; j++)
                 elements[index + j] = search[j];
         }
 
@@ -245,8 +245,8 @@ export class HTMLTools
             if (!Array.isArray(htl.elements)) // need for speed, because Array.from is very slow
                 htl.elements = Array.from(htl.elements);
 
-            for (var i = 0; i < this.elements.length; i++)
-            for (var j = 0; j < htl._srcLength; j++)
+            for (let i = 0; i < this.elements.length; i++)
+            for (let j = 0; j < htl._srcLength; j++)
             {
                 let element = htl.elements[j];
 
@@ -261,14 +261,14 @@ export class HTMLTools
         }
         else if (Array.isArray(htl))
         {
-            for (var i = 0; i < htl.length; i++)
+            for (let i = 0; i < htl.length; i++)
                 this._insert(htl[i], remove, position);
         }
     }
 
     _insertJSON(htl, position)
     {
-        for (var i = 0; i < this.elements.length; i++)
+        for (let i = 0; i < this.elements.length; i++)
         {
             let element = htl._jsonConv.build();
             htl.elements.push(element);
@@ -278,7 +278,7 @@ export class HTMLTools
 
     createFromJSON(json)
     {
-        var jsonConv = new JSONConverter(json),
+        let jsonConv = new JSONConverter(json),
             result = jsonConv.htl;
             result._jsonConv = jsonConv;
             result.node = jsonConv.nodes;
@@ -288,7 +288,7 @@ export class HTMLTools
 
     createJSON(htl)
     {
-        var elements = htl ? htl.elements : this.elements,
+        let elements = htl ? htl.elements : this.elements,
             result;
 
         if (elements.length > 1)
@@ -310,7 +310,7 @@ export class HTMLTools
 
     addClass(name)
     {
-        for (var i = 0; i < this.elements.length; i++)
+        for (let i = 0; i < this.elements.length; i++)
             this.elements[i].classList.add(name);
 
         return this;
@@ -318,7 +318,7 @@ export class HTMLTools
 
     removeClass(name)
     {
-        for (var i = 0; i < this.elements.length; i++)
+        for (let i = 0; i < this.elements.length; i++)
             this.elements[i].classList.remove(name);
 
         return this;
@@ -327,7 +327,7 @@ export class HTMLTools
     html(str, clear = true)
     {
         if (str !== undefined)
-            for (var i = 0; i < this.elements.length; i++)
+            for (let i = 0; i < this.elements.length; i++)
             {
                 if (clear) this.elements[i].innerHTML = str;
                 else this.elements[i].innerHTML += str;
@@ -341,7 +341,7 @@ export class HTMLTools
     text(str)
     {
         if (str !== undefined)
-            for (var i = 0; i < this.elements.length; i++)
+            for (let i = 0; i < this.elements.length; i++)
                 this.elements[i].innerText = str;
 
         else return this.elements[0].innerText;
@@ -353,7 +353,7 @@ export class HTMLTools
     {
         if (data !== undefined)
         {
-            for (var i = 0; i < this.elements.length; i++)
+            for (let i = 0; i < this.elements.length; i++)
                 this.elements[i].value = data;
         }
         else return this.elements[0].value;
@@ -371,7 +371,7 @@ export class HTMLTools
     checked(yes)
     {
         if (typeof yes == "boolean")
-            for (var i = 0; i < this.elements.length; i++)
+            for (let i = 0; i < this.elements.length; i++)
             {
                 if ("checked" in this.elements[i])
                     this.elements[i].checked = yes;
@@ -385,7 +385,7 @@ export class HTMLTools
 
     toogle()
     {
-        for (var i = 0; i < this.elements.length; i++)
+        for (let i = 0; i < this.elements.length; i++)
         {
             if ("checked" in this.elements[i])
                 this.elements[i].checked = !this.elements[i].checked;
@@ -401,7 +401,7 @@ export class HTMLTools
 
     choose(index)
     {
-        for (var i = 0; i < this.elements.length; i++)
+        for (let i = 0; i < this.elements.length; i++)
         {
             if ("selectedIndex" in this.elements[i])
                 this.elements[i].selectedIndex = index;
@@ -418,7 +418,7 @@ export class HTMLTools
         if (typeof value == "number")
             value += "px";
 
-        for (var i = 0; i < this.elements.length; i++)
+        for (let i = 0; i < this.elements.length; i++)
             this.elements[i].style.width = value;
         
         return this;
@@ -432,7 +432,7 @@ export class HTMLTools
         if (typeof value == "number")
             value += "px";
 
-        for (var i = 0; i < this.elements.length; i++)
+        for (let i = 0; i < this.elements.length; i++)
             this.elements[i].style.height = value;
 
         return this;
@@ -440,7 +440,7 @@ export class HTMLTools
 
     offsetParent()
     {
-        var element = this.elements[0];
+        let element = this.elements[0];
         return {
             top  : element.offsetTop,
             left : element.offsetLeft
@@ -454,7 +454,7 @@ export class HTMLTools
 
     offsetScroll()
     {
-        var element = this.elements[0];
+        let element = this.elements[0];
         return {
             top  : element.scrollTop,
             left : element.scrollLeft
@@ -463,7 +463,7 @@ export class HTMLTools
 
     offsetPage()
     {
-        var element = this.elements[0],
+        let element = this.elements[0],
             rect = element.getBoundingClientRect(),
             doc  = document.documentElement,
             top  = rect.top + window.pageYOffset - doc.clientTop,
@@ -486,11 +486,11 @@ export class HTMLTools
     {
         if (typeof classList == "string")
         {
-            var result = [],
+            let result = [],
                 wrapper = document.createElement("div"); 
                 wrapper.classList.add(classList);
 
-            for (var i = 0; i < this.elements.length; i++)
+            for (let i = 0; i < this.elements.length; i++)
             {
                 let element = this.elements[i],
                     wrapClone = wrapper.cloneNode();
@@ -505,18 +505,18 @@ export class HTMLTools
         }
         else if (Array.isArray(classList))
         {
-            var result;
+            let result;
 
             if (!revOrder)
             {
                 result = this.wrap(classList[0]);
-                for (var i = 1; i < classList.length; i++)
+                for (let i = 1; i < classList.length; i++)
                     this.wrap(classList[i]);
             }
             else
             {
                 result = this.wrap(classList[classList.length - 1]);
-                for (var i = classList.length - 2; i >= 0; i--)
+                for (let i = classList.length - 2; i >= 0; i--)
                     this.wrap(classList[i]);
             }
 
@@ -526,7 +526,7 @@ export class HTMLTools
 
     hide()
     {
-        for (var i = 0; i < this.elements.length; i++)
+        for (let i = 0; i < this.elements.length; i++)
             this.elements[i].style.display = "none";
 
         return this;
@@ -534,7 +534,7 @@ export class HTMLTools
 
     show(disp = "")
     {
-        for (var i = 0; i < this.elements.length; i++)
+        for (let i = 0; i < this.elements.length; i++)
             this.elements[i].style.display = disp;
 
         return this;
@@ -542,9 +542,9 @@ export class HTMLTools
 
     parent()
     {
-        var parents = [];
+        let parents = [];
 
-        for (var i = 0; i < this.elements.length; i++)
+        for (let i = 0; i < this.elements.length; i++)
             parents.push(this.elements[i].parentElement || this.elements[i].parentNode || null)
 
         return new HTMLTools(parents);
@@ -552,7 +552,7 @@ export class HTMLTools
 
     transform(data)
     {
-        var transform = new Transform(this);
+        let transform = new Transform(this);
             transform.apply(data);
             
         return transform;
@@ -560,7 +560,7 @@ export class HTMLTools
 
     getAttr(name)
     {
-        var element = this.elements[0],
+        let element = this.elements[0],
             result;
 
         if (!element)
@@ -577,14 +577,14 @@ export class HTMLTools
                 result = element.getAttribute(name);
 
             else if (Array.isArray(name))
-                for (var i = 0; i < name.length; i++)
+                for (let i = 0; i < name.length; i++)
                 {
                     let attr = element.getAttribute(item);
                     if (attr) result[item] = attr;
                 }
             
             else if (!name)
-                for (var i = 0; i < element.attributes.length; i++)
+                for (let i = 0; i < element.attributes.length; i++)
                 {
                     let attr = element.attributes[i];
                     result[attr.name] = attr.value;
@@ -597,13 +597,13 @@ export class HTMLTools
     setAttr(attr, value)
     {
         if (typeof attr == "string" && value !== undefined)
-            for (var i = 0; i < this.elements.length; i++)
+            for (let i = 0; i < this.elements.length; i++)
                 this.elements[i].setAttribute(attr, value)
 
         else if (typeof attr == "object")
-            for (var i = 0; i < this.elements.length; i++)
+            for (let i = 0; i < this.elements.length; i++)
             {
-                for (var n in attr)
+                for (let n in attr)
                     this.elements[i].setAttribute(n, attr[n])
             }
 
@@ -613,24 +613,24 @@ export class HTMLTools
     unsetAttr(name)
     {
         if (typeof name == "string")
-            for (var i = 0; i < this.elements.length; i++)
+            for (let i = 0; i < this.elements.length; i++)
                 this.elements[i].removeAttribute(name)
 
         else if (Array.isArray(name))
-            for (var i = 0; i < this.elements.length; i++)
+            for (let i = 0; i < this.elements.length; i++)
             {
-                for (var j = 0; j < name.length; j++)
+                for (let j = 0; j < name.length; j++)
                     this.elements[i].removeAttribute(name[j])
             }
 
         else if (name == undefined)
         {
-            var list = this.getAttr();
+            let list = this.getAttr();
             
             if (list)
-                for (var i = 0; i < this.elements.length; i++)
+                for (let i = 0; i < this.elements.length; i++)
                 {
-                    for (var item in list)
+                    for (let item in list)
                         this.elements[i].removeAttribute(item)
                 }
         }
@@ -641,13 +641,13 @@ export class HTMLTools
     style(name, value)
     {
         if (typeof name == "string" && value !== undefined)
-            for (var i = 0; i < this.elements.length; i++)
+            for (let i = 0; i < this.elements.length; i++)
                 this.elements[i].style[name] = value;
 
         else if (typeof name == "object")
-            for (var i = 0; i < this.elements.length; i++)
+            for (let i = 0; i < this.elements.length; i++)
             {
-                for (var item in name)
+                for (let item in name)
                     this.elements[i].style[item] = name[item];
             }
 
@@ -662,14 +662,14 @@ export class HTMLTools
         if (!eventList[this._id])
             eventList[this._id] = {};
 
-        var list = eventList[this._id];
+        let list = eventList[this._id];
 
         if (typeof data == "string" && fn !== undefined)
             this._eventAttach(list, data, fn);
 
         else if (typeof data == "object")
         {
-            for (var event in data)
+            for (let event in data)
                 this._eventAttach(list, event, data[event]);
         }
 
@@ -678,9 +678,9 @@ export class HTMLTools
 
     eventDispatch(type)
     {
-        var event = new Event(type);
+        let event = new Event(type);
 
-        for (var i = 0; i < this.elements.length; i++)
+        for (let i = 0; i < this.elements.length; i++)
             this.elements[i].dispatchEvent(event)
 
         return this;
@@ -688,11 +688,11 @@ export class HTMLTools
 
     eventDetach(type)
     {
-        var list = eventList[this._id];
+        let list = eventList[this._id];
 
         if (type)
         {
-            for (var event in list)
+            for (let event in list)
                 this.elements.unsetAttr(event.substr(0, 2));
         }
         else eventList[this._id][type] = undefined;
@@ -710,7 +710,7 @@ export class HTMLTools
 
     each(fn)
     {
-        for (var i = 0; i < this.elements.length; i++)
+        for (let i = 0; i < this.elements.length; i++)
             fn(this.elements[i], i, this);
 
         return this;
@@ -718,9 +718,9 @@ export class HTMLTools
 
     clone(deep)
     {
-        var clones = [];
+        let clones = [];
 
-        for (var i = 0; i < this.elements.length; i++)
+        for (let i = 0; i < this.elements.length; i++)
             clones.push(this.elements[i].cloneNode(deep))
 
         return new HTMLTools(clones);
@@ -728,7 +728,7 @@ export class HTMLTools
 
     join(source)
     {
-        var elemList;
+        let elemList;
 
         if (!source)
         {
@@ -746,7 +746,7 @@ export class HTMLTools
 
         else elemList = [source];
 
-        for (var i = 0; i < elemList.length; i++)
+        for (let i = 0; i < elemList.length; i++)
             this.elements.push(elemList[i]);
 
         return this;
@@ -754,13 +754,13 @@ export class HTMLTools
 
     clear()
     {
-        for (var i = 0; i < this.elements.length; i++)
+        for (let i = 0; i < this.elements.length; i++)
             this.elements[i].innerHTML = "";
     }
 
     remove()
     {
-        for (var i = 0; i < this.elements.length; i++)
+        for (let i = 0; i < this.elements.length; i++)
         {
             let element = this.elements[i];
 

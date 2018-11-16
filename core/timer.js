@@ -105,7 +105,7 @@ export default class Timer
 
 	_start()
 	{
-		var tick = this.step ? this._stepTick : this._tick;
+		let tick = this.step ? this._stepTick : this._tick;
 
 		tick = bind.context(tick, this);
 

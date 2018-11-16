@@ -1,4 +1,4 @@
-var jq = $html
+let jq = $html
 	.script("https://code.jquery.com/jquery-3.2.1.min.js")
 	.then(function(e){
 		log("jquery loaded!");
@@ -11,7 +11,7 @@ $html.ready(function(){
 	log("dom loaded!");
 });
 
-var bigImages = $html.select(".big-images").ready(function(){
+let bigImages = $html.select(".big-images").ready(function(){
 	log("Images ready!")
 });
 

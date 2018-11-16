@@ -1,4 +1,4 @@
-var mega = new Dew.MegaFunction();
+let mega = new Dew.MegaFunction();
 
 mega.push(function(data){
 	return data + 1;

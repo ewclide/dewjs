@@ -3,7 +3,7 @@ import {printErr, define} from './functions';
 import StyleSheet from './stylesheet';
 import Async from './async';
 
-var proto = HTMLTools.prototype,
+let proto = HTMLTools.prototype,
     $html = new HTMLTools(document);
 
 $html._eventStart = function(id, type, e)
@@ -25,7 +25,7 @@ $html.ready = function(fn)
 
 $html.script = function(source, add)
 {
-    var result = new Async(),
+    let result = new Async(),
         element = document.createElement("script");
 
     element.src = source;
@@ -43,7 +43,7 @@ $html.script = function(source, add)
 
 $html.create = function(tag, attrs, styles)
 {
-    var htls = new HTMLTools(document.createElement(tag));
+    let htls = new HTMLTools(document.createElement(tag));
 
     if (typeof attrs == "string")
         htls.addClass(attrs);
@@ -72,7 +72,7 @@ $html.convert = function(elements)
 
 $html.parseXML = function(data)
 {
-    var parse, errors = '';
+    let parse, errors = '';
 
     if (typeof window.DOMParser != "undefined")
         parse = function(str){
@@ -81,7 +81,7 @@ $html.parseXML = function(data)
 
     else if ( typeof window.ActiveXObject != "undefined" && new window.ActiveXObject("Microsoft.XMLDOM") )
         parse = function(str){
-            var xml = new window.ActiveXObject("Microsoft.XMLDOM");
+            let xml = new window.ActiveXObject("Microsoft.XMLDOM");
                 xml.async = "false";
                 xml.loadXML(str);
             return xml;

@@ -4,7 +4,7 @@ class Loader extends Dew.Async
     {
         super();
 
-        var list = [],
+        let list = [],
             ref = new Dew.Async();
 
         setTimeout(function(){
@@ -30,7 +30,7 @@ class Loader extends Dew.Async
 
 $html.ready(function(){
 
-    var bar = $html.create("div", "loadbar");
+    let bar = $html.create("div", "loadbar");
         bar.style({
             height : "5px",
             width  : "100%",
@@ -47,5 +47,5 @@ $html.ready(function(){
 
     $html.body.append(bar);
 
-    var loader = new Loader(bar);
+    let loader = new Loader(bar);
 });

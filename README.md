@@ -36,7 +36,7 @@ Or include library to the page as script and use global objects
 ```js
 import {$html} from 'dewjs'; // using npm
 
-var hello = $html.create("h1").text("Hello world!");
+let hello = $html.create("h1").text("Hello world!");
 
 $html.ready(function(){
 	$html.body.append(hello);

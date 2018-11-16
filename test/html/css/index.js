@@ -1,4 +1,4 @@
-var h1 = $html.select("h1").style("color", "red");
+let h1 = $html.select("h1").style("color", "red");
 $html.select(".text-block")
 .style({
 	display : "inline-block",

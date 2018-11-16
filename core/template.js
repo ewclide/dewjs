@@ -34,7 +34,7 @@ export default class Template
 
     _create(str, args)
     {
-        var fn = "var ", 
+        let fn = "let ", 
             tokens = str.replace(/\<&/g, "<&#").split(/\<&|&\>/gi);
 
         if (Array.isArray(args))

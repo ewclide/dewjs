@@ -15,7 +15,7 @@ export default class JSONConverter
     {
         if (!json.tag) json.tag = "div";
 
-        var element = document.createElement(json.tag);
+        let element = document.createElement(json.tag);
 
         struct.element = element;
 
@@ -28,7 +28,7 @@ export default class JSONConverter
             struct.key = json.key;
         }
 
-        for (var prop in json)
+        for (let prop in json)
         {
             switch (prop)
             {
@@ -49,12 +49,12 @@ export default class JSONConverter
                     break;
 
                 case "events" :
-                    var id = Math.random(),
+                    let id = Math.random(),
                         self = this;
 
                     eventList[id] = {};
 
-                    for (var type in json.events)
+                    for (let type in json.events)
                     {
                         eventList[id][type] = function(e){
                             json.events[type](e, self.nodes[json.key], self.htl);
@@ -71,7 +71,7 @@ export default class JSONConverter
                     if (!Array.isArray(json.nodes))
                         json.nodes = [json.nodes];
 
-                    for (var i = 0; i < json.nodes.length; i++)
+                    for (let i = 0; i < json.nodes.length; i++)
                         this._createDOM(json.nodes[i], struct.nodes[i] = {})
 
                     break;
@@ -81,13 +81,13 @@ export default class JSONConverter
 
     build(struct = this._struct)
     {
-        var element = struct.element.cloneNode(true);
+        let element = struct.element.cloneNode(true);
 
         if (struct.nodes)
         {
-            var frag = document.createDocumentFragment();
+            let frag = document.createDocumentFragment();
 
-            for (var i = 0; i < struct.nodes.length; i++)
+            for (let i = 0; i < struct.nodes.length; i++)
             {
                 let structNode = struct.nodes[i],
                     node = this.build(structNode);
@@ -108,7 +108,7 @@ export default class JSONConverter
     {
         if (element.nodeType == 1)
         {
-            var result = { tag : element.tagName.toLowerCase() },
+            let result = { tag : element.tagName.toLowerCase() },
             attrs = element.attributes,
             nodes = element.childNodes;
 
@@ -116,7 +116,7 @@ export default class JSONConverter
             {
                 result.attrs = {};
 
-                for (var i = 0; i < attrs.length; i++)
+                for (let i = 0; i < attrs.length; i++)
                 {
                     let attr = attrs[i];
 
@@ -129,7 +129,7 @@ export default class JSONConverter
             {
                 result.nodes = [];
 
-                for (var i = 0; i < nodes.length; i++)
+                for (let i = 0; i < nodes.length; i++)
                 {
                     if (nodes[i].nodeType == 1)
                         result.nodes.push(this.createJSON(nodes[i]));

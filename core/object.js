@@ -10,9 +10,9 @@ function _join(list, target, method)
 
 function _defineProperties(from, target)
 {
-    for (var i in from)
+    for (let i in from)
     {
-        var desc = Object.getOwnPropertyDescriptor(from, i);
+        let desc = Object.getOwnPropertyDescriptor(from, i);
         desc ? Object.defineProperty(target, i, desc) : target[i] = from[i];
     }
 
@@ -23,7 +23,7 @@ function _createClone(object, full)
 {
     function Clone()
     {
-        for (var field in object)
+        for (let field in object)
         {
             if (object.hasOwnProperty(field))
                 this[field] = full ? _createClone(object[field], true) : object[field];
@@ -63,7 +63,7 @@ export function joinLeft(target, list, copy)
     target = copy ? Object.assign({}, target) : target;
 
     _join(list, target, (item, target) => {
-        for (var i in item)
+        for (let i in item)
             i in target && (target[i] = item[i]);
     });
 
@@ -75,7 +75,7 @@ export function joinRight(target, list, copy)
     target = copy ? Object.assign({}, target) : target;
 
     _join(list, target, (item, target) => {
-        for (var i in item)
+        for (let i in item)
             !(i in target) && (target[i] = item[i]);
     });
 
@@ -97,9 +97,9 @@ export function init(target, values, settings, common = { errors : true })
         return false;
     }
 
-    var initer = new ObjectIniter(target);
+    let initer = new ObjectIniter(target);
 
-    for (var field in settings)
+    for (let field in settings)
     {
         if (typeof settings[field] !== "object")
         {

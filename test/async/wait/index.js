@@ -1,4 +1,4 @@
-var main  = new Dew.Async(),
+let main  = new Dew.Async(),
     one   = new Dew.Async(),
     two   = new Dew.Async(),
     three = new Dew.Async(),

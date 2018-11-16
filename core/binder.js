@@ -6,7 +6,7 @@ class Binder
 
 	change(object, field, trigger)
 	{
-		var hidden = "_bind_" + field;
+		let hidden = "_bind_" + field;
 		// object[hidden] = object[field];
 
 		define(object, hidden, { value : object[field] });
@@ -35,7 +35,7 @@ class Binder
 
 	fields(data)
 	{
-		var left = data.left,
+		let left = data.left,
 			right = data.right,
 			modifier = data.modifier,
 			trigger = data.trigger;
@@ -73,7 +73,7 @@ class Binder
 
 	_genGetSet(object, field, trigger)
 	{
-		var self = this,
+		let self = this,
 			binded = "_bind_" + field;
 
 		if (!(binded in object))
@@ -110,7 +110,7 @@ class Binder
 
 	_applyValue(object, field, value, modifier)
 	{
-		var binded = "_bind_" + field;
+		let binded = "_bind_" + field;
 
 		if (modifier) value = modifier(value);
 
@@ -121,7 +121,7 @@ class Binder
 
 	_setData(object, field, data)
 	{
-		var sourseValue = data.value || data,
+		let sourseValue = data.value || data,
 			binded = object["_bind_" + field];
 			binded.value = sourseValue;
 
@@ -130,7 +130,7 @@ class Binder
 
 		binded.joints.forEach(function(joint){
 
-			var value = joint.modifier ? joint.modifier(sourseValue) : sourseValue;
+			let value = joint.modifier ? joint.modifier(sourseValue) : sourseValue;
 
 			if (joint.object == data.object && joint.field == data.field) return;
 
@@ -147,6 +147,6 @@ class Binder
 	}
 }
 
-var bind = new Binder();
+let bind = new Binder();
 
 export {bind}

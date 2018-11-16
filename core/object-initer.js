@@ -11,7 +11,7 @@ export default class ObjectIniter
 
 	checkout(field, settings, value)
 	{
-		var result = this._validate(field, settings, value);
+		let result = this._validate(field, settings, value);
 
 		if (result !== undefined)
 			this._setValue(field, settings, result);
@@ -19,7 +19,7 @@ export default class ObjectIniter
 
 	_setValue(field, settings, value)
 	{
-		var object = settings.root ? settings.root : this._object;
+		let object = settings.root ? settings.root : this._object;
 
 		if (settings.desc)
 			Object.defineProperty(object, String(field), {
@@ -66,7 +66,7 @@ export default class ObjectIniter
 		{
 			if (!settings.prefix) settings.prefix = "data-";
 
-			var attr = $html.convert(settings.element).getAttr(settings.prefix + field);
+			let attr = $html.convert(settings.element).getAttr(settings.prefix + field);
 
 			if (settings.only)
 				!attr ? ( value = undefined, this.errors.push(`empty required attribute of option "${field}"`) )

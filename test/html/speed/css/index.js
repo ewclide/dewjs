@@ -1,19 +1,19 @@
-var place = $html.create("span", "place").text("place");
-for (var i = 0; i < 1000; i++)
+let place = $html.create("span", "place").text("place");
+for (let i = 0; i < 1000; i++)
     $html.body.after(place);
 
-var elemNative = document.querySelectorAll(".place");
+let elemNative = document.querySelectorAll(".place");
 log.time("css - native");
-for (var j = 0; j < elemNative.length; j++)
+for (let j = 0; j < elemNative.length; j++)
     elemNative[j].style.background = "red";
 log.timeEnd("css - native");
 
-var elemDew = $html.select(".place");
+let elemDew = $html.select(".place");
 log.time("css - dew");
 elemDew.style("background", "red");
 log.timeEnd("css - dew");
 
-var elemJquery = $(".place");
+let elemJquery = $(".place");
 log.time("css - jquery");
 elemJquery.css("background", "red");
 log.timeEnd("css - jquery");

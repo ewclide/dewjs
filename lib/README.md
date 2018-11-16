@@ -13,7 +13,7 @@ Initially, the project was conceived as a replacement for jquery, as well as a c
 ```js
 import {$html} from 'dewjs';
 
-var hello = $html.create('h1').text('Hello world!');
+let hello = $html.create('h1').text('Hello world!');
 
 $html.body.append(hello);
 

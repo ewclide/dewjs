@@ -10,13 +10,13 @@ class Url
 
 	_getSearch(search)
 	{
-		var result = {};
+		let result = {};
 
 		if (search)
 		{
 			search = search.replace("?", "").split("&");
-			search.forEach( p => {
-				var p = p.split("=");
+			search.forEach( str => {
+				let p = str.split("=");
 				result[p[0].replace("-", "_")] = p[1];
 			});
 		}
@@ -62,7 +62,7 @@ class Url
 		else if (typeof name == "string") return this._search[name];
 		else if (Array.isArray(name))
 		{
-			var result = {};
+			let result = {};
 
 			name.forEach( p => {
 				if (p in this._search) result[p] = this._search[p];
@@ -74,7 +74,7 @@ class Url
 
 	setSearch(params, changeState)
 	{
-		for (var i in params)
+		for (let i in params)
 			this._search[i] = params[i];
 
 		this._strSearch = this.serialize(this._search);
@@ -115,9 +115,9 @@ class Url
 
 	serialize(data)
 	{
-		var request = "?";
+		let request = "?";
 
-		for (var i in data)
+		for (let i in data)
 		{
 			if (typeof data[i] == "number" || typeof data[i] == "string" || typeof data[i] == "boolean")
 				request += i + "=" + data[i] + "&";
@@ -127,4 +127,4 @@ class Url
 	}
 }
 
-export var url = new Url();
+export let url = new Url();

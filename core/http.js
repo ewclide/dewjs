@@ -12,7 +12,7 @@ class HTTP
 
 	get(path, options = {})
 	{
-		var self = this,
+		let self = this,
 			data = options.data,
 			result = new Async(),
 			request = new this.XHR();
@@ -59,13 +59,13 @@ class HTTP
 
 	post(data)
 	{
-		var self = this,
+		let self = this,
 			formData;
 
 		if (data)
 		{
 			formData = new FormData();
-			for (var key in data) formData.append(key, data[key]);
+			for (let key in data) formData.append(key, data[key]);
 		}
 		else printErr("http.post must have some data!");
 
@@ -74,7 +74,7 @@ class HTTP
 			{
 				if (path)
 				{
-					var async = new Async(),
+					let async = new Async(),
 						request = new self.XHR();
 						request.open("POST", path, true);
 						request.send(formData);
@@ -108,5 +108,5 @@ class HTTP
 	}
 }
 
-export var http = new HTTP();
+export let http = new HTTP();
 

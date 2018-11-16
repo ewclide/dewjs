@@ -1,16 +1,16 @@
-var place = $html.create("div", "place");
-for (var i = 0; i < 1000; i++)
+let place = $html.create("div", "place");
+for (let i = 0; i < 1000; i++)
     $html.body.after(place);
 
-var text = $html.create("p"),
+let text = $html.create("p"),
     natText = document.createElement("p"),
     jqText = $("<p></p>");
 
-var natPlace = document.querySelectorAll(".place"),
+let natPlace = document.querySelectorAll(".place"),
     jqPlace = $(".place");
 
 log.time("insert - native");
-for (var j = 0; j < natPlace.length; j++)
+for (let j = 0; j < natPlace.length; j++)
 {
     let elem = natText.cloneNode(true);
     natPlace[j].appendChild(elem);

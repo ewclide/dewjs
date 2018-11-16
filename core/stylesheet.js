@@ -13,7 +13,7 @@ export default class StyleSheet
 
 		else
 		{
-			var head = document.getElementsByTagName("head")[0],
+			let head = document.getElementsByTagName("head")[0],
 				style = document.createElement("style");
 
 			head.appendChild(style);
@@ -24,11 +24,11 @@ export default class StyleSheet
 
 	addRule(selector, styles)
 	{
-		var styles = this._stylesToString(styles);
+		let strStyles = this._stylesToString(styles);
 
 		this.styleSheet.insertRule
-		? this.styleSheet.insertRule(selector + " {" + styles + "}", this.styleSheet.cssRules.length)
-		: this.styleSheet.addRule(selector, styles, this.styleSheet.cssRules.length)
+		? this.styleSheet.insertRule(`${selector} {${strStyles}}`, this.styleSheet.cssRules.length)
+		: this.styleSheet.addRule(selector, strStyles, this.styleSheet.cssRules.length)
 	}
 
 	addRules(styles)
@@ -44,10 +44,10 @@ export default class StyleSheet
 
 	_stylesToString(styles)
 	{
-		var result = "";
+		let result = "";
 
-		for (var i in styles)
-			result += i + ":" + styles[i] + ";";
+		for (let name in styles)
+			result += `${name}:${styles[name]};`;
 
 		return result;
 	}

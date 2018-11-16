@@ -10,14 +10,14 @@ if (!("assign" in Object))
 			if (target === undefined || target === null)
 				throw new TypeError('Object.assign: cannot convert undefined or null to object');
 
-			for (var arg = 1; arg < arguments.length; arg++)
+			for (let arg = 1; arg < arguments.length; arg++)
 			{
-				var source = arguments[arg];
+				let source = arguments[arg];
 
 				if (source === undefined || source === null) continue;
 				else source = Object(source);
 
-				for (var key in source)
+				for (let key in source)
 					target[key] = source[key];
 			}
 
@@ -36,7 +36,7 @@ if (!("from" in Array))
 
 			function getLength(obj)
 			{
-				var length = 0;
+				let length = 0;
 
 				if ("length" in obj)
 				{
@@ -64,15 +64,15 @@ if (!("from" in Array))
 
 				target = Object(target);
 
-				var result = [],
+				let result = [],
 					length = getLength(target),
 					mapFn = arguments[1],
 					thisArg = arguments[2];
 
 			    if (!Array.isArray(target))
-			    	for (var key = 0; key < length; key++)
+			    	for (let key = 0; key < length; key++)
 			    	{
-			    		var desc = Object.getOwnPropertyDescriptor(target, key);
+			    		let desc = Object.getOwnPropertyDescriptor(target, key);
 
 				       	if (desc !== undefined && desc.enumerable)
 				       		result.push(getValue(mapFn, target, key));
