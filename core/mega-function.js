@@ -4,15 +4,13 @@ export default class MegaFunction
 {
 	constructor(fn, name)
 	{
-		let self = this;
+		// let self = this;
 
 		this._handlers = [];
-		this._names = Object.create(null);
+		this._names = {};
 		this._data;
 
-		let mega = function(data, order, filter){
-			return self._call(data, order, filter);
-		}
+		let mega = (data, order, filter) => this._call(data, order, filter);
 
 		mega.__megaInstance = this;
 		mega.isMegaFunction = true;
@@ -20,6 +18,9 @@ export default class MegaFunction
 
 		mega.push = this.push;
 		mega.remove = this.remove;
+		mega.clear = this.clear;
+		mega.pop = this.pop;
+		mega.shift = this.shift;
 		mega.invoke = this.invoke;
 
 		if (typeof fn == "function")
@@ -65,7 +66,12 @@ export default class MegaFunction
 
 		if (typeof fn == "function")
 		{
-			if (name) self._names[name] = this.count;
+			if (name)
+			{
+				self._names[name] = this.count;
+				fn.__megaName = name;
+			}
+			
 			self._handlers.push(fn);
 			this.count = self._handlers.length;
 		}
@@ -73,24 +79,61 @@ export default class MegaFunction
 
 	remove(id)
 	{
-		let self = this.__megaInstance, index = id, handler;
+		let self = this.__megaInstance, index, name;
 
-		if (typeof id == "string")
+		if (typeof id == 'string')
 		{
 			index = self._names[id];
-			delete self._names[id];
+			name = id;
 		}
+		else if (typeof id == 'number')
+			index = id;
 
-		if (self._handlers[index])
+		let fn = self._handlers[index];
+
+		if (fn)
 		{
+			name = fn.__megaName;
+			if (name) delete self._names[name];
+
 			self._handlers.splice(index, 1);
 			this.count = self._handlers.length;
 		}
 	}
 
+	clear()
+	{
+		let self = this.__megaInstance;
+		self._handlers = [];
+		self._names = {};
+		self._data = null;
+	}
+
+	pop()
+	{
+		let self = this.__megaInstance,
+			last = self._handlers.pop(),
+			name = last.__megaName;
+
+		if (name) delete self._names[name];
+
+		this.count = self._handlers.length;
+	}
+
+	shift()
+	{
+		let self = this.__megaInstance,
+			first = self._handlers.shift(),
+			name = first.__megaName;
+
+		if (name) delete self._names[name];
+
+		this.count = self._handlers.length;
+	}
+
 	invoke(id, data)
 	{
-		let self = this.__megaInstance, index = id, handler;
+		let self = this.__megaInstance, index = id;
 
 		if (typeof id == "string") index = self._names[id];
 

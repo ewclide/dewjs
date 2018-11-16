@@ -223,7 +223,7 @@ export function publish(TheClass, fields, methods)
     return Output;
 }
 
-export function fetchSettings(settings, defaults, attributes, element)
+export function getElementSettings(settings, defaults, attributes, element)
 {
 	let result = {}
 
@@ -251,6 +251,31 @@ export function fetchSettings(settings, defaults, attributes, element)
     }
 
     return result;
+}
+
+export function fetchSettings(settings, defaults, types = {}, rates = {})
+{
+	let result = {}
+
+	for (let i in defaults)
+	{
+		let value = settings[i],
+			type = types[i],
+			rate = rates[i],
+			defValue = defaults[i],
+			writeValue = true;
+
+		if (value === undefined) writeValue = false;
+		else
+		{
+			if (type) writeValue = isType(value, type);
+			if (rate) writeValue = rate.indexOf(value) >= 0;
+		}
+
+		result[i] = writeValue ? value : defValue;
+	}
+
+	return result;
 }
 
 export function random(min = 0, max = 9999999)
