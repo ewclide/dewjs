@@ -1,34 +1,22 @@
-let main  = new Dew.Async(),
-    one   = new Dew.Async(),
-    two   = new Dew.Async(),
-    three = new Dew.Async(),
-    other = new Dew.Async();
+let main  = new Dew.AsyncExt(),
+    one   = new Dew.AsyncExt(),
+    two   = new Dew.AsyncExt(),
+    three = new Dew.AsyncExt(),
+    other = new Dew.AsyncExt();
 
-three.except(function(e){
-    log(e)
-    log("three rejected!");
-});
+// three.strict = true;
+three.catch((e) => log("three rejected!"));
 
 three.wait(other);
+setTimeout(() => other.reject("other rejected!"), 1500);
 
-setTimeout(function(){
-    one.resolve();
-}, 1000);
-
-setTimeout(function(){
-    two.resolve();
-}, 2000);
-
-setTimeout(function(){
-    other.reject("other rejected!");
-    // other.resolve();
-}, 1500);
+setTimeout(() => one.resolve(), 1000);
+setTimeout(() => two.resolve(), 2000);
+// setTimeout(() => three.resolve(), 1000);
 
 main.wait([one, two, three])
-.then(function(){
-    log("main resolved!");
-})
-.except(function(e){
+.then(() => log("main resolved!"))
+.catch((e) => {
     log("main rejected!");
     Dew.printErr(e);
 });

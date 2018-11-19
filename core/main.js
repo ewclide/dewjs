@@ -10,6 +10,7 @@ import MegaFunction from './mega-function';
 import Template from './template';
 import Timer from './timer';
 import Async from './async';
+import AsyncExt from './async-2';
 import Lerp from './lerp';
 
 const Dew = {
@@ -32,6 +33,7 @@ const Dew = {
 	MegaFunction: MegaFunction,
 	Template: Template,
 	Async: Async,
+	AsyncExt: AsyncExt,
 	Timer: Timer,
 	Lerp: Lerp,
 
