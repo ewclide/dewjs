@@ -138,6 +138,6 @@ export default class MegaFunction
 		if (typeof id == "string") index = self._names[id];
 
 		if (self._handlers[index]) return self._handlers[index](data);
-		else printErr('Dew MegaFunction invoke error: undefined function with id "' + id + '"');
+		else printErr('DEW MegaFunction invoke error: undefined function with id "' + id + '"');
 	}
 }

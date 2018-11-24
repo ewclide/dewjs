@@ -9,7 +9,7 @@ module.exports = {
 	output: {
 		path: path.resolve(__dirname, 'lib/src'),
         filename: '[name].js',
-		library: 'Dew',
+		library: 'DEW',
 		libraryTarget: 'commonjs2'
 	}
 };

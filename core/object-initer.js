@@ -6,7 +6,7 @@ export default class ObjectIniter
 	{
 		this._object = object;
 		this.errors = [];
-		this.errors.title = `Dew object init error at ${object.constructor.name} constructor`;
+		this.errors.title = `DEW object init error at ${object.constructor.name} constructor`;
 	}
 
 	checkout(field, settings, value)

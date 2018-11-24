@@ -25,10 +25,10 @@ export default class Template
         try {
             this._htl
             ? this._htl.html(this._render(data))
-            : printErr('Dew template error: "it must be append to DOM before drawing"');
+            : printErr('DEW template error: "it must be append to DOM before drawing"');
         }
         catch (e) {
-            printErr('Dew template error: "' + e.message + '"');
+            printErr('DEW template error: "' + e.message + '"');
         }
     }
 
@@ -52,7 +52,7 @@ export default class Template
             this._render = new Function("data", fn);
         }
         catch (e) {
-            printErr('Dew template error: "' + e.message + '"');
+            printErr('DEW template error: "' + e.message + '"');
             this._render = function(){};
         }
     }

@@ -1,8 +1,8 @@
-# Dew.js
+# DEW.js
 
 ![license](img/license.svg)  
 
-Dew is experimental javaScript library for UI programming.
+DEW is experimental javaScript library for UI programming.
 
 At the moment, the project is being developed by one person. If you liked the project, please **[support][2]** it.  
 

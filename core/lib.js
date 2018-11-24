@@ -8,7 +8,7 @@ import Template from './template';
 import Timer from './timer';
 import Async from './async';
 
-const Dew = {
+const DEW = {
 	fetchSettings : funcList.fetchSettings,
 	browser   : funcList.browser,
 	define    : funcList.define,
@@ -32,4 +32,4 @@ const Dew = {
 	$html     : $html
 }
 
-export default Dew;
+export default DEW;

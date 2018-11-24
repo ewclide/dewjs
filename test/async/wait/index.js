@@ -1,8 +1,8 @@
-let main  = new Dew.AsyncExt(),
-    one   = new Dew.AsyncExt(),
-    two   = new Dew.AsyncExt(),
-    three = new Dew.AsyncExt(),
-    other = new Dew.AsyncExt();
+let main  = new DEW.AsyncExt(),
+    one   = new DEW.AsyncExt(),
+    two   = new DEW.AsyncExt(),
+    three = new DEW.AsyncExt(),
+    other = new DEW.AsyncExt();
 
 // three.strict = true;
 three.catch((e) => log("three rejected!"));
@@ -18,5 +18,5 @@ main.wait([one, two, three])
 .then(() => log("main resolved!"))
 .catch((e) => {
     log("main rejected!");
-    Dew.printErr(e);
+    DEW.printErr(e);
 });

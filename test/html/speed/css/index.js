@@ -8,9 +8,9 @@ for (let j = 0; j < elemNative.length; j++)
     elemNative[j].style.background = "red";
 log.timeEnd("css - native");
 
-let elemDew = $html.select(".place");
+let elemDEW = $html.select(".place");
 log.time("css - dew");
-elemDew.style("background", "red");
+elemDEW.style("background", "red");
 log.timeEnd("css - dew");
 
 let elemJquery = $(".place");

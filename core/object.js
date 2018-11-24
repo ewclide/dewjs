@@ -93,7 +93,7 @@ export function init(target, values, settings, common = { errors : true })
 {
     if (!values || !settings)
     {
-        printErr("Dew object.init error - missing required arguments (values or settings)");
+        printErr("DEW object.init error - missing required arguments (values or settings)");
         return false;
     }
 

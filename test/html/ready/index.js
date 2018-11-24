@@ -4,7 +4,7 @@ let jq = $html
 		log("jquery loaded!");
 	})
     .except(function(e){
-        Dew.printErr(e);
+        DEW.printErr(e);
     });
 
 $html.ready(function(){

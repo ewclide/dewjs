@@ -13,7 +13,7 @@ import Async from './async';
 import AsyncExt from './async-2';
 import Lerp from './lerp';
 
-const Dew = {
+const DEW = {
 	browser: funcList.browser,
 	define: funcList.define,
 	isType: funcList.isType,
@@ -49,6 +49,6 @@ funcList.define(window, "log", {
 });
 
 funcList.define(window, {
-	Dew   : Dew,
+	DEW   : DEW,
 	$html : $html
 })

@@ -1,18 +1,18 @@
-class Loader extends Dew.Async
+class Loader extends DEW.Async
 {
     constructor(bar)
     {
         super();
 
         let list = [],
-            ref = new Dew.Async();
+            ref = new DEW.Async();
 
         setTimeout(function(){
             ref.reject();
         }, 500);
 
-        list.push(Dew.http.get('/test/assets/big.jpg', { progress : true }));
-        list.push(Dew.http.get('/test/assets/big.jpg', { progress : true }));
+        list.push(DEW.http.get('/test/assets/big.jpg', { progress : true }));
+        list.push(DEW.http.get('/test/assets/big.jpg', { progress : true }));
         // list.push(ref);
 
         this.progress(function(e){
@@ -24,7 +24,7 @@ class Loader extends Dew.Async
 
         this.wait(list, true)
         .then(() => log("loaded!"))
-        .except((err) => Dew.printErr(err));
+        .except((err) => DEW.printErr(err));
     }
 }
 
