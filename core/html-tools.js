@@ -8,13 +8,12 @@ export let eventList = {};
 
 export class HTMLTools
 {
-    constructor(source)
-    {
-        if (source)
-            this.elements = source instanceof NodeList || Array.isArray(source)
-            ? source : [source];
-
-        else this.elements = [];
+    constructor(source) {
+        if (source) {
+            this.elements = source instanceof NodeList || Array.isArray(source) ? source : [source];
+        } else {
+            this.elements = [];
+        }
 
         this._srcLength = this.elements.length;
         this.query = '';
@@ -22,74 +21,71 @@ export class HTMLTools
         this._ready = false;
     }
 
-    native()
-    {
+    native() {
         return this.elements.length == 1 ? this.elements[0] : Array.from(this.elements);
     }
 
-    get length()
-    {
+    get length() {
         return this.elements.length > this._srcLength
         ? this.elements.length - this._srcLength
         : this._srcLength;
     }
 
-    get tag()
-    {
+    get tag() {
         return this.elements[0].tagName.toLowerCase();
     }
 
-    get isHTMLTools()
-    {
+    get isHTMLTools() {
         return true;
     }
 
-    ready(fn)
-    {
-        let list = this.select("img, link, script, iframe");
+    ready() {
+        return new Promise((resolve, reject) => {
 
-        const async = new Async();
-        const checkout = function() {
-            list._countReady++;
-            if (list._countReady == list.length) {
-                async.resolve();
-                if (typeof fn == "function") fn();
-            }
-        }
+            let list = this.select("img, link, script, iframe");
+                list = list.join(this.elements).elements;
+                list._countReady = 0;
 
-        list = list.join(this.elements).elements;
-        list._countReady = 0;
-        list.forEach( element => {
-
-            let tag = element.tagName.toLowerCase(),
-                errorText = `Can't load resource "${element.src}"`,
-                complete = true;
-                
-            if (tag == "img") {
-                complete = element.complete;
-                if (complete && !element.width && !element.height) {
-                    async.reject(errorText);
-                    return;
+            const checkout = () => {
+                list._countReady++;
+                if (list._countReady == list.length) {
+                    resolve();
                 }
             }
 
-            else if (tag == "link" || tag == "iframe")
-                complete = false;
+            list.forEach( element => {
 
-            if (complete) checkout();
-            else {
-                element.addEventListener("load", checkout);
-                element.addEventListener("error", (e) => async.reject(e));
-            }
-        });
+                const tag = element.tagName.toLowerCase();
+                const errorText = `Can't load resource "${element.src}"`;
 
-        return async;
+                let complete = true;
+                    
+                if (tag == "img") {
+                    complete = element.complete;
+                    if (complete && !element.width && !element.height) {
+                        reject(errorText);
+                        return;
+                    }
+                }
+
+                else if (tag == "link" || tag == "iframe") {
+                    complete = false;
+                }
+
+                if (complete) {
+                    checkout();
+
+                } else {
+                    element.addEventListener("load", checkout);
+                    element.addEventListener("error", reject);
+                }
+            });
+        })
     }
 
-    mutation(fn, options, replace)
-    {
-        if (!("MutationObserver" in window))
-        {
+    mutation(fn, options, replace) {
+
+        if (!("MutationObserver" in window)) {
             printErr("Your browser not support observ mutation");
             return;
         }
@@ -98,93 +94,84 @@ export class HTMLTools
 
         this._mutations = [];
 
-        for (let i = 0; i < this.elements.length; i++)
-        {
-            let observer = new MutationObserver(function(data){
-                fn(data[0]);
-            });
+        for (let i = 0; i < this.elements.length; i++) {
 
+            let observer = new MutationObserver((data) => fn(data[0]));
             observer.observe(this.elements[i], options);
 
             this._mutations.push({
-                observer : observer, 
-                element  : this.elements[i],
-                options  : options
+                options,
+                observer, 
+                element: this.elements[i]
             });
         }
         
         return this;
     }
 
-    mutationStart()
-    {
-        for (let i = 0; i < this._mutations.length; i++)
-        {
+    mutationStart() {
+        for (let i = 0; i < this._mutations.length; i++) {
             let mutation = this._mutations[i];
             mutation.observer.observe(mutation.element, mutation.options);
         }
     }
 
-    mutationEnd()
-    {
-        for (let i = 0; i < this._mutations.length; i++)
+    mutationEnd() {
+        for (let i = 0; i < this._mutations.length; i++) {
             this._mutations[i].observer.disconnect();
+        }  
     }
 
-    mutationClear()
-    {
-        for (let i = 0; i < this._mutations.length; i++)
+    mutationClear() {
+        for (let i = 0; i < this._mutations.length; i++) {
             this._mutations[i].observer.disconnect();
+        }
 
-        delete this._mutations;
+        this._mutations = null;
     }
 
-    visible(maxDepth = 3)
-    {
-        let found = this._findHidden(this.elements[0], maxDepth, 0)
+    visible(maxDepth = 3) {
+        const found = this._findHidden(this.elements[0], maxDepth, 0)
         return found ? { element : found } : {}
     }
 
-    _findHidden(element, maxDepth, depth)
-    {
+    _findHidden(element, maxDepth, depth) {
         if (depth >= maxDepth) return false;
 
-        let result = false,
-            parent = element.parentElement || element.parentNode || null;
+        let result = false;
+        let parent = element.parentElement || element.parentNode || null;
 
-        if (parent && parent != document)
-            result = !this.display(parent) ? parent : this._findHidden(parent, maxDepth, ++depth);
+        if (parent && parent !== document) {
+            result = this.display(parent) ? this._findHidden(parent, maxDepth, ++depth) : parent;
+        }
 
         return result;
     }
 
-    display(element)
-    {
-        let display;
+    display(element) {
+        if (!element) element = this.elements[0];
 
-        if (!element) element = this.elements[0]
-
-        display = element.style.display
+        const display = element.style.display
         ? element.style.display
         : getComputedStyle(element).display;
 
         return display !== "none";
     }
 
-    select(query)
-    {
+    select(query) {
         let elements = [], result;
 
-        if (this.elements.length == 1)
+        if (this.elements.length == 1) {
             elements = this.elements[0].querySelectorAll(query);
-
-        else for (let i = 0; i < this.elements.length; i++)
-        {
-            let search = this.elements[i].querySelectorAll(query),
-                index = elements.length;
-
-            for (let j = 0; j < search.length; j++)
-                elements[index + j] = search[j];
+        } else {
+            for (let i = 0; i < this.elements.length; i++) {
+                let search = this.elements[i].querySelectorAll(query),
+                    index = elements.length;
+    
+                for (let j = 0; j < search.length; j++) {
+                    elements[index + j] = search[j];
+                }  
+            }
         }
 
         result = new HTMLTools(elements);
@@ -193,82 +180,71 @@ export class HTMLTools
         return result;
     }
 
-    before(htl, remove)
-    {
+    before(htl, remove) {
         this._insert(htl, remove, "beforebegin");
         return this;
     }
 
-    after(htl, remove)
-    {
+    after(htl, remove) {
         this._insert(htl, remove, "afterend");
         return this;
     }
 
-    append(htl, remove)
-    {
+    append(htl, remove) {
         this._insert(htl, remove, "beforeend");
         return this;
     }
 
-    appendTo(target, remove)
-    {
+    appendTo(target, remove) {
         target.append(this, remove);
         return this;
     }
 
-    prepend(htl, remove)
-    {
+    prepend(htl, remove) {
         this._insert(htl, remove, "afterbegin");
         return this;
     }
 
-    _insert(htl, remove, position)
-    {
-        if (htl.isHTMLTools)
-        {
-            if (htl._jsonConv)
-            {
+    _insert(htl, remove, position) {
+        if (htl.isHTMLTools) {
+
+            if (htl._jsonConv) {
                 this._insertJSON(htl, "beforeend");
                 return;
             }
 
-            if (!Array.isArray(htl.elements)) // need for speed, because Array.from is very slow
+            if (!Array.isArray(htl.elements)) {
                 htl.elements = Array.from(htl.elements);
+            }
 
             for (let i = 0; i < this.elements.length; i++)
-            for (let j = 0; j < htl._srcLength; j++)
-            {
+            for (let j = 0; j < htl._srcLength; j++) {
+
                 let element = htl.elements[j];
 
-                if (!remove)
-                {
+                if (!remove) {
                     element = htl.elements[j].cloneNode(true);
                     htl.elements.push(element);
                 }
 
                 this.elements[i].insertAdjacentElement(position, element);
             }
-        }
-        else if (Array.isArray(htl))
-        {
+
+        } else if (Array.isArray(htl)) {
             for (let i = 0; i < htl.length; i++)
                 this._insert(htl[i], remove, position);
         }
     }
 
-    _insertJSON(htl, position)
-    {
-        for (let i = 0; i < this.elements.length; i++)
-        {
+    _insertJSON(htl, position) {
+        for (let i = 0; i < this.elements.length; i++) {
             let element = htl._jsonConv.build();
             htl.elements.push(element);
             this.elements[i].insertAdjacentElement(position, element);
         }
     }
 
-    createFromJSON(json)
-    {
+    createFromJSON(json) {
         let jsonConv = new JSONConverter(json),
             result = jsonConv.htl;
             result._jsonConv = jsonConv;
@@ -277,183 +253,178 @@ export class HTMLTools
         return result;
     }
 
-    createJSON(htl)
-    {
+    createJSON(htl) {
         let elements = htl ? htl.elements : this.elements,
             result;
 
-        if (elements.length > 1)
-        {
+        if (elements.length > 1) {
             result = [];
-            elements.forEach( element => {
-                result.push(JSONConverter.createJSON(element))
-            });
+            elements.forEach((elem) => result.push(JSONConverter.createJSON(elem)));
+        } else {
+            result = JSONConverter.createJSON(elements[0]);
         }
-        else result = JSONConverter.createJSON(elements[0]);
 
         return result;
     }
 
-    tplAppend(tpl)
-    {
+    tplAppend(tpl) {
         return tpl.isTemplate ? tpl.appendTo(this) : false;
     }
 
-    addClass(name)
-    {
-        for (let i = 0; i < this.elements.length; i++)
+    addClass(name) {
+        for (let i = 0; i < this.elements.length; i++) {
             this.elements[i].classList.add(name);
+        }
 
         return this;
     }
 
-    removeClass(name)
-    {
-        for (let i = 0; i < this.elements.length; i++)
+    removeClass(name) {
+        for (let i = 0; i < this.elements.length; i++) {
             this.elements[i].classList.remove(name);
+        }
 
         return this;
     }
 
-    html(str, clear = true)
-    {
-        if (str !== undefined)
-            for (let i = 0; i < this.elements.length; i++)
-            {
+    html(str, clear = true) {
+        if (str !== undefined) {
+            for (let i = 0; i < this.elements.length; i++) {
                 if (clear) this.elements[i].innerHTML = str;
                 else this.elements[i].innerHTML += str;
             }
 
-        else return this.elements[0].innerHTML;
-
-        return this;
-    }
-
-    text(str)
-    {
-        if (str !== undefined)
-            for (let i = 0; i < this.elements.length; i++)
-                this.elements[i].innerText = str;
-
-        else return this.elements[0].innerText;
-
-        return this;
-    }
-
-    value(data)
-    {
-        if (data !== undefined)
-        {
-            for (let i = 0; i < this.elements.length; i++)
-                this.elements[i].value = data;
+        } else { 
+            return this.elements[0].innerHTML;
         }
-        else return this.elements[0].value;
 
         return this;
     }
 
-    active(yes)
-    {
-        yes ? this.addClass("active") : this.removeClass("active");
-
-        return this;
-    }
-
-    checked(yes)
-    {
-        if (typeof yes == "boolean")
-            for (let i = 0; i < this.elements.length; i++)
-            {
-                if ("checked" in this.elements[i])
-                    this.elements[i].checked = yes;
+    text(str) {
+        if (str !== undefined) {
+            for (let i = 0; i < this.elements.length; i++) {
+                this.elements[i].innerText = str;
             }
 
-        else if (yes == undefined)
-            return this.elements[0].checked;
-
-        return this;
-    }
-
-    toogle()
-    {
-        for (let i = 0; i < this.elements.length; i++)
-        {
-            if ("checked" in this.elements[i])
-                this.elements[i].checked = !this.elements[i].checked;
+        } else {
+            return this.elements[0].innerText;
         }
 
         return this;
     }
 
-    get index()
-    {
+    value(data) {
+        if (data !== undefined) {
+            for (let i = 0; i < this.elements.length; i++) {
+                this.elements[i].value = data;
+            }
+
+        } else { 
+            return this.elements[0].value;
+        }
+
+        return this;
+    }
+
+    active(yes) {
+        yes ? this.addClass('active') : this.removeClass('active');
+        return this;
+    }
+
+    checked(yes) {
+        if (typeof yes == 'boolean') {
+            for (let i = 0; i < this.elements.length; i++) {
+                if ('checked' in this.elements[i]) {
+                    this.elements[i].checked = yes;
+                } 
+            }
+        }
+        
+        else if (yes == undefined) {
+            return this.elements[0].checked;
+        }  
+
+        return this;
+    }
+
+    toogle() {
+        for (let i = 0; i < this.elements.length; i++) {
+            if ("checked" in this.elements[i]) {
+                this.elements[i].checked = !this.elements[i].checked;
+            } 
+        }
+
+        return this;
+    }
+
+    get index() {
         return this.elements[0].selectedIndex;
     }
 
-    choose(index)
-    {
-        for (let i = 0; i < this.elements.length; i++)
-        {
-            if ("selectedIndex" in this.elements[i])
+    choose(index) {
+        for (let i = 0; i < this.elements.length; i++) {
+            if ("selectedIndex" in this.elements[i]) {
                 this.elements[i].selectedIndex = index;
+            } 
         }
 
         return this;
     }
 
-    width(value)
-    {
-        if (value === undefined)
+    width(value) {
+        if (value === undefined) {
             return this.elements[0].offsetWidth;
+        } 
 
-        if (typeof value == "number")
+        if (typeof value == "number") {
             value += "px";
-
-        for (let i = 0; i < this.elements.length; i++)
+        }
+            
+        for (let i = 0; i < this.elements.length; i++) {
             this.elements[i].style.width = value;
+        } 
         
         return this;
     }
 
-    height(value)
-    {
-        if (value === undefined)
+    height(value) {
+        if (value === undefined) {
             return this.elements[0].offsetHeight;
+        }
 
-        if (typeof value == "number")
+        if (typeof value == "number") {
             value += "px";
+        }  
 
-        for (let i = 0; i < this.elements.length; i++)
+        for (let i = 0; i < this.elements.length; i++) {
             this.elements[i].style.height = value;
+        }
 
         return this;
     }
 
-    offsetParent()
-    {
-        let element = this.elements[0];
+    offsetParent() {
+        const element = this.elements[0];
         return {
             top  : element.offsetTop,
             left : element.offsetLeft
         }
     }
 
-    offsetWindow()
-    {
+    offsetWindow() {
         return this.elements[0].getBoundingClientRect();
     }
 
-    offsetScroll()
-    {
-        let element = this.elements[0];
+    offsetScroll() {
+        const element = this.elements[0];
         return {
             top  : element.scrollTop,
             left : element.scrollLeft
         }
     }
 
-    offsetPage()
-    {
+    offsetPage() {
         let element = this.elements[0],
             rect = element.getBoundingClientRect(),
             doc  = document.documentElement,
@@ -468,21 +439,17 @@ export class HTMLTools
         }
     }
 
-    scroll()
-    {
+    scroll() {
 
     }
 
-    wrap(classList, revOrder)
-    {
-        if (typeof classList == "string")
-        {
+    wrap(classList, revOrder) {
+        if (typeof classList == "string") {
             let result = [],
                 wrapper = document.createElement("div"); 
                 wrapper.classList.add(classList);
 
-            for (let i = 0; i < this.elements.length; i++)
-            {
+            for (let i = 0; i < this.elements.length; i++) {
                 let element = this.elements[i],
                     wrapClone = wrapper.cloneNode();
 
@@ -493,270 +460,286 @@ export class HTMLTools
             }
 
             return new HTMLTools(result);
+
         }
-        else if (Array.isArray(classList))
-        {
+
+        else if (Array.isArray(classList)) {
             let result;
 
-            if (!revOrder)
-            {
+            if (!revOrder) {
                 result = this.wrap(classList[0]);
-                for (let i = 1; i < classList.length; i++)
+                for (let i = 1; i < classList.length; i++) {
                     this.wrap(classList[i]);
-            }
-            else
-            {
+                }
+                    
+            } else {
                 result = this.wrap(classList[classList.length - 1]);
-                for (let i = classList.length - 2; i >= 0; i--)
+                for (let i = classList.length - 2; i >= 0; i--) {
                     this.wrap(classList[i]);
+                }  
             }
 
             return result;
         }
     }
 
-    hide()
-    {
-        for (let i = 0; i < this.elements.length; i++)
+    hide() {
+        for (let i = 0; i < this.elements.length; i++) {
             this.elements[i].style.display = "none";
+        }  
 
         return this;
     }
 
-    show(disp = "")
-    {
-        for (let i = 0; i < this.elements.length; i++)
+    show(disp = "") {
+        for (let i = 0; i < this.elements.length; i++) {
             this.elements[i].style.display = disp;
+        }
 
         return this;
     }
 
-    parent()
-    {
+    parent() {
         let parents = [];
 
-        for (let i = 0; i < this.elements.length; i++)
-            parents.push(this.elements[i].parentElement || this.elements[i].parentNode || null)
+        for (let i = 0; i < this.elements.length; i++) {
+            let parent = this.elements[i].parentElement || this.elements[i].parentNode || null;
+            parents.push(parent);
+        }
 
         return new HTMLTools(parents);
     }
 
-    transform(data)
-    {
-        let transform = new Transform(this);
-            transform.apply(data);
+    transform(data) {
+        const transform = new Transform(this);
+        transform.apply(data);
             
         return transform;
     }
 
-    getAttr(name)
-    {
-        let element = this.elements[0],
-            result;
+    getAttr(name) {
+        let element = this.elements[0], result;
 
-        if (!element)
-        {
+        if (!element) {
             printErr(`Can't get attribute of undefined element`);
             return;
         }
 
-        if (element.nodeType == 1 && element.attributes.length)
-        {
+        if (element.nodeType == 1 && element.attributes.length) {
             result = {};
 
-            if (typeof name == "string")
+            if (typeof name == "string") {
                 result = element.getAttribute(name);
+            }
 
-            else if (Array.isArray(name))
-                for (let i = 0; i < name.length; i++)
-                {
+            else if (Array.isArray(name)) {
+                for (let i = 0; i < name.length; i++) {
                     let attr = element.getAttribute(item);
                     if (attr) result[item] = attr;
                 }
+
+            }
             
-            else if (!name)
-                for (let i = 0; i < element.attributes.length; i++)
-                {
+            else if (!name) {
+                for (let i = 0; i < element.attributes.length; i++) {
                     let attr = element.attributes[i];
                     result[attr.name] = attr.value;
                 }
+            }
         }
 
         return result;
     }
 
-    setAttr(attr, value)
-    {
-        if (typeof attr == "string" && value !== undefined)
-            for (let i = 0; i < this.elements.length; i++)
+    setAttr(attr, value) {
+        if (typeof attr == "string" && value !== undefined) {
+            for (let i = 0; i < this.elements.length; i++) {
                 this.elements[i].setAttribute(attr, value)
-
-        else if (typeof attr == "object")
-            for (let i = 0; i < this.elements.length; i++)
-            {
-                for (let n in attr)
-                    this.elements[i].setAttribute(n, attr[n])
             }
+        }
+        
+        else if (typeof attr == "object") {
+            for (let i = 0; i < this.elements.length; i++) {
+                for (let n in attr) {
+                    this.elements[i].setAttribute(n, attr[n])
+                }
+            }
+        }  
 
         return this;
     }
 
-    unsetAttr(name)
-    {
-        if (typeof name == "string")
-            for (let i = 0; i < this.elements.length; i++)
+    unsetAttr(name) {
+        if (typeof name == "string") {
+            for (let i = 0; i < this.elements.length; i++) {
                 this.elements[i].removeAttribute(name)
-
-        else if (Array.isArray(name))
-            for (let i = 0; i < this.elements.length; i++)
-            {
-                for (let j = 0; j < name.length; j++)
-                    this.elements[i].removeAttribute(name[j])
             }
 
-        else if (name == undefined)
-        {
+        }
+
+        else if (Array.isArray(name)) {
+            for (let i = 0; i < this.elements.length; i++) {
+                for (let j = 0; j < name.length; j++) {
+                    this.elements[i].removeAttribute(name[j])
+                }
+            }
+
+        }
+        
+        else if (name == undefined) {
             let list = this.getAttr();
-            
-            if (list)
-                for (let i = 0; i < this.elements.length; i++)
-                {
+            if (list) {
+                for (let i = 0; i < this.elements.length; i++) {
                     for (let item in list)
                         this.elements[i].removeAttribute(item)
                 }
+            }
         }
 
         return this;
     }
 
-    style(name, value)
-    {
-        if (typeof name == "string" && value !== undefined)
-            for (let i = 0; i < this.elements.length; i++)
+    style(name, value) {
+        if (typeof name == "string" && value !== undefined) {
+            for (let i = 0; i < this.elements.length; i++) {
                 this.elements[i].style[name] = value;
+            }  
 
-        else if (typeof name == "object")
-            for (let i = 0; i < this.elements.length; i++)
-            {
+        }
+        
+        else if (typeof name == "object") {
+            for (let i = 0; i < this.elements.length; i++) {
                 for (let item in name)
                     this.elements[i].style[item] = name[item];
             }
 
-        else if (typeof name == "string" && value == undefined)
+        }
+        
+        else if (typeof name == "string" && value == undefined) {
             return this.elements[0].style[name];
+        }
 
         return this;
     }
 
-    eventAttach(data, fn)
-    {
-        if (!eventList[this._id])
+    eventAttach(data, fn) {
+
+        if (!eventList[this._id]) {
             eventList[this._id] = {};
+        }  
 
         let list = eventList[this._id];
 
-        if (typeof data == "string" && fn !== undefined)
+        if (typeof data == "string" && fn !== undefined) {
             this._eventAttach(list, data, fn);
-
-        else if (typeof data == "object")
-        {
-            for (let event in data)
+        }
+        
+        else if (typeof data == "object") {
+            for (let event in data) {
                 this._eventAttach(list, event, data[event]);
+            }
         }
 
         return this;
     }
 
-    eventDispatch(type)
-    {
-        let event = new Event(type);
+    eventDispatch(type) {
+        const event = new Event(type);
 
-        for (let i = 0; i < this.elements.length; i++)
+        for (let i = 0; i < this.elements.length; i++) {
             this.elements[i].dispatchEvent(event)
-
-        return this;
-    }
-
-    eventDetach(type)
-    {
-        let list = eventList[this._id];
-
-        if (type)
-        {
-            for (let event in list)
-                this.elements.unsetAttr(event.substr(0, 2));
         }
-        else eventList[this._id][type] = undefined;
 
         return this;
     }
 
-    _eventAttach(list, type, fn)
-    {
-        if (list[type]) list[type].push(fn);
-        else list[type] = new MegaFunction(fn);
+    eventDetach(type) {
+        const list = eventList[this._id];
+
+        if (type) {
+            for (let event in list) {
+                this.elements.unsetAttr(event.substr(0, 2));
+            }
+
+        } else {
+            eventList[this._id][type] = undefined;
+        }
+
+        return this;
+    }
+
+    _eventAttach(list, type, fn) {
+        if (list[type]) {
+            list[type].push(fn);
+        } else {
+            list[type] = new MegaFunction(fn);
+        }
 
         this.setAttr("on" + type, "$html._eventStart(" + this._id + ",'" + type + "',event)");
     }
 
-    each(fn)
-    {
-        for (let i = 0; i < this.elements.length; i++)
+    each(fn) {
+        for (let i = 0; i < this.elements.length; i++) {
             fn(this.elements[i], i, this);
+        }
 
         return this;
     }
 
-    clone(deep)
-    {
-        let clones = [];
+    clone(deep) {
+        const clones = [];
 
-        for (let i = 0; i < this.elements.length; i++)
+        for (let i = 0; i < this.elements.length; i++) {
             clones.push(this.elements[i].cloneNode(deep))
+        }
 
         return new HTMLTools(clones);
     }
 
-    join(source)
-    {
+    join(source) {
         let elemList;
 
-        if (!source)
-        {
+        if (!source) {
             printErr(`Can't attach the invalid elements (${source})`);
             return;
         }
 
         this.elements = Array.from(this.elements);
 
-        if (source.isHTMLTools)
+        if (source.isHTMLTools) {
             elemList = source.elements;
+        }
 
-        else if (source instanceof NodeList || Array.isArray(source))
+        else if (source instanceof NodeList || Array.isArray(source)) {
             elemList = source;
+        }
 
-        else elemList = [source];
+        else {
+            elemList = [source];
+        }
 
-        for (let i = 0; i < elemList.length; i++)
+        for (let i = 0; i < elemList.length; i++) {
             this.elements.push(elemList[i]);
+        }
 
         return this;
     }
 
-    clear()
-    {
-        for (let i = 0; i < this.elements.length; i++)
+    clear() {
+        for (let i = 0; i < this.elements.length; i++) {
             this.elements[i].innerHTML = "";
+        }
+
+        return this;
     }
 
-    remove()
-    {
-        for (let i = 0; i < this.elements.length; i++)
-        {
+    remove() {
+        for (let i = 0; i < this.elements.length; i++) {
             let element = this.elements[i];
 
-            if (element.parentNode)
+            if (element.parentNode) {
                 element.parentNode.removeChild(element);
+            } 
         }
 
         this.elements = [];

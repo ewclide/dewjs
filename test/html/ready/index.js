@@ -1,18 +1,10 @@
-let jq = $html
-	.script("https://code.jquery.com/jquery-3.2.1.min.js")
-	.then(function(e){
-		log("jquery loaded!");
-	})
-    .except(function(e){
-        DEW.printErr(e);
-    });
+const jq = $html
+.script('https://code.jquery.com/jquery-3.2.1.min.js')
+.then((e) => log('jquery loaded!'))
+.catch((e) => DEW.printErr(e));
 
-$html.ready(function(){
-	log("dom loaded!");
-});
+$html.ready.then(() => log('dom loaded!'));
 
-let bigImages = $html.select(".big-images").ready(function(){
-	log("Images ready!")
-});
-
-bigImages.except((e) => log(e));
+$html.select('.big-images').ready()
+.then(() => log('Images ready!'))
+.catch((e) => log(e));

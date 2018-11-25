@@ -24,7 +24,7 @@ class Loader extends DEW.Async
             }
         })
 
-        $html.ready(() => $html.body.append(this._bar));
+        $html.ready.then(() => $html.body.append(this._bar));
 
         this.onAsyncProgress((e) => this._bar.transform({ scale: e.ready }));
     }
