@@ -1,51 +1,44 @@
 class Loader extends DEW.Async
 {
-    constructor(bar)
-    {
+    constructor(list) {
         super();
 
-        let list = [],
-            ref = new DEW.Async();
+        list = list.map((item) => DEW.http.get(item, null, { progress : true }));
 
-        setTimeout(function(){
-            ref.reject();
-        }, 500);
-
-        list.push(DEW.http.get('/test/assets/big.jpg', { progress : true }));
-        list.push(DEW.http.get('/test/assets/big.jpg', { progress : true }));
-        // list.push(ref);
-
-        this.progress(function(e){
-            // log(e)
-            bar.transform({
-                scale : e.ready
-            })
-        });
-
-        this.wait(list, true)
-        .then(() => log("loaded!"))
-        .except((err) => DEW.printErr(err));
+        this._createBar();
+        this.load(list);
     }
-}
-
-$html.ready(function(){
-
-    let bar = $html.create("div", "loadbar");
-        bar.style({
-            height : "5px",
-            width  : "100%",
-            background : "#0070ff",
-            transition : "500ms"
+    
+    _createBar() {
+        this._bar = $html.create('div', 'loadbar');
+        this._bar.style({
+            height: '5px',
+            width: '100%',
+            background: '#0070ff',
+            transition: '500ms'
         })
-        bar.transform({
-            scale : 0.01,
-            settings : {
-                origin : [0, 0]
+        this._bar.transform({
+            scale: 0.01,
+            settings: {
+                origin: [0, 0]
             }
         })
 
+        $html.ready(() => $html.body.append(this._bar));
 
-    $html.body.append(bar);
+        this.onAsyncProgress((e) => this._bar.transform({ scale: e.ready }));
+    }
 
-    let loader = new Loader(bar);
-});
+    load(list) {
+        this.wait(list, true)
+        .then(() => log('loaded!'))
+        .catch((e) => DEW.printErr(e));
+    }
+}
+
+let loader = new Loader([
+    '/test/assets/big.jpg',
+    '/test/assets/big.jpg',
+    '/test/assets/empty.jpg'
+]);
+

@@ -1,10 +1,9 @@
-let main  = new DEW.AsyncExt(),
-    one   = new DEW.AsyncExt(),
-    two   = new DEW.AsyncExt(),
-    three = new DEW.AsyncExt(),
-    other = new DEW.AsyncExt();
+let main  = new DEW.Async(),
+    one   = new DEW.Async(),
+    two   = new DEW.Async(),
+    three = new DEW.Async(),
+    other = new DEW.Async();
 
-// three.strict = true;
 three.catch((e) => log("three rejected!"));
 
 three.wait(other);

@@ -1,110 +1,103 @@
 import {printErr} from './functions';
-import {joinRight} from './object';
+import {joinLeft} from './object';
 import {url} from './url';
 import Async from './async';
 
 class HTTP
 {
-	constructor()
-	{
-		this.XHR = ("onload" in new XMLHttpRequest()) ? XMLHttpRequest : XDomainRequest;
+	constructor() {
+		this._XHR = ("onload" in new XMLHttpRequest()) ? XMLHttpRequest : XDomainRequest;
 	}
 
-	get(path, options = {})
-	{
-		let self = this,
-			data = options.data,
-			result = new Async(),
-			request = new this.XHR();
-
-		joinRight(options, {
-			uncache  : true,
+	get(path, data, settings = {}) {
+		const request = new this._XHR();
+		const async = new Async();
+		const defaults = {
+			cached   : false,
 			progress : false,
-			saveData : false,
-			errors   : true
-		});
+			errors   : false
+		}
 
-		if (options.uncache)
-			!data ? data = { с : Math.random() } : data.с = Math.random();
+		settings = joinLeft(defaults, settings);
+
+		if (!settings.cached) {
+			if (!data) data = {};
+			data.c = Math.random();
+		}
+
+		request.onload = function() {
+			this.status < 400
+			? async.resolve(this.responseText)
+			: async.reject(`(${this.status}) ${this.statusText} "${path}"`);
+		}
+			
+		request.onerror = function() {
+			if (settings.errors) {
+				printErr(`(${this.status}) ${this.statusText} "${path}"`);
+			}
+			async.reject(this.statusText);
+		}
+
+		if (settings.progress)
+			request.onprogress = function(respose) {
+				const { loaded, total } = respose;
+				async.asyncProgress({
+					loaded,
+					total,
+					ready: loaded/total
+				}); 
+			}
 
 		request.open("GET", path + url.serialize(data), true);
 		request.send();
 
-		request.onload = function()
-		{
-			this.status < 400
-			? result.resolve(this.responseText, options.saveData)
-			: result.reject(this.status);
-		}
-		
-		request.onerror = function()
-		{
-			result.reject(this.statusText);
-
-			if (options.errors)
-				printErr(`http.send ajax error (${this.status}): ${this.statusText}`);
-		}
-
-		if (options.progress)
-			request.onprogress = function(e){
-				result.shift({
-					loaded : e.loaded,
-					total  : e.total,
-					ready  : e.loaded / e.total
-				});
-			}
-
-		return result;
+		return async;
 	}
 
-	post(data)
-	{
-		let self = this,
-			formData;
+	post(data = {}) {
+		const formData = new FormData();
+		const result = {};
 
-		if (data)
-		{
-			formData = new FormData();
-			for (let key in data) formData.append(key, data[key]);
-		}
-		else printErr("http.post must have some data!");
+		for (let key in data)
+			formData.append(key, data[key]);
 
-		return {
-			to : function(path, options)
-			{
-				if (path)
-				{
-					let async = new Async(),
-						request = new self.XHR();
-						request.open("POST", path, true);
-						request.send(formData);
-
-					request.onload = function()
-					{
-						async.resolve(this.responseText);
-					}
-
-					request.onerror = function()
-					{
-						async.reject(this.statusText);
-						printErr("$http.send ajax error (" + this.status + "): " + this.statusText);
-					}
-
-					if (options.progress)
-						request.onprogress = function(e)
-						{
-							async.shift({
-								loaded : e.loaded,
-								total  : e.total,
-								ready : e.loaded / e.total
-							});
-						}
-
-					return async;
-				}
-				else printErr("http.post must have some path!");
+		result.to = (path, settings) => {
+			if (!path) {
+				printErr("http.post must have some path!");
+				return;
 			}
+
+			const async = new Async();
+			const request = new this._XHR();
+
+			request.onload = function() {
+				this.status < 400
+				? async.resolve(this.responseText)
+				: async.reject(`(${this.status}) ${this.statusText} "${path}"`);
+			}
+
+			request.onerror = function() {
+				async.reject(this.statusText);
+				printErr(`(${this.status}) ${this.statusText} "${path}"`);
+			}
+
+			if (settings.progress)
+				request.onprogress = function(respose) {
+					const { loaded, total } = respose;
+					async.asyncProgress({
+						loaded,
+						total,
+						ready: loaded/total
+					}); 
+				}
+
+			request.open("POST", path, true);
+			request.send();
+
+			return async;
 		}
+
+		return result;
 	}
 }
 

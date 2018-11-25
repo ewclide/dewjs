@@ -1,48 +1,37 @@
 import {HTMLTools, eventList}  from './html-tools';
 import {printErr, define} from './functions';
 import StyleSheet from './stylesheet';
-import Async from './async';
 
 let proto = HTMLTools.prototype,
     $html = new HTMLTools(document);
 
-$html._eventStart = function(id, type, e)
-{
+$html._eventStart = function(id, type, e) {
     eventList[id][type](e);
 }
 
-$html.extend = function(name, method)
-{
+$html.extend = function(name, method) {
     proto[name] = method;
     return this;
 }
 
-$html.ready = function(fn)
-{
+$html.ready = function(fn) {
     if (this._ready) fn()
     else document.addEventListener("DOMContentLoaded", function(){ fn() });
 }
 
-$html.script = function(source, add)
-{
-    let result = new Async(),
-        element = document.createElement("script");
+$html.script = function(source) {
+    return new Promise((resolve, reject) => {
 
-    element.src = source;
-    element.onload = function(){
-        result.resolve(element);
-    };
-    element.onerror = function(){
-        result.reject("can't load the script - " + source);
-    };
+        const element = document.createElement("script");
+        element.src = source;
+        element.onload = () => resolve(element);
+        element.onerror = () => reject(`can't load the script "${source}"`);
 
-    document.body.appendChild(element);
-
-    return result;
+        document.body.appendChild(element);
+    });
 }
 
-$html.create = function(tag, attrs, styles)
-{
+$html.create = function(tag, attrs, styles) {
     let htls = new HTMLTools(document.createElement(tag));
 
     if (typeof attrs == "string")
@@ -56,8 +45,7 @@ $html.create = function(tag, attrs, styles)
     return htls;
 }
 
-$html.convert = function(elements)
-{
+$html.convert = function(elements) {
     if (elements.nodeType == 1 || elements.nodeType == 9)
         return new HTMLTools(elements);
 
@@ -70,8 +58,7 @@ $html.convert = function(elements)
     else return false;
 }
 
-$html.parseXML = function(data)
-{
+$html.parseXML = function(data) {
     let parse, errors = '';
 
     if (typeof window.DOMParser != "undefined")
@@ -92,8 +79,7 @@ $html.parseXML = function(data)
     return !errors ? parse(data) : printErr(errors);
 }
 
-$html.cascad = function()
-{
+$html.cascad = function() {
     return new StyleSheet();
 }
 

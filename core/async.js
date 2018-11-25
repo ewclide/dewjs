@@ -1,212 +1,160 @@
+import {printErr} from './functions';
 import MegaFunction from './mega-function';
 
 export default class Async
 {
-	constructor()
-	{
-		this._async_waiters  = [];
-		this._async_status   = 0;
-		this._async_calls    = new MegaFunction();
-		this._async_fails    = new MegaFunction();
-		this._async_progress = null;
-		this._async_refresh  = null;
-		this._async_ready    = 0;
-		this._async_subReady = false;
-		this._async_strict   = true;
-		this._async_data     = null;
-		this._async_error    = null;
+    constructor() {
+        this.__async__status = 0;
+        this.__async__list = [];
+        this.__async__permit = true;
+        this.__async__progress = null;
+        this.__async__refresh = null;
+        this.__async__ready = 0;
+        this.__async__init();
+    }
+
+    get isAsync() {
+		return true;
 	}
 
-	resolve(data, saveData = false)
-	{
-		if (this._canResolve())
-		{
-			this._async_status = 1;
+    get asyncNative() {
+        return this._promise;
+    }
 
-			if (this._async_ready != 1) this.shift({ ready : 1 });
-			if (saveData) this._async_data = data;
-			
-			this._async_calls(data);
-		}
+    get asyncReady () {
+        return this.__async__ready;
+    }
+    
+    get pending() {
+        return this.__async__status === 0;
+    }
+
+    get fulfilled() {
+		return this.__async__status === 1;
 	}
 
-	_canResolve()
-	{
-		let waiting = true;
-
-		if (this._async_strict && this._async_waiters.length && !this._async_subReady)
-			waiting = false;
-
-		return this._async_status == 0 && waiting;
+	get rejected() {
+		return this.__async__status === -1;
 	}
 
-	reject(error)
+    __async__init()
+    {
+        this._resolve = null;
+        this._reject = null;
+        this.__async__permit = true;
+
+        this._promise = new Promise((resolve, reject) => {
+            this._resolve = resolve;
+            this._reject = reject;
+        });
+
+        this._promise
+            .then(() => this.__async__status = 1)
+            .catch(() => this.__async__status = -1);
+    }
+
+    then(fn) {
+        return this._promise.then(fn);
+    }
+
+    catch(fn) {
+        return this._promise.catch(fn);
+    }
+
+    resolve(e) {
+        if (this.__async__permit) this._resolve(e);
+        else printErr("can't use resolve after use wait!");
+    }
+
+    reject(e) {
+        if (this.__async__permit) this._reject(e);
+        else printErr("can't use reject after use wait!");
+    }
+
+    wait(list, progress)
+    {
+        let wait, promises = [];
+
+        this.__async__list = Array.isArray(list) ? list : [list];
+
+        this.__async__list.forEach((async) => {
+            let prom = async.isAsync ? async.asyncNative : async;
+            promises.push(prom);
+
+            if (progress)
+                async.onAsyncProgress(() => {
+                    this.asyncProgress({ ready: this._calcAsyncReady()})
+                });  
+        });
+
+        this.__async__permit = false;
+        
+        wait = Promise.all(promises);
+        wait.then((e) => {
+            this.__async__permit = true;
+            this._resolve(e);
+        }).catch((e) => {
+            this.__async__permit = true;
+            this._reject(e);
+        });
+
+        return wait;
+    }
+
+    _calcAsyncReady()
 	{
-		this._async_status = -1;
-		this._async_error = error;
-		this._async_fails(error);
-	}
+        let rate = 1 / this.__async__list.length,
+            ready = 0;
 
-	then(fn)
-	{
-		this._async_calls.push(fn);
-
-		if (this._async_status == 1)
-			fn(this._async_data);
-
-		return this;
-	}
-
-	except(fn)
-	{
-		this._async_fails.push(fn);
-
-		if (this._async_status == -1)
-			fn(this._async_error);
-
-		return this;
-	}
-
-	progress(fn)
-	{
-		if (!this._async_progress)
-			this._async_progress = new MegaFunction();
-
-		this._async_progress.push(fn);
-
-		return this;
-	}
-
-	shift(data)
-	{
-		if (this._canShift(data.ready))
-		{
-			this._async_ready = data.ready;
-
-			if (this._async_progress)
-				this._async_progress(data);
-		}
-	}
-
-	_canShift(ready)
-	{
-		return !this.failed && typeof ready == "number" && ready >= 0 && ready <= 1;
-	}
-
-	reset()
-	{
-		this._async_status   = 0;
-		this._async_ready    = 0;
-		this._async_subReady = false;
-		this._async_data     = null;
-		this._async_error    = null;
-	}
-
-	onRefresh(fn)
-	{
-		if (!this._async_refresh)
-			this._async_refresh  = new MegaFunction();
-
-		this._async_refresh.push(fn);
-	}
-
-	refresh()
-	{
-		this.reset();
-
-		if (this._async_refresh)
-			this._async_refresh();
-		
-		this._async_waiters.forEach( waiter => {
-			if (waiter.failed) waiter.refresh()
-		});
-	}
-
-	wait(list, progress = false)
-	{
-		let self = this, count = 0;
-
-		if (Array.isArray(list))
-			list.forEach( item => {
-				if (item.isAsync) this._async_waiters.push(item);
-			});
-
-		else if (list.isAsync)
-			this._async_waiters.push(list);
-
-		if (this._async_waiters.length)
-			this._async_waiters.forEach( (waiter, index) => {
-
-				waiter
-				.then(function(){
-					count++;
-					if (count == self._async_waiters.length)
-					{
-						self._async_subReady = true;
-						self.resolve();
-					}
-				})
-				.except(function(err){
-					self.reject("Can't wait object from list: item[" + index + "] - rejected!");
-				});
-
-				if (progress)
-					waiter.progress(function(){
-						self.shift({ ready : self._calcProgress() });
-					})
-			});
-
-		else this.resolve();
-
-		return this;
-	}
-
-	_calcProgress()
-	{
-		let part = 1 / this._async_waiters.length,
-			ready = 0;
-
-		this._async_waiters.forEach( waiter => {
-			ready += waiter._async_ready * part;
-		});
-
+        this.__async__list.forEach((async) => ready += async.asyncReady * rate);
+        
 		return ready;
 	}
 
-	set strict(value)
+    asyncReset() {
+        this.__async__init();
+    }
+
+    onAsyncRefresh(fn)
 	{
-		if (typeof value == "bolean") this._async_strict = value;
+		if (!this.__async__refresh)
+			this.__async__refresh  = new MegaFunction();
+
+		this.__async__refresh.push(fn);
 	}
 
-	get strict()
+	asyncRefresh()
 	{
-		return this._async_strict;
+		this.asyncReset();
+
+		if (this.__async__refresh)
+			this.__async__refresh();
+		
+		this.__async__list.forEach((async) => {
+			if (async.rejected) async.asyncRefresh();
+		});
 	}
 
-	get status()
+    onAsyncProgress(fn)
 	{
-		return this._async_status;
+		if (!this.__async__progress)
+			this.__async__progress = new MegaFunction();
+
+		this.__async__progress.push(fn);
+
+		return this;
 	}
 
-	get completed()
+	asyncProgress(data)
 	{
-		return this._async_status == 1 ? true : false;
-	}
+        const ready = data.ready;
 
-	get failed()
-	{
-		return this._async_status == -1 ? true : false;
-	}
+		if (this.pending && typeof ready == "number" && ready >= 0 && ready <= 1)
+		{
+            this.__async__ready = ready;
 
-	get isAsync()
-	{
-		return true;
-	}
-}
-
-Async.wait = function(list, progress)
-{
-	let async = new Async();
-	async.wait(list, progress);
-	return async;
+			if (this.__async__progress)
+                this.__async__progress(data);
+		}
+    }
 }

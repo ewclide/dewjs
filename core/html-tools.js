@@ -46,17 +46,13 @@ export class HTMLTools
 
     ready(fn)
     {
-        let self = this,
-            result = new Async(),
-            list = this.select("img, link, script, iframe"),
+        let list = this.select("img, link, script, iframe");
 
-        checkout = function()
-        {
+        const async = new Async();
+        const checkout = function() {
             list._countReady++;
-
-            if (list._countReady == list.length)
-            {
-                result.resolve();
+            if (list._countReady == list.length) {
+                async.resolve();
                 if (typeof fn == "function") fn();
             }
         }
@@ -69,13 +65,10 @@ export class HTMLTools
                 errorText = `Can't load resource "${element.src}"`,
                 complete = true;
                 
-            if (tag == "img")
-            {
+            if (tag == "img") {
                 complete = element.complete;
-
-                if (complete && !element.width && !element.height)
-                {
-                    result.reject(errorText);
+                if (complete && !element.width && !element.height) {
+                    async.reject(errorText);
                     return;
                 }
             }
@@ -84,15 +77,13 @@ export class HTMLTools
                 complete = false;
 
             if (complete) checkout();
-            else
-            {
+            else {
                 element.addEventListener("load", checkout);
-                element.addEventListener("error", (e) => result.reject(e));
+                element.addEventListener("error", (e) => async.reject(e));
             }
-
         });
 
-        return result;
+        return async;
     }
 
     mutation(fn, options, replace)
