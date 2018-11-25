@@ -1,8 +1,7 @@
 import { fetchSettings } from "./functions";
 import MegaFunction from "./mega-function";
-import { resolve } from "path";
 
-const _easingFunctions = {
+const _easing = {
     linear     : (t) => t,
     InQuad     : (t) => t*t,
     OutQuad    : (t) => t*(2-t),
@@ -19,7 +18,7 @@ const _easingFunctions = {
 }
 
 const _defaults = {
-    timing   : _easingFunctions.linear,
+    timing   : _easing.linear,
     duration : 500,
     onUpdate : null,
     onStart  : null,
@@ -39,8 +38,8 @@ export default class Lerp
 
         let { timing, duration, onUpdate, onStart, onFinish } = settings;
 
-        if (typeof timing == 'string' && timing in _easingFunctions)
-            timing = _easingFunctions[timing];
+        if (typeof timing == 'string' && timing in _easing)
+            timing = _easing[timing];
 
         this.timing = timing;
         this.duration = duration;
@@ -49,37 +48,32 @@ export default class Lerp
         this.value = 0;
         this.progress = 0;
 
-        this._onUpdate = new MegaFunction(onUpdate);
-        this._onStart  = new MegaFunction(onStart);
-        this._onFinish = new MegaFunction(onFinish);
-
-        this._callStack = new MegaFunction();
+        this._handlerUpdate = new MegaFunction(onUpdate);
+        this._handlerStart  = new MegaFunction(onStart);
+        this._handlerFinish = new MegaFunction(onFinish);
 
         this._stopFlag = false;
         this._finishFlag = false;
         this._startTime = 0;
         this._delta = 1;
+        this._stepResolver = () => {}
     }
 
-    onUpdate(fn)
-    {
-        this._onUpdate.push(fn);
+    onUpdate(fn) {
+        this._handlerUpdate.push(fn);
     }
 
-    onStart(fn)
-    {
-        this._onStart.push(fn);
+    onStart(fn) {
+        this._handlerStart.push(fn);
     }
 
-    onFinish(fn)
-    {
-        this._onFinish.push(fn);
+    onFinish(fn) {
+        this._handlerFinish.push(fn);
     }
 
     setState(from, to)
     {
-        if (typeof from == 'number' && typeof to == 'number')
-        {
+        if (typeof from == 'number' && typeof to == 'number') {
             this.from = from;
             this.to = to;
             this._delta = to - from;
@@ -92,13 +86,10 @@ export default class Lerp
     {
         let fraction = (time - this._startTime) / this.duration;
 
-        if (fraction < 0)
-        {
+        if (fraction < 0) {
             requestAnimationFrame((t) => this._update(t));
             return;
-        }
-        else if (fraction > 1)
-        {
+        } else if (fraction > 1) {
             fraction = 1;
             this._stopFlag = true;
         }
@@ -106,59 +97,44 @@ export default class Lerp
         this.progress = this.timing(fraction);
         this.value = this.from + this.progress * this._delta;
 
-        this._onUpdate({
+        this._handlerUpdate({
             value    : this.value,
             progress : this.progress
         });
 
-        !this._stopFlag ? requestAnimationFrame((t) => this._update(t)) : this.stop();
+        this._stopFlag ? this.stop() : requestAnimationFrame((t) => this._update(t));
     }
 
-    thenState___(from, to)
-    {
-        this._callStack.push(() => {
-            this._callStack.shift();
-            this.setState(from, to).start();
-        });
-
-        return this;
-    }
-
-    thenState(from, to)
-    {
+    thenState(from, to) {
         return this.setState(from, to).start();
     }
 
-    run()
-    {
+    run() {
         
     }
 
-    pause()
-    {
+    pause() {
 
     }
 
-    start()
-    {
+    start() {
         this.value = this.from;
         this.progress = 0;
         this._stopFlag = false;
         this._startTime = performance.now();
         
-        this._onStart();
+        this._handlerStart();
         this._update(this._startTime);
 
-        return new Promise((res) => this._onFinish.push(res));
+        return new Promise((res) => this._stepResolver = res);
     }
 
-    stop()
-    {
+    stop() {
         this.value = this.to;
         this.progress = 1;
         this._stopFlag = true;
 
-        this._onFinish();
-        this._callStack();
+        this._handlerFinish();
+        this._stepResolver();
     }
 }
