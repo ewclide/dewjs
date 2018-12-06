@@ -1,6 +1,5 @@
-function getBrowser()
-{
-    let agent = navigator.userAgent;
+function _getBrowser() {
+    const agent = navigator.userAgent;
 
     if (agent.search(/Chrome/) > 0)  return 'Chrome';
     if (agent.search(/Firefox/) > 0) return 'Firefox';
@@ -11,28 +10,27 @@ function getBrowser()
     return false;
 }
 
-export let browser = getBrowser();
+export const browser = _getBrowser();
 
-export function printErr(data, source = true)
-{
+export function printErr(data, source = true) {
 	let error = "Error: ";
 
 	if (source) source = _getSourceLog();
 
-	if (Array.isArray(data) && data.length)
-	{
+	if (Array.isArray(data) && data.length) {
 		error += data.title || "Error list";
 		error += '\n';
 
-		data.forEach( message => error += `  --> ${message}\n` );
+		data.forEach((message) => error += `  --> ${message}\n` );
 
         if (source) error += `  -----\n  Source: ${source}`;
 	}
-	else if (typeof data == "string")
-	{
+
+	else if (typeof data == "string") {
 		error += data;
 		if (source) error += ` (${source})`;
 	}
+
 	else return false;
 
 	console.error(error);
@@ -40,38 +38,35 @@ export function printErr(data, source = true)
 	return false;
 }
 
-function _getSourceLog()
-{
+function _getSourceLog() {
 	let stack = (new Error()).stack;
 
 	if (stack) stack = stack.split('\n');
 	else return '';
 
-	for (let i = 0; i < stack.length; i++)
-		if (stack[i].search(/dew\.(min|dev)\.js|anonymous/g) == -1)
-		{
-			let src = stack[i].match(/https?:[^\)]+/g);
+	for (let i = 0; i < stack.length; i++) {
+		if (stack[i].search(/dew\.(min|dev)\.js|anonymous/g) == -1) {
+			const src = stack[i].match(/https?:[^\)]+/g);
 			if (src && src[0]) return src[0];
 		}
+	}
 
 	return '';
 }
 
-export function define(obj, fields, options = {})
-{
+export function define(obj, fields, options = {}) {
 	let desc = {
 		enumerable   : options.enumer !== undefined ? options.enumer : false,
 		configurable : options.config !== undefined ? options.config : true,
 		writable     : options.write  !== undefined ? options.write  : true
 	};
 
-	if (typeof fields == "string")
-	{
-		if (options.value !== undefined)
+	if (typeof fields == "string") {
+		if (options.value !== undefined) {
 			desc.value = options.value;
-		
-		else if (options.get && options.set)
-		{
+		}
+
+		else if (options.get && options.set) {
 			desc.get = options.get;
 			desc.set = options.set;
 			delete desc.writable;
@@ -79,25 +74,25 @@ export function define(obj, fields, options = {})
 
 		Object.defineProperty(obj, fields, desc);
 
-		if (options.set && options.value !== undefined)
+		if (options.set && options.value !== undefined) {
 			obj[fields] = options.value;
-	}
-	else for (let key in fields)
-		{
+		}
+
+	} else {
+		for (let key in fields) {
 			desc.value = fields[key];
 			Object.defineProperty(obj, String(key), desc);
 		}
-};
+	}
+}
 
-export function isType(value, type)
-{
-	if (Array.isArray(type))
-		return type.some( t => isType(value, t) );
+export function isType(value, type) {
+	if (Array.isArray(type)) {
+		return type.some((t) => isType(value, t));
+	}
 
-	else if (type !== undefined)
-	{
-		switch (type)
-		{
+	else if (type !== undefined) {
+		switch (type) {
 			case 'number'   : return typeof value == 'number';
 			case 'string'   : return typeof value == 'string';
 			case 'boolean'  : return typeof value == 'boolean';
@@ -108,58 +103,63 @@ export function isType(value, type)
 			default : printErr(`the type "${type}" is unknown!`); return false;
 		}
 	}
-	else
-	{
-		if (typeof value == "number") return "number";
-		else if (typeof value == "string") return "string";
-		else if (typeof value == "boolean") return "boolean";
-		else if (Array.isArray(value)) return "array";
-		else if (typeof value == "function") return "function";
-		else if (value.nodeType == 1) return "DOM";
-		else if (value.isHTMLTools) return "HTMLTools";
-		else return "object";
+
+	else {
+		if (typeof value == 'number') return 'number';
+		else if (typeof value == 'string') return 'string';
+		else if (typeof value == 'boolean') return 'boolean';
+		else if (Array.isArray(value)) return 'array';
+		else if (typeof value == 'function') return 'function';
+		else if (value instanceof Element) return 'DOM';
+		else if (value.isHTMLTools) return 'HTMLTools';
+		else return 'object';
 	}
 }
 
-export function strParse(value)
-{
-	if (typeof value == 'string')
-	{
+export function strParse(value) {
+	if (typeof value == 'string') {
 		if (+value) return +value;
 		if (value == 'true' || value == 'TRUE') return true;
 		if (value == 'false' || value == 'FALSE') return false;
-		if (value.search(/\[.+\]/g) != -1)
-		{
+		if (value.search(/\[.+\]/g) != -1) {
 			value = value.replace(/\[|\]/g, "").split(",");
 			return value.map(val => strParse(val));
 		}
 		if (value.search(/\{.+\}/g) != -1) return jsonParse(value);
 
 		return value.replace(/^\s+|\s+$/g, "");
+		
+	} else {
+		printErr('strParse function error : type of argument must be "string"');
 	}
-	else printErr('strParse function error : type of argument must be "string"')
 }
 
-export function jsonParse(str)
-{
-    let devs = '{}[],:',
-    	quot = '', word = '', isString = false, left = false,
-        reg = /^[\s*"']+|['"\s*]+$/gm,
-        result = '';
+export function jsonParse(str) {
+	const devs = '{}[],:';
+	const reg = /^[\s*"']+|['"\s*]+$/gm;
+
+	let quot = '', word = '', isString = false, left = false;
+	let result = '';
  
-    for (let i = 0; i < str.length; i++)
-    {
-    	if (isString && str[i] == quot) { isString = false; i++ }
-    	if (str[i] == "'" || str[i] == '"') { isString = true; quot = str[i]; i++ }
+    for (let i = 0; i < str.length; i++) {
+
+    	if (isString && str[i] == quot) {
+			isString = false;
+			i++
+		}
+
+    	if (str[i] == "'" || str[i] == '"') {
+			isString = true;
+			quot = str[i];
+			i++
+		}
 
     	left = str[i] == ":";
 
-        if (devs.indexOf(str[i]) != -1 && !isString)
-        {
+        if (devs.indexOf(str[i]) != -1 && !isString) {
         	word = word.replace(reg, '');
 
-            if (word)
-            {
+            if (word) {
 				if (word == 'true') word = true;
             	else if (word == 'false') word = false;
 
@@ -168,51 +168,49 @@ export function jsonParse(str)
             }
 
             result += str[i];
-            word = '';
-        }
-        else word += str[i];
+			word = '';
+			
+        } else {
+			word += str[i];
+		}
+		
     }
 
     return JSON.parse(result);
 }
 
-export function construct(Cls, args)
-{
+export function construct(Cls, args) {
 	args = Array.from(args);
     args.unshift(0);
 	return new (Function.bind.apply(Cls, args))();
 }
 
-export function publish(TheClass, fields, methods)
-{
-    let list = {};
+export function publish(TheClass, fields, methods) {
+    const list = {};
 
-    function Output()
-    {
-        let id = Math.random();
+    function Output() {
+        const id = Math.random();
         list[id] = construct(TheClass, arguments);
         this.id = id;
     }
 
     if (fields)
-    for (let i = 0; i < fields.length; i++)
-    {
+    for (let i = 0; i < fields.length; i++) {
         let field = fields[i];
 
         Object.defineProperty(Output.prototype, field, {
             configurable : false,
-            get : function(){
+            get : function() {
                 return list[this.id][field];
             },
-            set : function(value){
+            set : function(value) {
                 list[this.id][field] = value;
             }
         });
     }
 
     if (methods)
-    for (let i = 0; i < methods.length; i++)
-    {
+    for (let i = 0; i < methods.length; i++) {
         let method = methods[i];
         Output.prototype[method] = function(){
             let obj = list[this.id];
@@ -223,47 +221,48 @@ export function publish(TheClass, fields, methods)
     return Output;
 }
 
-export function getElementSettings(settings, defaults, attributes, element)
-{
-	let result = {}
+export function getElementData(settings, defaults, attributes, element) {
+	const result = {}
 
-    for (let i in defaults)
-    {
-        if (settings[i] === undefined)
-        {
+    for (let i in defaults) {
+        if (settings[i] === undefined) {
             let attr = 'data-' + (attributes[i] || i), num;
 
             attr = element ? element.getAttribute(attr) : null;
             num = +attr;
 
-            if (attr === '' || attr === 'true')
-                attr = true;
+            if (attr === '' || attr === 'true') {
+				attr = true;
+			}
 
-            else if (attr === 'false')
-                attr = false;
+            else if (attr === 'false') {
+				attr = false;
+			}
 
-            else if (attr !== null && !isNaN(num))
-                attr = num;
+            else if (attr !== null && !isNaN(num)) {
+				attr = num;
+			} 
 
-            result[i] = attr !== null ? attr : defaults[i];
-        }
-        else result[i] = settings[i];
+			result[i] = attr !== null ? attr : defaults[i];
+			
+		} else {
+			result[i] = settings[i];
+		}
     }
 
     return result;
 }
 
-export function fetchSettings(settings, defaults, types = {}, rates = {})
-{
-	let result = {}
+export function fetchSettings(settings, defaults, types = {}, rates = {}) {
+	const result = {}
 
-	for (let i in defaults)
-	{
-		let value = settings[i],
-			type = types[i],
-			rate = rates[i],
-			defValue = defaults[i],
-			writeValue = true;
+	for (let i in defaults) {
+		const value = settings[i];
+		const type = types[i];
+		const rate = rates[i];
+		const defValue = defaults[i];
+		
+		let writeValue = true;
 
 		if (value === undefined) writeValue = false;
 		else
@@ -278,33 +277,35 @@ export function fetchSettings(settings, defaults, types = {}, rates = {})
 	return result;
 }
 
-export function random(min = 0, max = 9999999)
-{
+export function randi(min = 0, max = 9999999) {
 	return Math.floor(Math.random() * (max - min)) + min;
 }
-export function randomKey(length = 15, types = ['all'])
-{
-	let lower = 'abcdefghijklmnopqrstuvwxyz',
-		upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
-		numbers = '1234567890',
-		specials = "!?@#$%^&*()*-_+=[]{}<>.,;:/'\"\\",
-		chars = '';
 
-	if (types.indexOf('all') != -1 ) 
+export function randf() {
+	return Math.random() * (max - min) + min;
+}
+
+export function randKey(length = 15, types = ['all']) {
+	const lower = 'abcdefghijklmnopqrstuvwxyz';
+	const upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+	const numbers = '1234567890';
+	const specials = "!?@#$%^&*()*-_+=[]{}<>.,;:/'\"\\";
+
+	let chars = '';
+
+	if (types.indexOf('all') != -1 ) {
 		chars = lower + upper + numbers + specials;
-	else
-	{
+	} else {
 		if (types.indexOf('lower') != -1 ) chars += lower;
 		if (types.indexOf('upper') != -1 ) chars += upper;
 		if (types.indexOf('numbers') != -1 ) chars += numbers;
 		if (types.indexOf('specials') != -1 ) chars += specials;
 	}
 
-	let limit = chars.length - 1,
-		result = '';
+	const limit = chars.length - 1;
+	let result = '';
 
-	for (let i = 1; i < length; i++)
-	{
+	for (let i = 1; i < length; i++) {
 		let char = chars[random(0, limit)];
 		if (char != result[i - 1]) result += char;
 	}
@@ -312,8 +313,25 @@ export function randomKey(length = 15, types = ['all'])
 	return result;
 }
 
-export function log()
-{
+export function vmin(value) {
+	const side = Math.min(window.innerWidth, window.innerHeight);
+	return value * side / 100;
+}
+
+export function vmax(value) {
+	const side = Math.max(window.innerWidth, window.innerHeight);
+	return value * side / 100;
+}
+
+export function vw(value) {
+	return value * window.innerWidth / 100;
+}
+
+export function vh(value) {
+	return value * window.innerHeight / 100;
+} 
+
+export function log() {
 	let args = Array.from(arguments),
 		source = _getSourceLog();
 
@@ -322,10 +340,6 @@ export function log()
 	console.log.apply(null, args);
 }
 
-log.json = function(json, spaces = 4)
-{
-    log(JSON.stringify(json, null, spaces));
-}
-
+log.json = (json, spaces = 4) => log(JSON.stringify(json, null, spaces));
 log.time = (name) => console.time(name);
 log.timeEnd = (name) => console.timeEnd(name);

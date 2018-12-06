@@ -1,31 +1,31 @@
 import {HTMLTools, eventList}  from './html-tools';
-import {printErr, define} from './functions';
+import {printErr} from './functions';
 import StyleSheet from './stylesheet';
 
-let proto = HTMLTools.prototype,
-    $html = new HTMLTools(document);
+const proto = HTMLTools.prototype;
+const html = new HTMLTools(document);
 
-$html._eventStart = function(id, type, e) {
+html._eventStart = function(id, type, e) {
     eventList[id][type](e);
 }
 
-$html.extend = function(name, method) {
+html.extend = function(name, method) {
     proto[name] = method;
     return this;
 }
 
-$html.ready = new Promise((resolve, reject) => {
-    if ($html._ready) {
+html.ready = new Promise((resolve) => {
+    if (html._ready) {
         resolve();
     } else {
-        document.addEventListener("DOMContentLoaded", resolve);
+        document.addEventListener('DOMContentLoaded', resolve);
     }
 });
 
-$html.script = function(source) {
+html.script = function(source) {
     return new Promise((resolve, reject) => {
 
-        const element = document.createElement("script");
+        const element = document.createElement('script');
 
         element.src = source;
         element.onload = () => resolve(element);
@@ -35,14 +35,14 @@ $html.script = function(source) {
     });
 }
 
-$html.create = function(tag, attrs, styles) {
+html.create = function(tag, attrs, styles) {
     const htls = new HTMLTools(document.createElement(tag));
 
-    if (typeof attrs == "string") {
+    if (typeof attrs == 'string') {
         htls.addClass(attrs);
     }
 
-    else if (typeof attrs == "object") {
+    else if (typeof attrs == 'object') {
         htls.setAttr(attrs);
     }
 
@@ -51,12 +51,12 @@ $html.create = function(tag, attrs, styles) {
     return htls;
 }
 
-$html.convert = function(elements) {
+html.convert = function(elements) {
     if (elements.nodeType == 1 || elements.nodeType == 9) {
         return new HTMLTools(elements);
     }
 
-    else if (typeof elements == "string") {
+    else if (typeof elements == 'string') {
         return this.select(elements);
     }
 
@@ -69,11 +69,11 @@ $html.convert = function(elements) {
     }
 }
 
-$html.parseXML = function(data) {
+html.parseXML = function(data) {
     let parse, errors = '';
 
     if (typeof window.DOMParser != 'undefined') {
-        parse = (str) => (new window.DOMParser()).parseFromString(str, "text/xml");
+        parse = (str) => (new window.DOMParser()).parseFromString(str, 'text/xml');
     }
 
     else if (typeof window.ActiveXObject != 'undefined' && new window.ActiveXObject('Microsoft.XMLDOM')) {
@@ -92,13 +92,13 @@ $html.parseXML = function(data) {
     return errors ? printErr(errors) : parse(data);
 }
 
-$html.cascad = function() {
+html.cascad = function() {
     return new StyleSheet();
 }
 
-$html._body = new HTMLTools();
+html._body = new HTMLTools();
 
-Object.defineProperty($html, "body", {
+Object.defineProperty(html, 'body', {
     configurable: false,
     get: function() {
         if (!this._body.length && document.body) {
@@ -106,13 +106,13 @@ Object.defineProperty($html, "body", {
         }
 
         else if (!document.body) {
-            printErr("body element is currently unavailable!");
+            printErr('body element is currently unavailable!');
         }
 
         return this._body;
     }
 });
 
-document.addEventListener("DOMContentLoaded", () => $html._ready = true );
+document.addEventListener('DOMContentLoaded', () => html._ready = true );
 
-export {$html}
+export default html;

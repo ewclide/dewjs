@@ -37,8 +37,7 @@ export default class Async
 		return this.__async__status === -1;
 	}
 
-    __async__init()
-    {
+    __async__init() {
         this._resolve = null;
         this._reject = null;
         this.__async__permit = true;
@@ -71,8 +70,7 @@ export default class Async
         else printErr("can't use reject after use wait!");
     }
 
-    wait(list, progress)
-    {
+    wait(list, progress) {
         let wait, promises = [];
 
         this.__async__list = Array.isArray(list) ? list : [list];
@@ -81,10 +79,11 @@ export default class Async
             let prom = async.isAsync ? async.asyncNative : async;
             promises.push(prom);
 
-            if (progress)
+            if (progress) {
                 async.onAsyncProgress(() => {
                     this.asyncProgress({ ready: this._calcAsyncReady()})
-                });  
+                });
+            }     
         });
 
         this.__async__permit = false;
@@ -101,10 +100,9 @@ export default class Async
         return wait;
     }
 
-    _calcAsyncReady()
-	{
-        let rate = 1 / this.__async__list.length,
-            ready = 0;
+    _calcAsyncReady() {
+        const rate = 1 / this.__async__list.length;
+        let ready = 0;
 
         this.__async__list.forEach((async) => ready += async.asyncReady * rate);
         
@@ -115,46 +113,45 @@ export default class Async
         this.__async__init();
     }
 
-    onAsyncRefresh(fn)
-	{
-		if (!this.__async__refresh)
-			this.__async__refresh  = new MegaFunction();
+    onAsyncRefresh(fn) {
+		if (!this.__async__refresh) {
+            this.__async__refresh  = new MegaFunction();
+        }
 
 		this.__async__refresh.push(fn);
 	}
 
-	asyncRefresh()
-	{
+	asyncRefresh() {
 		this.asyncReset();
 
-		if (this.__async__refresh)
-			this.__async__refresh();
+		if (this.__async__refresh) {
+            this.__async__refresh();
+        }
 		
 		this.__async__list.forEach((async) => {
 			if (async.rejected) async.asyncRefresh();
 		});
 	}
 
-    onAsyncProgress(fn)
-	{
-		if (!this.__async__progress)
-			this.__async__progress = new MegaFunction();
+    onAsyncProgress(fn) {
+		if (!this.__async__progress) {
+            this.__async__progress = new MegaFunction();
+        }
 
 		this.__async__progress.push(fn);
 
 		return this;
 	}
 
-	asyncProgress(data)
-	{
+	asyncProgress(data) {
         const ready = data.ready;
 
-		if (this.pending && typeof ready == "number" && ready >= 0 && ready <= 1)
-		{
+		if (this.pending && typeof ready == "number" && ready >= 0 && ready <= 1) {
             this.__async__ready = ready;
-
-			if (this.__async__progress)
+            
+			if (this.__async__progress) {
                 this.__async__progress(data);
+            }  
 		}
     }
 }
