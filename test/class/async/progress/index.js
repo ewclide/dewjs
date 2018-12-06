@@ -26,7 +26,9 @@ class Loader extends DEW.Async
 
         $html.ready.then(() => $html.body.append(this._bar));
 
-        this.onAsyncProgress((e) => this._bar.transform({ scale: e.ready }));
+        this.onProgress(({ loaded, total }) => {
+            this._bar.transform({ scale: loaded / total })
+        });
     }
 
     load(list) {

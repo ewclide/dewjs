@@ -1,4 +1,3 @@
-import {printErr} from './functions';
 import MegaFunction from './mega-function';
 
 export default class Async
@@ -6,10 +5,10 @@ export default class Async
     constructor() {
         this.__async__status = 0;
         this.__async__list = [];
-        this.__async__permit = true;
         this.__async__progress = null;
         this.__async__refresh = null;
         this.__async__ready = 0;
+
         this.__async__init();
     }
 
@@ -17,11 +16,11 @@ export default class Async
 		return true;
 	}
 
-    get asyncNative() {
+    get promise() {
         return this._promise;
     }
 
-    get asyncReady () {
+    get ready () {
         return this.__async__ready;
     }
     
@@ -52,22 +51,22 @@ export default class Async
             .catch(() => this.__async__status = -1);
     }
 
-    then(fn) {
-        return this._promise.then(fn);
+    then(handler) {
+        return this._promise.then(handler);
     }
 
-    catch(fn) {
-        return this._promise.catch(fn);
+    catch(handler) {
+        return this._promise.catch(handler);
     }
 
     resolve(e) {
         if (this.__async__permit) this._resolve(e);
-        else printErr("can't use resolve after use wait!");
+        else console.warn("can't use resolve after use wait!");
     }
 
     reject(e) {
         if (this.__async__permit) this._reject(e);
-        else printErr("can't use reject after use wait!");
+        else console.warn("can't use reject after use wait!");
     }
 
     wait(list, progress) {
@@ -76,16 +75,17 @@ export default class Async
         this.__async__list = Array.isArray(list) ? list : [list];
 
         this.__async__list.forEach((async) => {
-            let prom = async.isAsync ? async.asyncNative : async;
+            let prom = async.isAsync ? async.promise : async;
             promises.push(prom);
 
             if (progress) {
-                async.onAsyncProgress(() => {
-                    this.asyncProgress({ ready: this._calcAsyncReady()})
+                async.onProgress(() => {
+                    this.progress(this.__calcReady(), 1);
                 });
             }     
         });
 
+        this.__async__refreshable = false;
         this.__async__permit = false;
         
         wait = Promise.all(promises);
@@ -100,57 +100,62 @@ export default class Async
         return wait;
     }
 
-    _calcAsyncReady() {
+    __calcReady() {
         const rate = 1 / this.__async__list.length;
         let ready = 0;
 
-        this.__async__list.forEach((async) => ready += async.asyncReady * rate);
+        this.__async__list.forEach((async) => ready += async.ready * rate);
         
 		return ready;
 	}
 
-    asyncReset() {
+    reset() {
         this.__async__init();
     }
 
-    onAsyncRefresh(fn) {
+    onRefresh(handler) {
 		if (!this.__async__refresh) {
             this.__async__refresh  = new MegaFunction();
         }
 
-		this.__async__refresh.push(fn);
+		this.__async__refresh.push(handler);
 	}
 
-	asyncRefresh() {
-		this.asyncReset();
+	refresh() {
+		this.reset();
 
 		if (this.__async__refresh) {
             this.__async__refresh();
         }
 		
 		this.__async__list.forEach((async) => {
-			if (async.rejected) async.asyncRefresh();
+			if (async.rejected) async.refresh();
 		});
 	}
 
-    onAsyncProgress(fn) {
+    onProgress(handler) {
 		if (!this.__async__progress) {
             this.__async__progress = new MegaFunction();
         }
 
-		this.__async__progress.push(fn);
+		this.__async__progress.push(handler);
 
 		return this;
 	}
 
-	asyncProgress(data) {
-        const ready = data.ready;
+	progress(loaded, total) {
+        if (typeof loaded != "number" && typeof total != "number") {
+            console.warn('progress must to receive two numeric arguments');
+            return;
+        }
 
-		if (this.pending && typeof ready == "number" && ready >= 0 && ready <= 1) {
+        const ready = loaded / total;
+
+		if (this.pending && ready >= 0 && ready <= 1) {
             this.__async__ready = ready;
             
 			if (this.__async__progress) {
-                this.__async__progress(data);
+                this.__async__progress({ loaded, total });
             }  
 		}
     }
