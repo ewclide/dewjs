@@ -1,11 +1,11 @@
 ﻿import './polyfill';
-import * as funcList from './functions';
-import * as arrayExt from'./array';
-import * as objectExt from './object';
+import * as fn from './functions';
+import * as array from'./array';
+import * as object from './object';
 import {bind} from './binder';
 import {http} from './http';
 import {url} from './url';
-import {$html} from './html';
+import html from './html';
 import MegaFunction from './mega-function';
 import Template from './template';
 import Timer from './timer';
@@ -14,41 +14,39 @@ import Async from './async';
 import Lerp from './lerp';
 
 const DEW = {
-	browser: funcList.browser,
-	define: funcList.define,
-	isType: funcList.isType,
-	strParse: funcList.strParse,
-	jsonParse: funcList.jsonParse,
-	random: funcList.random,
-	randomKey: funcList.randomKey,
-	construct: funcList.construct,
-	publish: funcList.publish,
-	printErr: funcList.printErr,
-	fetchSettings: funcList.fetchSettings,
-	getElementSettings: funcList.getElementSettings,
+	browser: fn.browser,
+	define: fn.define,
+	isType: fn.isType,
+	strParse: fn.strParse,
+	jsonParse: fn.jsonParse,
+	random: fn.random,
+	randomKey: fn.randomKey,
+	construct: fn.construct,
+	publish: fn.publish,
+	printErr: fn.printErr,
+	fetchSettings: fn.fetchSettings,
+	getElementData: fn.getElementData,
 
-	array: arrayExt,
-	object: objectExt,
+	array,
+	object,
 
-	MegaFunction: MegaFunction,
-	Template: Template,
-	Async: Async,
-	Timer: Timer,
-	Timer2: Timer2,
-	Lerp: Lerp,
+	MegaFunction,
+	Template,
+	Async,
+	Timer,
+	Timer2,
+	Lerp,
 
-	bind: bind,
-	http: http,
-	url: url
+	bind,
+	http,
+	url,
+	html
 }
 
-funcList.define(window, "log", {
-	value  : funcList.log,
+fn.define(window, "log", {
+	value  : fn.log,
 	config : false,
 	write  : false
 });
 
-funcList.define(window, {
-	DEW   : DEW,
-	$html : $html
-})
+fn.define(window, { DEW })

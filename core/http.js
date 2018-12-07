@@ -6,11 +6,11 @@ import Async from './async';
 class HTTP
 {
 	constructor() {
-		this._XHR = ("onload" in new XMLHttpRequest()) ? XMLHttpRequest : XDomainRequest;
+		this._xhr = ("onload" in new XMLHttpRequest()) ? XMLHttpRequest : XDomainRequest;
 	}
 
 	get(path, data, settings = {}) {
-		const request = new this._XHR();
+		const request = new this._xhr();
 		const async = new Async();
 		const defaults = {
 			cached   : false,
@@ -41,11 +41,7 @@ class HTTP
 		if (settings.progress)
 			request.onprogress = function(respose) {
 				const { loaded, total } = respose;
-				async.asyncProgress({
-					loaded,
-					total,
-					ready: loaded/total
-				}); 
+				async.progress(loaded, total); 
 			}
 
 		request.open("GET", path + url.serialize(data), true);
@@ -68,7 +64,7 @@ class HTTP
 			}
 
 			const async = new Async();
-			const request = new this._XHR();
+			const request = new this._xhr();
 
 			request.onload = function() {
 				this.status < 400
@@ -84,11 +80,7 @@ class HTTP
 			if (settings.progress)
 				request.onprogress = function(respose) {
 					const { loaded, total } = respose;
-					async.asyncProgress({
-						loaded,
-						total,
-						ready: loaded/total
-					}); 
+					async.progress(loaded, total);
 				}
 
 			request.open("POST", path, true);
