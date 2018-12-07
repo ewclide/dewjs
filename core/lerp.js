@@ -1,5 +1,6 @@
 import { fetchSettings } from "./functions";
 import MegaFunction from "./mega-function";
+import Timer from "./timer";
 
 const _easing = {
     linear     : (t) => t,
@@ -32,10 +33,10 @@ const _types = {
 
 export default class Lerp
 {
-    constructor(config = {})
-    {
-        const settings = fetchSettings(config, _defaults, _types);
+    constructor(config = {}) {
 
+        const settings = fetchSettings(config, _defaults, _types);
+        
         let { timing, duration, onUpdate, onStart, onFinish } = settings;
 
         if (typeof timing == 'string' && timing in _easing)
@@ -48,93 +49,101 @@ export default class Lerp
         this.value = 0;
         this.progress = 0;
 
-        this._handlerUpdate = new MegaFunction(onUpdate);
-        this._handlerStart  = new MegaFunction(onStart);
-        this._handlerFinish = new MegaFunction(onFinish);
-
-        this._stopFlag = false;
-        this._finishFlag = false;
-        this._startTime = 0;
         this._delta = 1;
+        this._completed = true;
+
+        this._handlerUpdate = new MegaFunction(onUpdate);
+        this._handlerStart  = onStart || null;
+        this._handlerFinish = onFinish || null;
+
+        this._timer = new Timer({
+            action: (t) => this._update(t)
+        });
+
         this._stepResolver = () => {}
     }
 
-    onUpdate(fn) {
-        this._handlerUpdate.push(fn);
+    onUpdate(handler) {
+        this._handlerUpdate.push(handler);
     }
 
-    onStart(fn) {
-        this._handlerStart.push(fn);
+    onStart(handler) {
+        if (typeof handler == 'function') {
+            this._handlerStart = handler;
+        } 
     }
 
-    onFinish(fn) {
-        this._handlerFinish.push(fn);
+    onFinish(handler) {
+        if (typeof handler == 'function') {
+            this._handlerFinish = handler;
+        }
     }
 
-    setState(from, to)
-    {
+    setState(from, to) {
         if (typeof from == 'number' && typeof to == 'number') {
             this.from = from;
             this.to = to;
             this._delta = to - from;
+            this.value = from;
+            this.progress = 0;
         }
 
         return this;
     }
 
-    _update(time)
-    {
-        let fraction = (time - this._startTime) / this.duration;
+    _update(time) {
+        let fraction = time / this.duration;
 
         if (fraction < 0) {
-            requestAnimationFrame((t) => this._update(t));
             return;
         } else if (fraction > 1) {
             fraction = 1;
-            this._stopFlag = true;
+            this._completed = true;
         }
 
         this.progress = this.timing(fraction);
         this.value = this.from + this.progress * this._delta;
 
-        this._handlerUpdate({
-            value    : this.value,
-            progress : this.progress
-        });
+        this._handlerUpdate(this.value);
 
-        this._stopFlag ? this.stop() : requestAnimationFrame((t) => this._update(t));
+        if (this._completed) {
+            this.finish();
+        }
     }
 
     thenState(from, to) {
         return this.setState(from, to).start();
     }
 
-    run() {
-        
-    }
-
-    pause() {
-
+    sleep(time) {
+        return this._timer.sleep(time);
     }
 
     start() {
-        this.value = this.from;
-        this.progress = 0;
-        this._stopFlag = false;
-        this._startTime = performance.now();
-        
-        this._handlerStart();
-        this._update(this._startTime);
+        if (this._completed) {
+            if (this._handlerStart) this._handlerStart();
+            this._completed = false;
+        }
+
+        this._timer.start();
 
         return new Promise((res) => this._stepResolver = res);
     }
 
     stop() {
+        this._timer.stop();
+    }
+
+    finish() {
         this.value = this.to;
         this.progress = 1;
-        this._stopFlag = true;
 
-        this._handlerFinish();
+        this._timer.finish();
+        
+        if (this._handlerFinish) {
+            this._handlerFinish();
+        }
+        
         this._stepResolver();
     }
 }

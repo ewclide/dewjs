@@ -1,134 +1,162 @@
-import {bind} from './binder';
 import MegaFunction from './mega-function';
 
 export default class Timer
 {
-	constructor(options)
-	{
+	constructor(settings = {}) {
+		this.count = settings.count || 0;
+		this.duration = settings.duration || 0;
+		this.delay = settings.delay || 0;
+		this.step = settings.step || 0;
+
+		this._actions = new MegaFunction(settings.action);
+		this._onStart = settings.onStart || null;
+		this._onStop = settings.onStop || null;
+		this._onFinish = settings._onFinish || null;
+
+		this._pauseStartTime = 0;
+		this._startTime = 0;
+		this._timePassed = 0;
+		this._iteration = 0;
+
 		this._stop = true;
-
-		if (!options) options = {}
-
-		this.count = options.count || 0;
-		this.duration = options.duration || 0;
-		this.delay = options.delay || 0;
-		this.step = options.step || 0;
-
-		this._onTick   = new MegaFunction(options.onTick);
-		this._onStart  = new MegaFunction(options.onStart);
-		this._onStop   = new MegaFunction(options.onStop);
-
-		this._state = {
-			timePassed : 0,
-			startTime  : 0,
-			iteration  : 0
-		}
+		this._sleepTimeout = null;
 
 		this._init();
+
+		this._tickLimited = this._tickLimited.bind(this);
+		this._tickInfinity = this._tickInfinity.bind(this);
 	}
 
-	get state()
-	{
-		return this._state;
-	}
-
-	_init()
-	{
-		if (this.step)
-		{
-			if (!this.count)
-				this.count = Math.round(this.duration / this.step);
-
+	_init() {
+		if (this.step && this.duration) {
+			this.count = Math.round(this.duration / this.step);
 			this.duration = null;
 		}
+		else if (this.count && this.duration) {
+			this.step = this.duration / this.count;
+		}
 
-		if (this.count) this.count--;
+		this._tickMethod = this._getTickMethod();
 	}
 
-	onTick(fn)
-	{
-		self._onTick.push(fn);
-	}
-
-	onStart(fn)
-	{
-		self._onStart.push(fn);
-	}
-
-	onStop(fn)
-	{
-		self._onStop.push(fn);
-	}
-
-	_stepTick(time)
-	{
-		this._state.timePassed = time - this._state.startTime;
-
-		if (this.count && this._state.iteration++ >= this.count)
-			this._stop = true;
-
-		this._onTick(this._state.timePassed);
-
-		this._stop ? this.stop() : setTimeout(() => this._stepTick(performance.now()), this.step);
-	}
-
-	_tick(time)
-	{
-		this._state.timePassed = time - this._state.startTime;
-
-		if (this.count && this._state.iteration++ >= this.count)
-			this._stop = true;
-
-		if (this.duration && this._state.timePassed >= this.duration)
-			this._stop = true;
-
-		this._onTick(this._state.timePassed);
-
-		this._stop ? this.stop() : requestAnimationFrame(this._tick);
-	}
-
-	_infinityTick(time)
-	{
-		this._state.timePassed = time - this._state.startTime;
-		this._onTick(this._state.timePassed);
-		this._stop ? this.stop() : requestAnimationFrame(this._tick);
-	}
-
-	start()
-	{
-		this._stop = false;
-		
-		this.delay
-		? setTimeout(() => this._start(), this.delay)
-		: this._start();
-	}
-
-	_start()
-	{
-		let tick = this.step ? this._stepTick : this._tick;
-
-		tick = bind.context(tick, this);
-
-		this._state.startTime = performance.now();
-		this._state.timePassed = 0;
-
-		if (this._onStart.count) this._onStart();
-
-		tick(state.startTime);
-	}
-
-	reset()
-	{
-		this._state = {
-			timePassed : 0,
-			startTime : 0,
-			iteration : 0
+	_getTickMethod() {
+		if (this.step) {
+			return this.count ? '_tickLimitedStep' : '_tickInfinityStep';
+		} else {
+			return this.duration ? '_tickLimited' : '_tickInfinity';
 		}
 	}
 
-	stop()
-	{
-		if (this._onStop.count) this._onStop();
+	addAction(action) {
+		this._actions.push(action);
+		return this;
+	}
+
+	sleep(time) {
+		clearTimeout(this._sleepTimeout);
+
+		this.stop();
+
+		return new Promise((resolve) => {
+			this._sleepTimeout = setTimeout(() => {
+				if (this._startTime) this.start(0);
+				resolve();
+			}, time);
+		});
+	}
+
+	start(delay) {
+		const wait = typeof delay == 'number' ? delay : this.delay;
+		
+		if (wait) {
+			setTimeout(() => this._start(), wait);
+		} else {
+			this._start();
+		}
+	}
+
+	_start() {
+		this._stop = false;
+
+		const now = performance.now();
+
+		if (!this._startTime) {
+			this._startTime = now;
+		} else {
+			this._startTime += now - this._pauseStartTime;
+		}
+
+		if (typeof this._onStart == 'function') {
+			this._onStart(now);
+		}
+
+		this[this._tickMethod](this._startTime + this._timePassed);
+	}
+
+	stop() {
+		this._pauseStartTime = performance.now();
 		this._stop = true;
+
+		if (typeof this._onStop == 'function') {
+			this._onStop();
+		}
+	}
+
+	finish() {
+		this._stop = true;
+		clearTimeout(this._sleepTimeout);
+
+		this._pauseStartTime = 0;
+		this._startTime = 0;
+		this._timePassed = 0;
+		this._iteration = 0;
+
+		if (typeof this._onFinish == 'function') {
+			this._onFinish();
+		}
+	}
+
+	_tickInfinity(time) {
+		this._timePassed = time - this._startTime;
+		this._actions(this._timePassed);
+		this._stop ? this.stop() : requestAnimationFrame(this._tickInfinity);
+	}
+
+	_tickInfinityStep() {
+		this._timePassed = time - this._startTime;
+		this._actions(this._timePassed);
+
+		if (this._stop) {
+			this.stop();
+		} else {
+			setTimeout(() => this._tickInfinityStep(performance.now()), this.step);
+		}
+	}
+
+	_tickLimited(time) {
+		this._timePassed = time - this._startTime;
+		this._actions(this._timePassed);
+
+		if (this._timePassed >= this.duration) {
+			this._stop = true;
+		}
+
+		this._stop ? this.stop() : requestAnimationFrame(this._tickLimited);
+	}
+
+	_tickLimitedStep(time) {
+		this._timePassed = time - this._startTime;
+		this._actions(this._timePassed, this._iteration);
+
+		if (this._iteration++ >= this.count - 1) {
+			this._stop = true;
+			this._iteration--;
+		}
+
+		if (this._stop) {
+			this.stop();
+		} else {
+			setTimeout(() => this._tickLimitedStep(performance.now()), this.step);
+		}
 	}
 }

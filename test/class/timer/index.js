@@ -1,11 +1,11 @@
-const timer = new DEW.Timer2({
+const timer = new DEW.Timer({
     // count: 5,
-    duration: 1000,
-    step: 100,
+    duration: 500,
+    // step: 100,
     action: (e) => console.log(e)
 });
 
 timer.start();
 
-setTimeout(() => timer.sleepSync(1000), 200);
-// setTimeout(() => timer.sleepSync(1000), 1000);
+setTimeout(() => timer.sleep(1000), 200);
+setTimeout(() => timer.sleep(1000), 1100);
