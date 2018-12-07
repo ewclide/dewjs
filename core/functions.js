@@ -315,20 +315,20 @@ export function randKey(length = 15, types = ['all']) {
 
 export function vmin(value) {
 	const side = Math.min(window.innerWidth, window.innerHeight);
-	return value * side / 100;
+	return value / 100 * side;
 }
 
 export function vmax(value) {
 	const side = Math.max(window.innerWidth, window.innerHeight);
-	return value * side / 100;
+	return value / 100 * side;
 }
 
 export function vw(value) {
-	return value * window.innerWidth / 100;
+	return value / 100 * window.innerWidth;
 }
 
 export function vh(value) {
-	return value * window.innerHeight / 100;
+	return value / 100 * window.innerHeight;
 } 
 
 export function log() {
