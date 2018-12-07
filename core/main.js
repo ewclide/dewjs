@@ -9,6 +9,7 @@ import {$html} from './html';
 import MegaFunction from './mega-function';
 import Template from './template';
 import Timer from './timer';
+import Timer2 from './timer2';
 import Async from './async';
 import Lerp from './lerp';
 
@@ -33,6 +34,7 @@ const DEW = {
 	Template: Template,
 	Async: Async,
 	Timer: Timer,
+	Timer2: Timer2,
 	Lerp: Lerp,
 
 	bind: bind,
