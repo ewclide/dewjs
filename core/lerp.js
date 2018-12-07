@@ -21,7 +21,7 @@ const _easing = {
 const _defaults = {
     timing   : _easing.linear,
     duration : 500,
-    onUpdate : null,
+    action : null,
     onStart  : null,
     onFinish : null
 }
@@ -36,7 +36,7 @@ export default class Lerp
     constructor(config = {}) {
 
         const settings = fetchSettings(config, _defaults, _types);
-        
+
         let { timing, duration, onUpdate, onStart, onFinish } = settings;
 
         if (typeof timing == 'string' && timing in _easing)
@@ -67,6 +67,10 @@ export default class Lerp
         this._handlerUpdate.push(handler);
     }
 
+    clearUpdates() {
+        this._handlerUpdate.clear();
+    }
+
     onStart(handler) {
         if (typeof handler == 'function') {
             this._handlerStart = handler;
@@ -79,13 +83,14 @@ export default class Lerp
         }
     }
 
-    setState(from, to) {
+    setState(from, to, duration = this.duration) {
         if (typeof from == 'number' && typeof to == 'number') {
             this.from = from;
             this.to = to;
             this._delta = to - from;
             this.value = from;
             this.progress = 0;
+            this.duration = duration;
         }
 
         return this;
@@ -111,8 +116,8 @@ export default class Lerp
         }
     }
 
-    thenState(from, to) {
-        return this.setState(from, to).start();
+    thenState(from, to, duration) {
+        return this.setState(from, to, duration).start();
     }
 
     sleep(time) {

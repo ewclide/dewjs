@@ -52,6 +52,10 @@ export default class Timer
 		return this;
 	}
 
+	clearActions() {
+        this._action.clear();
+    }
+
 	sleep(time) {
 		clearTimeout(this._sleepTimeout);
 

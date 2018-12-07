@@ -341,7 +341,7 @@ export class HTMLTools
             }
         }
         
-        else if (yes == undefined) {
+        else if (yes === undefined) {
             return this.elements[0].checked;
         }  
 
@@ -518,7 +518,8 @@ export class HTMLTools
     }
 
     getAttr(name) {
-        let element = this.elements[0], result;
+        const element = this.elements[0];
+        let result;
 
         if (!element) {
             printErr(`Can't get attribute of undefined element`);
@@ -537,7 +538,6 @@ export class HTMLTools
                     let attr = element.getAttribute(item);
                     if (attr) result[item] = attr;
                 }
-
             }
             
             else if (!name) {
@@ -586,7 +586,7 @@ export class HTMLTools
 
         }
         
-        else if (name == undefined) {
+        else if (name === undefined) {
             let list = this.getAttr();
             if (list) {
                 for (let i = 0; i < this.elements.length; i++) {
@@ -600,23 +600,24 @@ export class HTMLTools
     }
 
     style(name, value) {
-        if (typeof name == "string" && value !== undefined) {
+        if (value === undefined) {
+            return this.elements[0].style[name];
+        }
+        
+        else if (typeof name == "string") {
             for (let i = 0; i < this.elements.length; i++) {
                 this.elements[i].style[name] = value;
-            }  
-
-        }
-        
-        else if (typeof name == "object") {
-            for (let i = 0; i < this.elements.length; i++) {
-                for (let item in name)
-                    this.elements[i].style[item] = name[item];
             }
-
         }
-        
-        else if (typeof name == "string" && value == undefined) {
-            return this.elements[0].style[name];
+
+        return this;
+    }
+
+    styles(list) {
+        for (let i = 0; i < this.elements.length; i++) {
+            for (let item in list) {
+                this.elements[i].style[item] = list[item];
+            } 
         }
 
         return this;
