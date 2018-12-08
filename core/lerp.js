@@ -36,6 +36,7 @@ export default class Lerp
 
         this._delta = 1;
         this._completed = true;
+        this._stateStack = [];
 
         this._handlerAction = new MegaFunction(action);
         this._handlerStart  = onStart || null;
@@ -69,7 +70,10 @@ export default class Lerp
     }
 
     setState(from, to, duration, timing) {
-        if (typeof from != 'number' && typeof to != 'number') return;
+        if (typeof from != 'number' && typeof to != 'number') {
+            console.warn('state object must have required fields [from: numeric, to: numeric]');
+            return;
+        }
 
         this.from = from;
         this.to = to;
@@ -88,6 +92,18 @@ export default class Lerp
         }
 
         return this;
+    }
+
+    thenState(state) {
+        if (typeof state.from != 'number' && typeof state.to != 'number') {
+            console.warn('state object must have required fields [from: numeric, to: numeric]');
+            return;
+        }
+        this._stateStack.push(state);
+    }
+
+    clearStates() {
+        this._stateStack = [];
     }
 
     _update(time) {
@@ -127,6 +143,15 @@ export default class Lerp
         this._timer.start();
 
         return new Promise((res) => this._stepResolver = res);
+    }
+
+    startSync() {
+        if (this._completed) {
+            if (this._handlerStart) this._handlerStart();
+            this._completed = false;
+        }
+
+        this._timer.start();
     }
 
     stop() {
