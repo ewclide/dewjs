@@ -180,32 +180,32 @@ export class HTMLTools
         return result;
     }
 
-    before(htl, remove) {
-        this._insert(htl, remove, "beforebegin");
+    before(htl) {
+        this._insert(htl, "beforebegin");
         return this;
     }
 
-    after(htl, remove) {
-        this._insert(htl, remove, "afterend");
+    after(htl) {
+        this._insert(htl, "afterend");
         return this;
     }
 
-    append(htl, remove) {
-        this._insert(htl, remove, "beforeend");
+    append(htl) {
+        this._insert(htl, "beforeend");
         return this;
     }
 
-    appendTo(target, remove) {
-        target.append(this, remove);
+    appendTo(target) {
+        target.append(this);
         return this;
     }
 
-    prepend(htl, remove) {
+    prepend(htl) {
         this._insert(htl, remove, "afterbegin");
         return this;
     }
 
-    _insert(htl, remove, position) {
+    _insert(htl, position) {
         if (htl.isHTMLTools) {
 
             if (htl._jsonConv) {
@@ -222,17 +222,12 @@ export class HTMLTools
 
                 let element = htl.elements[j];
 
-                if (!remove) {
-                    element = htl.elements[j].cloneNode(true);
-                    htl.elements.push(element);
-                }
-
                 this.elements[i].insertAdjacentElement(position, element);
             }
 
         } else if (Array.isArray(htl)) {
             for (let i = 0; i < htl.length; i++)
-                this._insert(htl[i], remove, position);
+                this._insert(htl[i], position);
         }
     }
 

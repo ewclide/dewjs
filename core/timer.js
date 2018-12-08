@@ -1,5 +1,7 @@
 import MegaFunction from './mega-function';
 
+const _timerList = [];
+
 export default class Timer
 {
 	constructor(settings = {}) {
@@ -25,6 +27,8 @@ export default class Timer
 
 		this._tickLimited = this._tickLimited.bind(this);
 		this._tickInfinity = this._tickInfinity.bind(this);
+
+		_timerList.push(this);
 	}
 
 	_init() {
@@ -118,6 +122,18 @@ export default class Timer
 		if (typeof this._onFinish == 'function') {
 			this._onFinish();
 		}
+	}
+
+	static globalStart() {
+		_timerList.forEach((timer) => timer.start());
+	}
+
+	static globalStop() {
+		_timerList.forEach((timer) => timer.stop());
+	}
+
+	static globalFinish() {
+		_timerList.forEach((timer) => timer.finish());
 	}
 
 	_tickInfinity(time) {

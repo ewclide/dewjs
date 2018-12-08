@@ -1,4 +1,3 @@
-import { fetchSettings } from "./functions";
 import MegaFunction from "./mega-function";
 import Timer from "./timer";
 
@@ -18,32 +17,18 @@ const _easing = {
     InOutQuint : (t) => t<.5 ? 16*t*t*t*t*t : 1+16*(--t)*t*t*t*t
 }
 
-const _defaults = {
-    timing   : _easing.linear,
-    duration : 500,
-    action : null,
-    onStart  : null,
-    onFinish : null
-}
-
-const _types = {
-    timing   : ['string', 'function'],
-    duration : 'number'
-}
-
 export default class Lerp
 {
-    constructor(config = {}) {
+    constructor(settings = {}) {
 
-        const settings = fetchSettings(config, _defaults, _types);
+        let { timing, duration, action, onStart, onFinish } = settings;
 
-        let { timing, duration, onUpdate, onStart, onFinish } = settings;
-
-        if (typeof timing == 'string' && timing in _easing)
+        if (typeof timing == 'string' && timing in _easing) {
             timing = _easing[timing];
+        }
 
-        this.timing = timing;
-        this.duration = duration;
+        this.timing = timing || _easing.linear;
+        this.duration = duration || 500;
         this.from = 0;
         this.to = 1;
         this.value = 0;
@@ -52,7 +37,7 @@ export default class Lerp
         this._delta = 1;
         this._completed = true;
 
-        this._handlerUpdate = new MegaFunction(onUpdate);
+        this._handlerAction = new MegaFunction(action);
         this._handlerStart  = onStart || null;
         this._handlerFinish = onFinish || null;
 
@@ -63,12 +48,12 @@ export default class Lerp
         this._stepResolver = () => {}
     }
 
-    onUpdate(handler) {
-        this._handlerUpdate.push(handler);
+    addAction(action) {
+        this._handlerAction.push(action);
     }
 
-    clearUpdates() {
-        this._handlerUpdate.clear();
+    clearActions() {
+        this._handlerAction.clear();
     }
 
     onStart(handler) {
@@ -83,14 +68,23 @@ export default class Lerp
         }
     }
 
-    setState(from, to, duration = this.duration) {
-        if (typeof from == 'number' && typeof to == 'number') {
-            this.from = from;
-            this.to = to;
-            this._delta = to - from;
-            this.value = from;
-            this.progress = 0;
+    setState(from, to, duration, timing) {
+        if (typeof from != 'number' && typeof to != 'number') return;
+
+        this.from = from;
+        this.to = to;
+        this._delta = to - from;
+        this.value = from;
+        this.progress = 0;
+        
+        if (typeof duration == 'number') {
             this.duration = duration;
+        }
+
+        if (typeof timing == 'string' && timing in _easing) {
+            this.timing = _easing[timing];
+        } else if (typeof timing == 'function') {
+            this.timing = timing;
         }
 
         return this;
@@ -109,15 +103,15 @@ export default class Lerp
         this.progress = this.timing(fraction);
         this.value = this.from + this.progress * this._delta;
 
-        this._handlerUpdate(this.value);
+        this._handlerAction(this.value);
 
         if (this._completed) {
             this.finish();
         }
     }
 
-    thenState(from, to, duration) {
-        return this.setState(from, to, duration).start();
+    run(from, to, duration, timing) {
+        return this.setState(from, to, duration, timing).start();
     }
 
     sleep(time) {

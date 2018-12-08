@@ -10,19 +10,26 @@ var box = $html.create('div').styles({
     height: '50px',
     background: 'red',
     borderRadius: '50%'
-});
+}).appendTo($html.body)
 
-for (let i = 0; i < 1000; i++) {
-    $html.body.append(box, true);
-}
-    
+// const clones = [];
+
+// for (let i = 0; i < 100; i++) {
+//     let clone = box.clone().style('top', i * 70 + 'px');
+//     clones.push(clone);
+//     $html.body.append(clone);
+// }
+
+// box.join(clones);
+
+// console.log(box)
 
 async function animate(box) {
-    lerp.onUpdate((offset) => box.style('transform', `translateX(${offset}px)`));
-    await lerp.thenState(0, 500, 1000);
-    await lerp.thenState(500, 250, 500);
+    lerp.addAction((offset) => box.style('transform', `translateX(${offset}px)`));
+    await lerp.run(0, 500, 1000, 'linear');
+    await lerp.run(500, 250, 500);
     await lerp.sleep(1000);
-    await lerp.thenState(250, 700, 1500);
+    await lerp.run(250, 700, 1500);
 }
 
 animate(box);
