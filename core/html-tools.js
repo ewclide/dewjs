@@ -217,17 +217,17 @@ export class HTMLTools
                 htl.elements = Array.from(htl.elements);
             }
 
-            for (let i = 0; i < this.elements.length; i++)
-            for (let j = 0; j < htl._srcLength; j++) {
-
-                let element = htl.elements[j];
-
-                this.elements[i].insertAdjacentElement(position, element);
+            for (let i = 0; i < this.elements.length; i++) {
+                for (let j = 0; j < htl._srcLength; j++) {
+                    let element = htl.elements[j];
+                    this.elements[i].insertAdjacentElement(position, element);
+                }
             }
 
         } else if (Array.isArray(htl)) {
-            for (let i = 0; i < htl.length; i++)
+            for (let i = 0; i < htl.length; i++) {
                 this._insert(htl[i], position);
+            }
         }
     }
 
@@ -322,21 +322,20 @@ export class HTMLTools
         return this;
     }
 
-    active(yes) {
-        yes ? this.addClass('active') : this.removeClass('active');
+    active(enable) {
+        enable ? this.addClass('active') : this.removeClass('active');
         return this;
     }
 
-    checked(yes) {
-        if (typeof yes == 'boolean') {
+    checked(enable) {
+        if (typeof enable == 'boolean') {
             for (let i = 0; i < this.elements.length; i++) {
                 if ('checked' in this.elements[i]) {
-                    this.elements[i].checked = yes;
+                    this.elements[i].checked = enable;
                 } 
             }
         }
-        
-        else if (yes === undefined) {
+        else if (enable === undefined) {
             return this.elements[0].checked;
         }  
 
@@ -495,7 +494,7 @@ export class HTMLTools
     }
 
     parent() {
-        let parents = [];
+        const parents = [];
 
         for (let i = 0; i < this.elements.length; i++) {
             let parent = this.elements[i].parentElement || this.elements[i].parentNode || null;
@@ -527,14 +526,12 @@ export class HTMLTools
             if (typeof name == "string") {
                 result = element.getAttribute(name);
             }
-
             else if (Array.isArray(name)) {
                 for (let i = 0; i < name.length; i++) {
                     let attr = element.getAttribute(item);
                     if (attr) result[item] = attr;
                 }
             }
-            
             else if (!name) {
                 for (let i = 0; i < element.attributes.length; i++) {
                     let attr = element.attributes[i];
@@ -552,7 +549,6 @@ export class HTMLTools
                 this.elements[i].setAttribute(attr, value)
             }
         }
-        
         else if (typeof attr == "object") {
             for (let i = 0; i < this.elements.length; i++) {
                 for (let n in attr) {
@@ -569,24 +565,21 @@ export class HTMLTools
             for (let i = 0; i < this.elements.length; i++) {
                 this.elements[i].removeAttribute(name)
             }
-
         }
-
         else if (Array.isArray(name)) {
             for (let i = 0; i < this.elements.length; i++) {
                 for (let j = 0; j < name.length; j++) {
                     this.elements[i].removeAttribute(name[j])
                 }
             }
-
         }
-        
         else if (name === undefined) {
             let list = this.getAttr();
             if (list) {
                 for (let i = 0; i < this.elements.length; i++) {
-                    for (let item in list)
+                    for (let item in list) {
                         this.elements[i].removeAttribute(item)
+                    }
                 }
             }
         }
@@ -599,7 +592,7 @@ export class HTMLTools
             return this.elements[0].style[name];
         }
         
-        else if (typeof name == "string") {
+        else if (typeof name == 'string') {
             for (let i = 0; i < this.elements.length; i++) {
                 this.elements[i].style[name] = value;
             }
@@ -618,7 +611,7 @@ export class HTMLTools
         return this;
     }
 
-    eventAttach(data, fn) {
+    eventAttach(data, handler) {
 
         if (!eventList[this._id]) {
             eventList[this._id] = {};
@@ -626,11 +619,11 @@ export class HTMLTools
 
         let list = eventList[this._id];
 
-        if (typeof data == "string" && fn !== undefined) {
-            this._eventAttach(list, data, fn);
+        if (typeof data == 'string' && typeof handler == 'function') {
+            this._eventAttach(list, data, handler);
         }
         
-        else if (typeof data == "object") {
+        else if (typeof data == 'object') {
             for (let event in data) {
                 this._eventAttach(list, event, data[event]);
             }
@@ -664,19 +657,19 @@ export class HTMLTools
         return this;
     }
 
-    _eventAttach(list, type, fn) {
+    _eventAttach(list, type, handler) {
         if (list[type]) {
-            list[type].push(fn);
+            list[type].push(handler);
         } else {
-            list[type] = new MegaFunction(fn);
+            list[type] = new MegaFunction(handler);
         }
 
-        this.setAttr("on" + type, "$html._eventStart(" + this._id + ",'" + type + "',event)");
+        this.setAttr('on' + type, `$html._eventStart(${this._id},'${type}',event)`);
     }
 
-    each(fn) {
+    each(handler) {
         for (let i = 0; i < this.elements.length; i++) {
-            fn(this.elements[i], i, this);
+            handler(this.elements[i], i, this);
         }
 
         return this;
@@ -704,13 +697,9 @@ export class HTMLTools
 
         if (source.isHTMLTools) {
             elemList = source.elements;
-        }
-
-        else if (source instanceof NodeList || Array.isArray(source)) {
+        } else if (source instanceof NodeList || Array.isArray(source)) {
             elemList = source;
-        }
-
-        else {
+        } else {
             elemList = [source];
         }
 
@@ -723,7 +712,7 @@ export class HTMLTools
 
     clear() {
         for (let i = 0; i < this.elements.length; i++) {
-            this.elements[i].innerHTML = "";
+            this.elements[i].innerHTML = '';
         }
 
         return this;
