@@ -29,7 +29,9 @@ const CSSTransformer = {
 
 	_build(actions) {
 		if (Array.isArray(actions)) {
-			return actions.reduce((result, next) => result += this._buildLocal(next), '');
+			const res = actions.reduce((result, next) => result += this._buildLocal(next), '');
+			console.log(res)
+			return res
 		} else {
 			return this._buildLocal(actions);
 		}
@@ -67,17 +69,17 @@ const CSSTransformer = {
 			if (typeof skew == 'number') {
 				result += `skew(${skew}) `;
 			} else if (Array.isArray(skew)) {
-				result += `skew(${skew.join(',' + units.skew) + units.skew}) `;
+				result += `skew(${skew.join(units.skew + ',') + units.skew}) `;
 			}
 
 			if (typeof rotate == 'number') {
 				result += `rotate(${rotate + units.rotate}) `;
 			} else if (Array.isArray(rotate)) {
-				result += `rotate(${rotate.join(',' + units.rotate) + units.rotate}) `;
+				result += `rotate(${rotate.join(units.rotate + ',') + units.rotate}) `;
 			}
 
 			if (Array.isArray(translate)) {
-				result += `translate(${translate.join(',' + units.translate) + units.translate}) `;
+				result += `translate(${translate.join(units.translate + ',') + units.translate}) `;
 			}
 	    }
 
@@ -122,7 +124,7 @@ const CSSTransformer = {
 
 	_applySingle(elements, action, value, save, units, onlyArray) {
 		const result = Array.isArray(value) || onlyArray
-		? `${action}(${value.join(',' + units) + units})` : `${action}(${value + units})`;
+		? `${action}(${value.join(units + ',') + units})` : `${action}(${value + units})`;
 
 		for (let i = 0; i < elements.length; i++) {
 			let transform = save ? elements[i].style.transform : '';
