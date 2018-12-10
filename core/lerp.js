@@ -1,4 +1,3 @@
-import MegaFunction from "./mega-function";
 import Timer from "./timer";
 
 const _easing = {
@@ -38,23 +37,18 @@ export default class Lerp
         this._completed = true;
         this._stateStack = [];
 
-        this._handlerAction = new MegaFunction(action);
-        this._handlerStart  = onStart || null;
+        this._handlerAction = action ? action : () => {};
+        this._handlerStart  = onStart  || null;
         this._handlerFinish = onFinish || null;
+        this._stepResolver = () => {}
 
         this._timer = new Timer({
             action: (t) => this._update(t)
         });
-
-        this._stepResolver = () => {}
     }
 
-    addAction(action) {
-        this._handlerAction.push(action);
-    }
-
-    clearActions() {
-        this._handlerAction.clear();
+    action(handler) {
+        this._handlerAction = handler;
     }
 
     onStart(handler) {
@@ -92,18 +86,6 @@ export default class Lerp
         }
 
         return this;
-    }
-
-    thenState(state) {
-        if (typeof state.from != 'number' && typeof state.to != 'number') {
-            console.warn('state object must have required fields [from: numeric, to: numeric]');
-            return;
-        }
-        this._stateStack.push(state);
-    }
-
-    clearStates() {
-        this._stateStack = [];
     }
 
     _update(time) {
