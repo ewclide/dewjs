@@ -1,5 +1,5 @@
 import {printErr} from './functions';
-import {joinLeft} from './object';
+import {leftJoin} from './object';
 import {url} from './url';
 import Async from './async';
 
@@ -18,7 +18,7 @@ class HTTP
 			errors   : false
 		}
 
-		settings = joinLeft(defaults, settings);
+		settings = leftJoin(defaults, settings);
 
 		if (!settings.cached) {
 			if (!data) data = {};
