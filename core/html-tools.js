@@ -1,6 +1,6 @@
 import {printErr} from './functions';
 import JSONConverter from './json-converter';
-import Transform from './transform';
+import CSSTransformer from './css-transformer';
 import MegaFunction from './mega-function';
 import Async from './async';
 
@@ -504,11 +504,44 @@ export class HTMLTools
         return new HTMLTools(parents);
     }
 
-    transform(data) {
-        const transform = new Transform(this);
-        transform.apply(data);
-            
-        return transform;
+    transform(actions, settings) {
+        CSSTransformer.apply(this, actions, settings);
+        return this;
+    }
+
+    scale(value, save) {
+        CSSTransformer.scale(this.elements, value, save);
+        return this;
+	}
+
+	scaleX(value, save) {
+        CSSTransformer.scaleX(this.elements, value, save);
+        return this;
+	}
+
+	scaleY(value, save) {
+        CSSTransformer.scaleY(this.elements, value, save);
+        return this;
+	}
+
+	skew(value, save, units) {
+        CSSTransformer.skew(this.elements, value, save, units);
+        return this;
+	}
+
+	rotate(value, save, units) {
+        CSSTransformer.rotate(this.elements, value, save, units);
+        return this;
+	}
+
+	translate(value, save, units) {
+        CSSTransformer.translate(this.elements, value, save, units);
+        return this;
+    }
+    
+    origin(value, units) {
+        CSSTransformer.origin(this, value, units);
+        return this;
     }
 
     getAttr(name) {

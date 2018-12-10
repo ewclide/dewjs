@@ -1,7 +1,7 @@
 import {printErr} from './functions';
 import ObjectIniter from './object-initer';
 
-function _join(list, target, method) {
+function _join(list = {}, target, method) {
     if (Array.isArray(list)) {
         list.forEach( item => method(item, target) );
     } else {

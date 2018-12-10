@@ -11,23 +11,24 @@ class Loader extends DEW.Async
     
     _createBar() {
         this._bar = $html.create('div', 'loadbar');
-        this._bar.style({
+        this._bar.styles({
             height: '5px',
             width: '100%',
             background: '#0070ff',
             transition: '500ms'
         })
-        this._bar.transform({
-            scale: 0.01,
-            settings: {
-                origin: [0, 0]
-            }
-        })
+
+        this._bar.origin([0, 0]).scaleX(0);
+
+        // this._bar.transform({ scaleX: 0 }, {
+        //     origin: [0, 0]
+        // })
 
         $html.ready.then(() => $html.body.append(this._bar));
 
         this.onProgress(({ loaded, total }) => {
-            this._bar.transform({ scale: loaded / total })
+            // this._bar.transform({ scaleX: loaded / total })
+            this._bar.scaleX(loaded / total)
         });
     }
 

@@ -122,16 +122,24 @@ export function strParse(value) {
 		if (value == 'true' || value == 'TRUE') return true;
 		if (value == 'false' || value == 'FALSE') return false;
 		if (value.search(/\[.+\]/g) != -1) {
-			value = value.replace(/\[|\]/g, "").split(",");
+			value = value.replace(/\[|\]/g, '').split(',');
 			return value.map(val => strParse(val));
 		}
-		if (value.search(/\{.+\}/g) != -1) return jsonParse(value);
+		if (value.search(/\{.+\}/gm) != -1) return jsonParse(value);
 
-		return value.replace(/^\s+|\s+$/g, "");
+		return value.replace(/^\s+|\s+$/g, '');
 		
 	} else {
-		printErr('strParse function error : type of argument must be "string"');
+		printErr('strParse error - type of argument must be "string"');
 	}
+}
+
+export function intParse(str) {
+	return +str.replace(/[^\d]/g, '');
+}
+
+export function floatParse(str) {
+	return parseFloat(str.replace(/,/, '.').replace(/[^\d.,]/g, ''));
 }
 
 export function jsonParse(str) {
