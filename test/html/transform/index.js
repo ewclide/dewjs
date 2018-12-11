@@ -10,6 +10,6 @@ $html.body.append(box);
 
 // box.origin([0, 0]).scaleX(2);
 box.transform([
-	{ rotate: 45 },
-	{ translate: [150, 0], scale: 2, rotate: 45 },
+    { scaleY: 2, rotate: 45, translate: [150, 0] },
+    { rotate: 45 }
 ]);

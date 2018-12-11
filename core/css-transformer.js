@@ -29,9 +29,7 @@ const CSSTransformer = {
 
 	_build(actions) {
 		if (Array.isArray(actions)) {
-			const res = actions.reduce((result, next) => result += this._buildLocal(next), '');
-			console.log(res)
-			return res
+			return actions.reduce((res, next) => res = this._buildLocal(next) + res, '');
 		} else {
 			return this._buildLocal(actions);
 		}
@@ -56,20 +54,8 @@ const CSSTransformer = {
 		} else {
 			const { scale, scaleX, scaleY, skew, rotate, translate } = actions;
 
-			if (typeof scale == 'number') {
-				result += `scale(${scale}) `;
-			} else if (Array.isArray(scale)) {
-				result += `scale(${scale.join(',')}) `;
-			} else if (typeof scaleX == 'number') {
-				result += `scaleX(${scaleX}) `;
-			} else if (typeof scaleY == 'number') {
-				result += `scaleY(${scaleY}) `;
-			}
-
-			if (typeof skew == 'number') {
-				result += `skew(${skew}) `;
-			} else if (Array.isArray(skew)) {
-				result += `skew(${skew.join(units.skew + ',') + units.skew}) `;
+			if (Array.isArray(translate)) {
+				result += `translate(${translate.join(units.translate + ',') + units.translate}) `;
 			}
 
 			if (typeof rotate == 'number') {
@@ -78,8 +64,20 @@ const CSSTransformer = {
 				result += `rotate(${rotate.join(units.rotate + ',') + units.rotate}) `;
 			}
 
-			if (Array.isArray(translate)) {
-				result += `translate(${translate.join(units.translate + ',') + units.translate}) `;
+			if (typeof skew == 'number') {
+				result += `skew(${skew + units.skew}) `;
+			} else if (Array.isArray(skew)) {
+				result += `skew(${skew.join(units.skew + ',') + units.skew}) `;
+			}
+
+			if (typeof scale == 'number') {
+				result += `scale(${scale}) `;
+			} else if (Array.isArray(scale)) {
+				result += `scale(${scale.join(',')}) `;
+			} else if (typeof scaleX == 'number') {
+				result += `scaleX(${scaleX}) `;
+			} else if (typeof scaleY == 'number') {
+				result += `scaleY(${scaleY}) `;
 			}
 	    }
 
