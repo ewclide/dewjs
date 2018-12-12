@@ -54,7 +54,9 @@ const CSSTransformer = {
 		} else {
 			const { scale, scaleX, scaleY, skew, rotate, translate } = actions;
 
-			if (Array.isArray(translate)) {
+			if (typeof translate == 'number') {
+				result += `translate(${translate + units.translate}) `;
+			} else if (Array.isArray(translate)) {
 				result += `translate(${translate.join(units.translate + ',') + units.translate}) `;
 			}
 
@@ -117,12 +119,13 @@ const CSSTransformer = {
 	},
 
 	translate(elements, value, save, units = 'px') {
-		this._applySingle(elements, 'translate', value, save, units, true);
+		this._applySingle(elements, 'translate', value, save, units);
 	},
 
-	_applySingle(elements, action, value, save, units, onlyArray) {
-		const result = Array.isArray(value) || onlyArray
-		? `${action}(${value.join(units + ',') + units})` : `${action}(${value + units})`;
+	_applySingle(elements, action, value, save, units) {
+		const result = Array.isArray(value)
+		? `${action}(${value.join(units + ',') + units})`
+		: `${action}(${value + units})`;
 
 		for (let i = 0; i < elements.length; i++) {
 			let transform = save ? elements[i].style.transform : '';

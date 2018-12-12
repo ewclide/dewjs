@@ -25,7 +25,7 @@ var box = $html.create('div').styles({
 // console.log(box)
 
 async function animate(box) {
-    lerp.action((offset) => box.style('transform', `translateX(${offset}px)`));
+    lerp.action((offset) => box.translate(offset));
     await lerp.run(0, 500, 1000, 'linear');
     await lerp.run(500, 250, 500, 'InOutQuad');
     await lerp.sleep(1000);
