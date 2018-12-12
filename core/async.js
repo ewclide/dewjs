@@ -60,13 +60,20 @@ export default class Async
     }
 
     resolve(e) {
-        if (this.__async__permit) this._resolve(e);
-        else console.warn("can't use resolve after use wait!");
+        if (this.__async__permit) {
+            if (this.__async__progress) this.progress(1);
+            this._resolve(e);
+        } else {
+            console.warn("can't use resolve after use wait!");
+        }
     }
 
     reject(e) {
-        if (this.__async__permit) this._reject(e);
-        else console.warn("can't use reject after use wait!");
+        if (this.__async__permit) {
+            this._reject(e);
+        } else {
+            console.warn("can't use reject after use wait!");
+        }
     }
 
     wait(list, progress) {
@@ -80,7 +87,7 @@ export default class Async
 
             if (progress) {
                 async.onProgress(() => {
-                    this.progress(this.__calcReady(), 1);
+                    this.progress(this.__calcReady());
                 });
             }     
         });
@@ -143,9 +150,11 @@ export default class Async
 		return this;
 	}
 
-	progress(loaded, total) {
+	progress(loaded, total = 1) {
+        if (this.__async__ready == 1) return;
+
         if (typeof loaded != "number" && typeof total != "number") {
-            console.warn('progress must to receive two numeric arguments');
+            console.warn('progress must to receive numeric arguments');
             return;
         }
 

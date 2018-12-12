@@ -28,6 +28,7 @@ class Loader extends DEW.Async
 
         this.onProgress(({ loaded, total }) => {
             // this._bar.transform({ scaleX: loaded / total })
+            console.log(loaded)
             this._bar.scaleX(loaded / total)
         });
     }
@@ -42,6 +43,6 @@ class Loader extends DEW.Async
 let loader = new Loader([
     '/test/assets/big.jpg',
     '/test/assets/big.jpg',
-    '/test/assets/empty.jpg'
+    // '/test/assets/empty.jpg'
 ]);
 

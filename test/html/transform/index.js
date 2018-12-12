@@ -13,10 +13,7 @@ box.transform([
     {
         scaleY: 2,
         rotate: 45,
-        translate: [15, 0],
-        units: {
-            translate: 'vmin'
-        }
+        translate: [150, 0]
     },
     { rotate: 45 }
 ], {
