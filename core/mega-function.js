@@ -2,7 +2,7 @@ import {printErr} from "./functions";
 
 export default class MegaFunction
 {
-	constructor(fn, name) {
+	constructor(handler) {
 
 		this._handlers = [];
 		this._names = {};
@@ -21,8 +21,8 @@ export default class MegaFunction
 		mega.shift = this.shift;
 		mega.invoke = this.invoke;
 
-		if (typeof fn == "function") {
-			mega.push(fn, name);
+		if (typeof handler == "function") {
+			mega.push(handler);
 		}
 
 		return mega;
@@ -54,35 +54,37 @@ export default class MegaFunction
 		return result;
 	}
 
-	push(fn, name) {
+	push(handler) {
 		const self = this.__megaInstance;
 
-		if (typeof fn == "function") {
-			if (name) {
-				self._names[name] = this.count;
-				fn.__megaName = name;
+		if (typeof handler == "function") {
+			if (handler.name) {
+				self._names[handler.name] = this.count;
 			}
 			
-			self._handlers.push(fn);
+			self._handlers.push(handler);
 			this.count = self._handlers.length;
 		}
 	}
 
 	remove(id) {
-		let self = this.__megaInstance, index, name;
+		let self = this.__megaInstance, index;
 
 		if (typeof id == 'string') {
 			index = self._names[id];
 			name = id;
 		} else if (typeof id == 'number') {
 			index = id;
+		} else if (typeof id == 'function') {
+			index = self._handlers.indexOf(id);
 		}
 
-		const fn = self._handlers[index];
+		const handler = self._handlers[index];
 
-		if (fn) {
-			name = fn.__megaName;
-			if (name) delete self._names[name];
+		if (handler) {
+			if (handler.name) {
+				self._names[handler.name] = null;
+			}
 
 			self._handlers.splice(index, 1);
 			this.count = self._handlers.length;
@@ -99,9 +101,10 @@ export default class MegaFunction
 	pop() {
 		const self = this.__megaInstance;
 		const last = self._handlers.pop();
-		const name = last.__megaName;
 
-		if (name) self._names[name] = null;
+		if (last.name) {
+			self._names[last.name] = null;
+		}
 
 		this.count = self._handlers.length;
 	}
@@ -109,9 +112,10 @@ export default class MegaFunction
 	shift() {
 		const self = this.__megaInstance;
 		const first = self._handlers.shift();
-		const name = first.__megaName;
 
-		if (name) delete self._names[name];
+		if (first.name) {
+			self._names[first.name] = null;
+		}
 
 		this.count = self._handlers.length;
 	}
@@ -127,7 +131,7 @@ export default class MegaFunction
 		if (self._handlers[index]) {
 			return self._handlers[index](data);
 		} else {
-			printErr('DEW MegaFunction invoke error: undefined function with id "' + id + '"');
+			printErr(`MegaFunction invoke error: undefined function with id "${id}"`);
 		}
 	}
 }

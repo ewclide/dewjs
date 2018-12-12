@@ -14,8 +14,11 @@ const eventer = {
 		}
 	},
 
-	refuse: (handler) => {
-		
+	refuse: (type, handler) => {
+		const event = _eventList[type];
+		if (event && event.isMegaFunction) {
+			event.remove(handler);
+		}
 	},
 
 	detach: (type) => {
