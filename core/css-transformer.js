@@ -1,7 +1,7 @@
 const CSSTransformer = {
 	apply(element, actions, settings = {}) {
 
-		const { origin, backface, style, perspective, units } = settings;
+		const { origin, backface, style, perspective, units = {} } = settings;
 		let transform = '';
 
         if (Array.isArray(origin)) {
