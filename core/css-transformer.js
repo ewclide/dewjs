@@ -1,11 +1,11 @@
 const CSSTransformer = {
 	apply(element, actions, settings = {}) {
 
-		const { origin, backface, style, perspective } = settings;
+		const { origin, backface, style, perspective, units } = settings;
 		let transform = '';
 
         if (Array.isArray(origin)) {
-			const originUnits = settings.originUnits || '%';
+			const originUnits = units.origin || '%';
 			element.style('transform-origin', origin.join(originUnits + ' ') + originUnits);
 		}
 
@@ -20,8 +20,8 @@ const CSSTransformer = {
 		}
 
         if (typeof perspective == 'number') {
-			const perspectiveUnits = settings.perspectiveUnits || 'px';
-			transform += `perspective(${perspective + perspectiveUnits}) `;
+			const perspUnits = units.perspective || 'px';
+			transform += `perspective(${perspective + perspUnits}) `;
 		}
 
         element.style('transform', transform + this._build(actions));
@@ -38,11 +38,11 @@ const CSSTransformer = {
 	_buildLocal(actions) {
 		let result = '';
 
-		const userUnits = actions.units;
+		const userUnits = actions.units || {};
 		const units = {
-			translate: 'px' || userUnits.translate,
-			rotate: 'deg' || userUnits.rotate,
-			skew: 'deg' || userUnits.skew
+			translate: userUnits.translate || 'px',
+			rotate: userUnits.rotate || 'deg',
+			skew: userUnits.skew || 'deg'
 		}
 
 		if (actions.matrix2d && actions.matrix2d.length) {
