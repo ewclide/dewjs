@@ -7,6 +7,7 @@ import {http} from './http';
 import {url} from './url';
 import html from './html';
 import MegaFunction from './mega-function';
+import Invoker from './invoker';
 import Template from './template';
 import Timer from './timer';
 import Async from './async';
@@ -37,6 +38,7 @@ const DEW = {
 	object,
 
 	MegaFunction,
+	Invoker,
 	Template,
 	Async,
 	Timer,
