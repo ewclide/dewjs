@@ -4,51 +4,64 @@ export default class Invoker
 {
 	constructor(handler) {
 		this._handlers = new Map();
-		this._data;
-
+		
 		if (typeof handler == "function") {
 			this.push(handler);
 		}
+	}
+
+	get isInvoker() {
+		return true;
 	}
 
 	get length() {
 		return this._handlers.size;
 	}
 
-	call(...args) {
-		this._handlers.forEach((handler) => handler(...args));
+	async(...args) {
+		// this._handlers.forEach((handler) => {
+		// 	handler(args)
+		// 	args = Array.isArray(args) ? handler(...args) : handler(args);
+		// });
+
 		return args.length > 1 ? args : args[0];
 	}
 
-	orderCall(...args) {
-		this._handlers.forEach((handler) => {
+	call(...args) {
+		this._handlers.forEach( handler => handler(...args));
+		return args.length > 1 ? args : args[0];
+	}
+
+	sequence(...args) {
+		this._handlers.forEach( handler => {
 			args = Array.isArray(args) ? handler(...args) : handler(args);
 		});
-		return args.length > 1 ? args : args[0];
+
+		return args;
 	}
 
-	filterCall(filter, ...args) {
+	filter(filter, ...args) {
 		let index = 0;
 
-		for (let item of this._handlers) {
-			const handler = item[1];
-			const isArr = Array.isArray(args);
-			const skip = isArr ? filter(index, ...args) : filter(index, args);
+		for (let handler of this._handlers) {
+			const product = Array.isArray(args)
+			? handler[1](...args) : handler[1](args);
+
+			const skip = Array.isArray(product)
+			? filter(index, ...product) : filter(index, product);
 
 			if (skip) {
-				args = isArr ? handler(...args) : handler(args);
+				args = product;
 				index++;
 			} else {
 				break;
 			}
 		}
 
-		console.log(args)
-
-		// return Array.isArray(args) && args.length ? args : args[0];
+		return args;
 	}
 
-	singleCall(key, ...args) {
+	single(key, ...args) {
 		const handler = this._handlers.get(key);
 		
 		if (handler) {

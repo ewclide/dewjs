@@ -1,4 +1,4 @@
-import MegaFunction from './mega-function';
+import Invoker from './invoker';
 
 export default class Async
 {
@@ -92,7 +92,6 @@ export default class Async
             }     
         });
 
-        this.__async__refreshable = false;
         this.__async__permit = false;
         
         wait = Promise.all(promises);
@@ -122,7 +121,7 @@ export default class Async
 
     onRefresh(handler) {
 		if (!this.__async__refresh) {
-            this.__async__refresh  = new MegaFunction();
+            this.__async__refresh  = new Invoker();
         }
 
 		this.__async__refresh.push(handler);
@@ -132,7 +131,7 @@ export default class Async
 		this.reset();
 
 		if (this.__async__refresh) {
-            this.__async__refresh();
+            this.__async__refresh.call();
         }
 		
 		this.__async__list.forEach((async) => {
@@ -142,7 +141,7 @@ export default class Async
 
     onProgress(handler) {
 		if (!this.__async__progress) {
-            this.__async__progress = new MegaFunction();
+            this.__async__progress = new Invoker();
         }
 
 		this.__async__progress.push(handler);
@@ -164,7 +163,7 @@ export default class Async
             this.__async__ready = ready;
             
 			if (this.__async__progress) {
-                this.__async__progress({ loaded, total });
+                this.__async__progress.call({ loaded, total });
             }  
 		}
     }

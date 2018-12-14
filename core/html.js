@@ -6,7 +6,7 @@ const proto = HTMLTools.prototype;
 const html = new HTMLTools(document);
 
 html._eventStart = function(id, type, e) {
-    eventList[id][type](e);
+    eventList[id][type].call(e);
 }
 
 html.extend = function(name, method) {

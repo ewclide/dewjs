@@ -1,8 +1,7 @@
 import {printErr} from './functions';
 import JSONConverter from './json-converter';
 import CSSTransformer from './css-transformer';
-import MegaFunction from './mega-function';
-import Async from './async';
+import Invoker from './invoker';
 
 export let eventList = {};
 
@@ -694,7 +693,7 @@ export class HTMLTools
         if (list[type]) {
             list[type].push(handler);
         } else {
-            list[type] = new MegaFunction(handler);
+            list[type] = new Invoker(handler);
         }
 
         this.setAttr('on' + type, `$html._eventStart(${this._id},'${type}',event)`);

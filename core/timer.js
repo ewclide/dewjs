@@ -1,4 +1,4 @@
-import MegaFunction from './mega-function';
+import Invoker from './invoker';
 
 const _timerList = [];
 
@@ -10,7 +10,7 @@ export default class Timer
 		this.delay = settings.delay || 0;
 		this.step = settings.step || 0;
 
-		this._actions = new MegaFunction(settings.action);
+		this._actions = new Invoker(settings.action);
 		this._onStart = settings.onStart || null;
 		this._onStop = settings.onStop || null;
 		this._onFinish = settings._onFinish || null;
@@ -138,13 +138,13 @@ export default class Timer
 
 	_tickInfinity(time) {
 		this._timePassed = time - this._startTime;
-		this._actions(this._timePassed);
+		this._actions.call(this._timePassed);
 		this._stop ? this.stop() : requestAnimationFrame(this._tickInfinity);
 	}
 
 	_tickInfinityStep() {
 		this._timePassed = time - this._startTime;
-		this._actions(this._timePassed);
+		this._actions.call(this._timePassed);
 
 		if (this._stop) {
 			this.stop();
@@ -155,7 +155,7 @@ export default class Timer
 
 	_tickLimited(time) {
 		this._timePassed = time - this._startTime;
-		this._actions(this._timePassed);
+		this._actions.call(this._timePassed);
 
 		if (this._timePassed >= this.duration) {
 			this._stop = true;
@@ -166,7 +166,7 @@ export default class Timer
 
 	_tickLimitedStep(time) {
 		this._timePassed = time - this._startTime;
-		this._actions(this._timePassed, this._iteration);
+		this._actions.call(this._timePassed, this._iteration);
 
 		if (this._iteration++ >= this.count - 1) {
 			this._stop = true;

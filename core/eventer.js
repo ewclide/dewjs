@@ -1,4 +1,4 @@
-import MegaFunction from "./mega-function";
+import Invoker from "./invoker";
 
 const _eventList = {};
 const _lockList = {};
@@ -7,18 +7,16 @@ const eventer = {
 	listen: (type, handler) => {
 		const event = _eventList[type];
 
-		if (event && event.isMegaFunction) {
+		if (event) {
 			event.push(handler);
 		} else {
-			_eventList[type] = new MegaFunction(handler);
+			_eventList[type] = new Invoker(handler);
 		}
 	},
 
 	refuse: (type, handler) => {
 		const event = _eventList[type];
-		if (event && event.isMegaFunction) {
-			event.remove(handler);
-		}
+		if (event) event.remove(handler);
 	},
 
 	detach: (type) => {
@@ -27,10 +25,7 @@ const eventer = {
 
 	clear: (type) => {
 		const event = _eventList[type];
-
-		if (event && event.isMegaFunction) {
-			event.clear();
-		}
+		if (event) event.clear();
 	},
 
 	lock: (type) => {
@@ -54,8 +49,8 @@ const eventer = {
 		const event = _eventList[type];
 		const locked = _lockList[type];
 
-		if (typeof event == 'function') {
-			if (!locked) event(data);
+		if (event.isInvoker) {
+			if (!locked) event.call(data);
 		} else {
 			console.warn(`eventer error - event '${type}' is not defined`);
 		}
