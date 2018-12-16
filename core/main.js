@@ -6,7 +6,6 @@ import {bind} from './binder';
 import {http} from './http';
 import {url} from './url';
 import html from './html';
-import MegaFunction from './mega-function';
 import Invoker from './invoker';
 import Template from './template';
 import Timer from './timer';
@@ -37,7 +36,6 @@ const DEW = {
 	array,
 	object,
 
-	MegaFunction,
 	Invoker,
 	Template,
 	Async,
@@ -50,10 +48,10 @@ const DEW = {
 	html
 }
 
-fn.define(window, "log", {
+object.define(window, "log", {
 	value  : fn.log,
 	config : false,
 	write  : false
 });
 
-fn.define(window, { DEW })
+object.define(window, { DEW })

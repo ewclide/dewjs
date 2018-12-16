@@ -1,7 +1,7 @@
 import {printErr} from './functions';
 import ObjectIniter from './object-initer';
 
-function _join(list = {}, target, method) {
+function _assign(list = {}, target, method) {
     if (Array.isArray(list)) {
         list.forEach( item => method(item, target) );
     } else {
@@ -54,38 +54,34 @@ export function clone(target, full) {
     : _createClone(target, full)
 }
 
-export function leftJoin(target, list, copy) {
+export function innerAssign(target, list, copy) {
     const result = copy ? Object.assign({}, target) : target;
 
-    _join(list, result, (item, obj) => {
+    _assign(list, result, (item, obj) => {
         for (let i in item) {
-            if (i in obj) {
-                obj[i] = item[i];
-            }
+            if (i in obj) obj[i] = item[i];
         }
     });
 
     return result;
 }
 
-export function rightJoin(target, list, copy) {
+export function outerAssign(target, list, copy) {
     const result = copy ? Object.assign({}, target) : target;
 
-    _join(list, result, (item, obj) => {
+    _assign(list, result, (item, obj) => {
         for (let i in item) {
-            if (!(i in obj)) {
-                obj[i] = item[i];
-            }
+            if (!(i in obj)) obj[i] = item[i];
         }  
     });
 
     return result;
 }
 
-export function fullJoin(target, list, copy) {
+export function fullAssign(target, list, copy) {
     target = copy ? _defineProperties(target, {}) : target;
 
-    _join(list, target, item => _defineProperties(item, target));
+    _assign(list, target, item => _defineProperties(item, target));
     
     return target;
 }
@@ -108,4 +104,36 @@ export function init(target, values, settings, common = { errors : true }) {
     }
 
     return initer.errors.length ? (common.errors && printErr(initer.errors), false) : true;
+}
+
+export function define(obj, fields, options = {}) {
+	let desc = {
+		enumerable   : options.enumer !== undefined ? options.enumer : false,
+		configurable : options.config !== undefined ? options.config : true,
+		writable     : options.write  !== undefined ? options.write  : true
+	};
+
+	if (typeof fields == "string") {
+		if (options.value !== undefined) {
+			desc.value = options.value;
+		}
+
+		else if (options.get && options.set) {
+			desc.get = options.get;
+			desc.set = options.set;
+			delete desc.writable;
+		}
+
+		Object.defineProperty(obj, fields, desc);
+
+		if (options.set && options.value !== undefined) {
+			obj[fields] = options.value;
+		}
+
+	} else {
+		for (let key in fields) {
+			desc.value = fields[key];
+			Object.defineProperty(obj, String(key), desc);
+		}
+	}
 }

@@ -1,4 +1,4 @@
-import {define} from './functions';
+import {define} from './object';
 
 class Binder
 {

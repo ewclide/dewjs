@@ -54,38 +54,6 @@ function _getSourceLog() {
 	return '';
 }
 
-export function define(obj, fields, options = {}) {
-	let desc = {
-		enumerable   : options.enumer !== undefined ? options.enumer : false,
-		configurable : options.config !== undefined ? options.config : true,
-		writable     : options.write  !== undefined ? options.write  : true
-	};
-
-	if (typeof fields == "string") {
-		if (options.value !== undefined) {
-			desc.value = options.value;
-		}
-
-		else if (options.get && options.set) {
-			desc.get = options.get;
-			desc.set = options.set;
-			delete desc.writable;
-		}
-
-		Object.defineProperty(obj, fields, desc);
-
-		if (options.set && options.value !== undefined) {
-			obj[fields] = options.value;
-		}
-
-	} else {
-		for (let key in fields) {
-			desc.value = fields[key];
-			Object.defineProperty(obj, String(key), desc);
-		}
-	}
-}
-
 export function isType(value, type) {
 	if (Array.isArray(type)) {
 		return type.some((t) => isType(value, t));
