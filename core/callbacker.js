@@ -1,16 +1,16 @@
 import {printErr} from "./functions";
 
-export default class Invoker
+export default class CallBacker
 {
 	constructor(handler) {
 		this._handlers = new Map();
-		
+
 		if (typeof handler == "function") {
 			this.push(handler);
 		}
 	}
 
-	get isInvoker() {
+	get isCallBacker() {
 		return true;
 	}
 
@@ -63,11 +63,11 @@ export default class Invoker
 
 	single(key, ...args) {
 		const handler = this._handlers.get(key);
-		
+
 		if (handler) {
 			return handler(...args);
 		} else {
-			printErr(`Invoker error: undefined handler with key "${key}"`);
+			printErr(`CallBacker error: undefined handler with key "${key}"`);
 		}
 	}
 

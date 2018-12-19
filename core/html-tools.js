@@ -1,7 +1,7 @@
 import {printErr} from './functions';
 import JSONConverter from './json-converter';
 import CSSTransformer from './css-transformer';
-import Invoker from './invoker';
+import CallBacker from './callbacker';
 
 export let eventList = {};
 
@@ -58,7 +58,7 @@ export class HTMLTools
                 const errorText = `Can't load resource "${element.src}"`;
 
                 let complete = true;
-                    
+
                 if (tag == "img") {
                     complete = element.complete;
                     if (complete && !element.width && !element.height) {
@@ -88,7 +88,7 @@ export class HTMLTools
             printErr("Your browser not support observ mutation");
             return;
         }
-        
+
         if (replace) this.mutationClear();
 
         this._mutations = [];
@@ -100,11 +100,11 @@ export class HTMLTools
 
             this._mutations.push({
                 options,
-                observer, 
+                observer,
                 element: this.elements[i]
             });
         }
-        
+
         return this;
     }
 
@@ -118,7 +118,7 @@ export class HTMLTools
     mutationEnd() {
         for (let i = 0; i < this._mutations.length; i++) {
             this._mutations[i].observer.disconnect();
-        }  
+        }
     }
 
     mutationClear() {
@@ -166,10 +166,10 @@ export class HTMLTools
             for (let i = 0; i < this.elements.length; i++) {
                 let search = this.elements[i].querySelectorAll(query),
                     index = elements.length;
-    
+
                 for (let j = 0; j < search.length; j++) {
                     elements[index + j] = search[j];
-                }  
+                }
             }
         }
 
@@ -243,7 +243,7 @@ export class HTMLTools
             result = jsonConv.htl;
             result._jsonConv = jsonConv;
             result.node = jsonConv.nodes;
-            
+
         return result;
     }
 
@@ -288,7 +288,7 @@ export class HTMLTools
                 else this.elements[i].innerHTML += str;
             }
 
-        } else { 
+        } else {
             return this.elements[0].innerHTML;
         }
 
@@ -314,7 +314,7 @@ export class HTMLTools
                 this.elements[i].value = data;
             }
 
-        } else { 
+        } else {
             return this.elements[0].value;
         }
 
@@ -331,12 +331,12 @@ export class HTMLTools
             for (let i = 0; i < this.elements.length; i++) {
                 if ('checked' in this.elements[i]) {
                     this.elements[i].checked = enable;
-                } 
+                }
             }
         }
         else if (enable === undefined) {
             return this.elements[0].checked;
-        }  
+        }
 
         return this;
     }
@@ -345,7 +345,7 @@ export class HTMLTools
         for (let i = 0; i < this.elements.length; i++) {
             if ("checked" in this.elements[i]) {
                 this.elements[i].checked = !this.elements[i].checked;
-            } 
+            }
         }
 
         return this;
@@ -359,7 +359,7 @@ export class HTMLTools
         for (let i = 0; i < this.elements.length; i++) {
             if ("selectedIndex" in this.elements[i]) {
                 this.elements[i].selectedIndex = index;
-            } 
+            }
         }
 
         return this;
@@ -368,16 +368,16 @@ export class HTMLTools
     width(value) {
         if (value === undefined) {
             return this.elements[0].offsetWidth;
-        } 
+        }
 
         if (typeof value == "number") {
             value += "px";
         }
-            
+
         for (let i = 0; i < this.elements.length; i++) {
             this.elements[i].style.width = value;
-        } 
-        
+        }
+
         return this;
     }
 
@@ -388,7 +388,7 @@ export class HTMLTools
 
         if (typeof value == "number") {
             value += "px";
-        }  
+        }
 
         for (let i = 0; i < this.elements.length; i++) {
             this.elements[i].style.height = value;
@@ -423,7 +423,7 @@ export class HTMLTools
             doc  = document.documentElement,
             top  = rect.top + window.pageYOffset - doc.clientTop,
             left = rect.left + window.pageXOffset - doc.clientLeft;
-        
+
         return {
             top   : Math.round(top),
             left  : Math.round(left),
@@ -439,7 +439,7 @@ export class HTMLTools
     wrap(classList, revOrder) {
         if (typeof classList == "string") {
             let result = [],
-                wrapper = document.createElement("div"); 
+                wrapper = document.createElement("div");
                 wrapper.classList.add(classList);
 
             for (let i = 0; i < this.elements.length; i++) {
@@ -464,12 +464,12 @@ export class HTMLTools
                 for (let i = 1; i < classList.length; i++) {
                     this.wrap(classList[i]);
                 }
-                    
+
             } else {
                 result = this.wrap(classList[classList.length - 1]);
                 for (let i = classList.length - 2; i >= 0; i--) {
                     this.wrap(classList[i]);
-                }  
+                }
             }
 
             return result;
@@ -479,7 +479,7 @@ export class HTMLTools
     hide() {
         for (let i = 0; i < this.elements.length; i++) {
             this.elements[i].style.display = "none";
-        }  
+        }
 
         return this;
     }
@@ -537,7 +537,7 @@ export class HTMLTools
         CSSTransformer.translate(this.elements, value, save, units);
         return this;
     }
-    
+
     origin(value, units) {
         CSSTransformer.origin(this, value, units);
         return this;
@@ -587,7 +587,7 @@ export class HTMLTools
                     this.elements[i].setAttribute(n, attr[n])
                 }
             }
-        }  
+        }
 
         return this;
     }
@@ -623,7 +623,7 @@ export class HTMLTools
         if (value === undefined) {
             return this.elements[0].style[name];
         }
-        
+
         else if (typeof name == 'string') {
             for (let i = 0; i < this.elements.length; i++) {
                 this.elements[i].style[name] = value;
@@ -637,7 +637,7 @@ export class HTMLTools
         for (let i = 0; i < this.elements.length; i++) {
             for (let item in list) {
                 this.elements[i].style[item] = list[item];
-            } 
+            }
         }
 
         return this;
@@ -647,14 +647,14 @@ export class HTMLTools
 
         if (!eventList[this._id]) {
             eventList[this._id] = {};
-        }  
+        }
 
         let list = eventList[this._id];
 
         if (typeof data == 'string' && typeof handler == 'function') {
             this._eventAttach(list, data, handler);
         }
-        
+
         else if (typeof data == 'object') {
             for (let event in data) {
                 this._eventAttach(list, event, data[event]);
@@ -693,7 +693,7 @@ export class HTMLTools
         if (list[type]) {
             list[type].push(handler);
         } else {
-            list[type] = new Invoker(handler);
+            list[type] = new CallBacker(handler);
         }
 
         this.setAttr('on' + type, `$html._eventStart(${this._id},'${type}',event)`);
@@ -756,7 +756,7 @@ export class HTMLTools
 
             if (element.parentNode) {
                 element.parentNode.removeChild(element);
-            } 
+            }
         }
 
         this.elements = [];

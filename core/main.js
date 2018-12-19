@@ -6,7 +6,7 @@ import {bind} from './binder';
 import {http} from './http';
 import {url} from './url';
 import html from './html';
-import Invoker from './invoker';
+import CallBacker from './callbacker';
 import Template from './template';
 import Timer from './timer';
 import Async from './async';
@@ -36,7 +36,7 @@ const DEW = {
 	array,
 	object,
 
-	Invoker,
+	CallBacker,
 	Template,
 	Async,
 	Timer,

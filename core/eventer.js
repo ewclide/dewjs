@@ -1,4 +1,4 @@
-import Invoker from "./invoker";
+import CallBacker from "./callbacker";
 
 const _eventList = {};
 const _lockList = {};
@@ -10,7 +10,7 @@ const eventer = {
 		if (event) {
 			event.push(handler);
 		} else {
-			_eventList[type] = new Invoker(handler);
+			_eventList[type] = new CallBacker(handler);
 		}
 	},
 
@@ -49,7 +49,7 @@ const eventer = {
 		const event = _eventList[type];
 		const locked = _lockList[type];
 
-		if (event.isInvoker) {
+		if (event.isCallBacker) {
 			if (!locked) event.call(data);
 		} else {
 			console.warn(`eventer error - event '${type}' is not defined`);

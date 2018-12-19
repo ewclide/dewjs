@@ -1,4 +1,4 @@
-const cb = new DEW.Invoker();
+const cb = new DEW.CallBacker();
 
 cb.push(function first(v){
 	return v + 1;
