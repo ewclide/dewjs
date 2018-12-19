@@ -23,13 +23,21 @@ const bind = {
 		}
 	},
 
-	fields(settings) {
-		const { left, right, modifier, trigger } = settings;
+	remove() {
 
-		switch (data.type) {
-			case "left"  : this._attach(left, right, modifier, trigger); break;
-			case "right" : this._attach(right, left, modifier, trigger); break;
-			case "cross" :
+	},
+
+	clear() {
+
+	},
+
+	fields(settings) {
+		const { type, left, right, modifier, trigger } = settings;
+
+		switch (type) {
+			case 'left' : this._attach(left, right, modifier, trigger); break;
+			case 'right': this._attach(right, left, modifier, trigger); break;
+			case 'cross':
 				this._attach(left, right, right.modifier, left.trigger);
 				this._attach(right, left, left.modifier, right.trigger);
 				break;
