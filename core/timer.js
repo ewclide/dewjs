@@ -1,4 +1,4 @@
-import Invoker from './invoker';
+import CallBacker from './callbacker';
 
 const _timerList = [];
 
@@ -10,7 +10,7 @@ export default class Timer
 		this.delay = settings.delay || 0;
 		this.step = settings.step || 0;
 
-		this._actions = new Invoker(settings.action);
+		this._actions = new CallBacker(settings.action);
 		this._onStart = settings.onStart || null;
 		this._onStop = settings.onStop || null;
 		this._onFinish = settings._onFinish || null;
@@ -75,7 +75,7 @@ export default class Timer
 
 	start(delay) {
 		const wait = typeof delay == 'number' ? delay : this.delay;
-		
+
 		if (wait) {
 			setTimeout(() => this._start(), wait);
 		} else {

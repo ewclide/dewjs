@@ -1,4 +1,4 @@
-import Invoker from './invoker';
+import CallBacker from './callbacker';
 
 export default class Async
 {
@@ -23,7 +23,7 @@ export default class Async
     get ready () {
         return this.__async__ready;
     }
-    
+
     get pending() {
         return this.__async__status === 0;
     }
@@ -89,11 +89,11 @@ export default class Async
                 async.onProgress(() => {
                     this.progress(this.__calcReady());
                 });
-            }     
+            }
         });
 
         this.__async__permit = false;
-        
+
         wait = Promise.all(promises);
         wait.then((e) => {
             this.__async__permit = true;
@@ -111,7 +111,7 @@ export default class Async
         let ready = 0;
 
         this.__async__list.forEach((async) => ready += async.ready * rate);
-        
+
 		return ready;
 	}
 
@@ -121,7 +121,7 @@ export default class Async
 
     onRefresh(handler) {
 		if (!this.__async__refresh) {
-            this.__async__refresh  = new Invoker();
+            this.__async__refresh  = new CallBacker();
         }
 
 		this.__async__refresh.push(handler);
@@ -133,7 +133,7 @@ export default class Async
 		if (this.__async__refresh) {
             this.__async__refresh.call();
         }
-		
+
 		this.__async__list.forEach((async) => {
 			if (async.rejected) async.refresh();
 		});
@@ -141,7 +141,7 @@ export default class Async
 
     onProgress(handler) {
 		if (!this.__async__progress) {
-            this.__async__progress = new Invoker();
+            this.__async__progress = new CallBacker();
         }
 
 		this.__async__progress.push(handler);
@@ -161,10 +161,10 @@ export default class Async
 
 		if (this.pending && ready >= 0 && ready <= 1) {
             this.__async__ready = ready;
-            
+
 			if (this.__async__progress) {
                 this.__async__progress.call({ loaded, total });
-            }  
+            }
 		}
     }
 }
