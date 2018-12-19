@@ -23,11 +23,37 @@ const bind = {
 		}
 	},
 
+	trigger(object, field, trigger) {
+		this._genAccessors(object, field, trigger);
+	},
+
 	remove() {
 
 	},
 
-	clear() {
+	clear(object, field) {
+		const binded = object[`__bind__${field}`];
+
+		if (!binded) return;
+
+		binded.joints = [];
+		binded.trigger = null;
+	},
+
+	clearTargets(object, field) {
+		const binded = object[`__bind__${field}`];
+
+		if (!binded) return;
+
+		binded.joints.forEach((joint) => {
+			
+		});
+
+		binded.joints = [];
+		binded.trigger = null;
+	},
+
+	clearAll() {
 
 	},
 
@@ -44,6 +70,32 @@ const bind = {
 		}
 	},
 
+	left(arrFirst, arrSecond, modifier, trigger) {
+		const left = { object: arrFirst[0], field: arrFirst[1] }
+		const right = { object: arrSecond[0], field: arrSecond[1] }
+		
+		this._attach(left, right, modifier, trigger);
+	},
+
+	right(arrFirst, arrSecond, modifier, trigger) {
+		const left = { object: arrFirst[0], field: arrFirst[1] }
+		const right = { object: arrSecond[0], field: arrSecond[1] }
+		
+		this._attach(right, left, modifier, trigger);
+	},
+
+	cross(arrFirst, arrSecond) {
+		const left = { object: arrFirst[0], field: arrFirst[1] };
+		const right = { object: arrSecond[0], field: arrSecond[1] };
+		const leftModifier = arrFirst[2];
+		const rightModifier = arrSecond[2];
+		const leftTrigger = arrFirst[3];
+		const rightTrigger = arrFirst[3];
+
+		this._attach(left, right, rightModifier, leftTrigger);
+		this._attach(right, left, leftModifier, rightTrigger);
+	},
+
 	_attach(current, target, modifier, trigger) {
 		this._genAccessors(current.object, current.field, trigger);
 		this._addJoint(
@@ -57,23 +109,23 @@ const bind = {
 	},
 
 	_genAccessors(object, field, trigger) {
+		if (binded in object) return;
+
 		const self = this;
 		const binded = `__bind__${field}`;
 
-		if (!(binded in object)) {
-			object[binded] = {
-				joints : [],
-				value  : object[field],
-				trigger: trigger
-			}
-
-			define(object, field, {
-				get: () => object[binded].value,
-				set: (value) => { self._setData(object, field, value) },
-				config: true,
-				enumer: true
-			});
+		object[binded] = {
+			joints : [],
+			value  : object[field],
+			trigger: trigger
 		}
+
+		define(object, field, {
+			get: () => object[binded].value,
+			set: (value) => { self._setData(object, field, value) },
+			config: true,
+			enumer: true
+		});
 	},
 
 	_addJoint(object, field, joint) {
@@ -108,13 +160,12 @@ const bind = {
 		}
 
 		binded.joints.forEach((joint) => {
-
 			const value = joint.modifier ? joint.modifier(sourseValue) : sourseValue;
 
 			if (joint.object === data.object && joint.field === data.field) {
 				return;
 
-			} else if (('_bind_' + joint.field) in joint.object) {
+			} else if (('__bind__' + joint.field) in joint.object) {
 				joint.object[joint.field] = { value, object, field };
 
 			} else {
