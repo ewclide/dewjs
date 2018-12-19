@@ -2,10 +2,10 @@
 import * as fn from './functions';
 import * as array from'./array';
 import * as object from './object';
-import {bind} from './binder';
 import {http} from './http';
 import {url} from './url';
 import html from './html';
+import bind from './bind';
 import CallBacker from './callbacker';
 import Template from './template';
 import Timer from './timer';
