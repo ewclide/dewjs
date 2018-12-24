@@ -17,31 +17,29 @@ const third = {
 DEW.bind.onchange(first, 'b', (v) => console.log(v));
 first.b = 'New value!';
 /** New value! */
+console.log('----------------');
 
 DEW.bind.fields({
     type: 'sided',
     left: { object: first, field: 'a' },
     right: { object: second, field: 'a' },
     modifier: (v) => v + '!?',
-    trigger: (v) => console.log(`changed - ${v}`)
+    trigger: (v) => console.log(v)
 });
 
 first.a = 'first.a changed';
 console.log(second.a);
-/** changed - first.a changed
+/** first.a changed
  * first changed!?
 */
+console.log('----------------');
 
 DEW.bind.sided([first, 'a'], [second, 'a'], (v) => v + '...', (v) => console.log(v));
 first.a = 'first.a changed - 2';
 console.log(second.a);
 /** first changed... */
+console.log('----------------');
 
-// DEW.bind.fields({
-//     type: 'cross',
-//     left: { object: first, field: 'c', modifier: (v) => v+10 },
-//     right: { object: second, field: 'c', modifier: (v) => v-10 }
-// });
 DEW.bind.cross(
     [first,  'c', (v) => v+10, (v) => console.log('first.c changed to: ' + v)],
     [second, 'c', (v) => v-10, (v) => console.log('second.c changed to: ' + v)]
@@ -56,6 +54,7 @@ console.log(first.c, second.c);
  * second.c changed to: 30
  * 20 30
  */
+console.log('----------------');
 
 DEW.bind.cross(
     [second, 'c', (v) => v+10 ],
@@ -71,4 +70,4 @@ console.log(first.c, second.c, third.c);
  * second.c changed to: 20
  * 10 20 30
  *  */
-
+console.log('----------------');

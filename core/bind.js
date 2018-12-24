@@ -1,9 +1,12 @@
+import {printErr} from './functions';
 import {define} from './object';
 
 const getId = (() => {
 	let id = 0;
 	return () => id++;
 })();
+
+const metaBind = new Map();
 
 const bind = {
 	onchange(object, field, trigger) {
@@ -30,6 +33,23 @@ const bind = {
 
 	trigger(object, field, trigger) {
 		this._genAccessors(object, field, trigger);
+	},
+
+	detachById(id) {
+		if (!metaBind.has(id)) return;
+		const { current, target } = metaBind.get(id);
+
+		this.detach(
+			current.object, current.field,
+			target.object, target.field,
+		);
+	},
+
+	detach(curObject, curField, tarObject, tarField) {
+		const meta = curObject[`__bind__${curField}`];
+		if (!meta) return;
+
+		meta.joints.has();
 	},
 
 	break(object, field, cross) {
@@ -67,32 +87,43 @@ const bind = {
 		const { type, left, right, modifier, trigger } = settings;
 
 		if (type === 'sided') {
-			this._attach(left, right, modifier, trigger);
+			return this._attach(left, right, modifier, trigger);
 		} else if (type === 'cross') {
 			const id = getId();
 			this._attach(left, right, left.modifier, left.trigger, id);
 			this._attach(right, left, right.modifier, right.trigger, id);
+			return id;
 		}
 	},
 
-	sided(arrCurrent, arrTarget, modifier, trigger) {
-		const current = { object: arrCurrent[0], field: arrCurrent[1] }
-		const target = { object: arrTarget[0], field: arrTarget[1] }
-		
-		this._attach(current, target, modifier, trigger);
+	sided(current, target, modifier, trigger) {
+		if (!Array.isArray(current) && !Array.isArray(target)) {
+			printErr(`DEW bind error - "${current}" and "${target}" arguments must be an array!`);
+			return;
+		}
+
+		return this._attach(
+			{ object: current[0], field: current[1] },
+			{ object: target[0], field: target[1] },
+			modifier,
+			trigger
+		);
 	},
 
-	cross(arrFirst, arrSecond) {
-		const left = { object: arrFirst[0], field: arrFirst[1] };
-		const right = { object: arrSecond[0], field: arrSecond[1] };
-		const leftModifier = arrFirst[2];
-		const rightModifier = arrSecond[2];
-		const leftTrigger = arrFirst[3];
-		const rightTrigger = arrSecond[3];
+	cross(current, target) {
+		if (!Array.isArray(current) && !Array.isArray(target)) {
+			printErr(`DEW bind error - "${current}" and "${target}" arguments must be an array!`);
+			return;
+		}
 
 		const id = getId();
-		this._attach(left, right, leftModifier, leftTrigger, id);
-		this._attach(right, left, rightModifier, rightTrigger, id);
+		const left = { object: current[0], field: current[1] };
+		const right = { object: target[0], field: target[1] };
+
+		this._attach(left, right, current[2], current[3], id);
+		this._attach(right, left, target[2], target[3], id);
+
+		return id;
 	},
 
 	_attach(current, target, modifier, trigger, id = getId()) {
@@ -100,71 +131,73 @@ const bind = {
 		this._addJoint(id, current.object, current.field, {
 			object  : target.object,
 			field   : target.field,
-			modifier: modifier
+			modifier: typeof modifier == 'function' ? modifier : null
 		});
+
+		metaBind.set(id, { current, target });
+
+		return id;
 	},
 
 	_genAccessors(object, field, trigger) {
-		const self = this;
 		const meta = `__bind__${field}`;
-
 		if (meta in object) return;
 
 		define(object, meta, {
 			value: {
 				joints : new Map(),
 				value  : object[field],
-				trigger: trigger
+				trigger: typeof trigger == 'function' ? trigger : null
 			},
 			config: true
 		});
 
 		define(object, field, {
 			get: () => object[meta].value,
-			set: (value) => { self._setData(object, field, value) },
+			set: (value) => { this._setData(object, field, value) },
 			config: true,
 			enumer: true
 		});
 	},
 
 	_addJoint(id, object, field, joint) {
-		const meta = `__bind__${field}`;
-		object[meta].joints.set(id, joint);
-		this._applyValue(joint.object, joint.field, object[meta].value, joint.modifier);
+		const meta = object[`__bind__${field}`];
+		meta.joints.set(id, joint);
+		this._applyValue(joint.object, joint.field, meta.value, joint.modifier);
 	},
 
 	_applyValue(object, field, value, modifier) {
 		const meta = `__bind__${field}`;
-
-		if (modifier) value = modifier(value);
+		const val = typeof modifier == 'function' ? modifier(value) : value;
 
 		if (meta in object) {
-			object[meta].value = value
+			object[meta].value = val;
 		} else {
-			object[field] = value;
+			object[field] = val;
 		}
 	},
 
 	_setData(object, field, data) {
-		const sourseValue = data.value || data;
+		const srcValue = data.value !== undefined ? data.value : data;
 		const meta = object[`__bind__${field}`];
-		meta.value = sourseValue;
+		meta.value = srcValue;
 
-		if (!data.value && meta.trigger) {
-			meta.trigger(sourseValue);
+		if (data.value === undefined && meta.trigger) {
+			meta.trigger(srcValue);
 		}
 
 		meta.joints.forEach((joint) => {
-			const value = joint.modifier ? joint.modifier(sourseValue) : sourseValue;
+			const { object: jObject, field: jField, modifier } = joint;
+			const value = modifier ? modifier(srcValue) : srcValue;
 
-			if (joint.object === data.object && joint.field === data.field) {
+			if (jObject === data.object && jField === data.field) {
 				return;
 
-			} else if (('__bind__' + joint.field) in joint.object) {
-				joint.object[joint.field] = { value, object, field };
+			} else if (('__bind__' + jField) in jObject) {
+				jObject[jField] = { value, object, field };
 
 			} else {
-				joint.object[joint.field] = value;
+				jObject[jField] = value;
 			}
 		});
 	}
