@@ -6,6 +6,7 @@ import {http} from './http';
 import {url} from './url';
 import html from './html';
 import bind from './bind';
+import bind2 from './bind2';
 import CallBacker from './callbacker';
 import Template from './template';
 import Timer from './timer';
@@ -23,6 +24,7 @@ const DEW = {
 	randi: fn.randi,
 	randf: fn.randf,
 	randKey: fn.randKey,
+	idMaker: fn.idMaker,
 	vmin: fn.vmin,
 	vmax: fn.vmax,
 	vw: fn.vw,
@@ -43,6 +45,7 @@ const DEW = {
 	Lerp,
 
 	bind,
+	bind2,
 	http,
 	url,
 	html

@@ -257,7 +257,7 @@ export function randi(min = 0, max = 9999999) {
 	return Math.floor(Math.random() * (max - min)) + min;
 }
 
-export function randf() {
+export function randf(min, max) {
 	return Math.random() * (max - min) + min;
 }
 
@@ -287,6 +287,13 @@ export function randKey(length = 15, types = ['all']) {
 	}
 
 	return result;
+}
+
+export function idMaker() {
+	return (() => {
+		let id = 0;
+		return () => id++;
+	})();
 }
 
 export function vmin(value) {

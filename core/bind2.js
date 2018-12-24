@@ -2,7 +2,7 @@ import {printErr, idMaker} from './functions';
 import {define} from './object';
 
 const getId = idMaker();
-const _bondings = new Map();
+const _joints = new Map();
 
 const bind = {
 	onchange(object, field, trigger) {
@@ -32,8 +32,8 @@ const bind = {
 	},
 
 	detachById(id) {
-		if (!_bondings.has(id)) return;
-		const { current, target } = _bondings.get(id);
+		if (!metaBind.has(id)) return;
+		const { current, target } = metaBind.get(id);
 
 		this.detach(
 			current.object, current.field,
@@ -124,13 +124,18 @@ const bind = {
 
 	_attach(current, target, modifier, trigger, id = getId()) {
 		this._genAccessors(current.object, current.field, trigger);
+
+		_joints.set(id, {
+			// current, target, 
+		});
+
 		this._addJoint(id, current.object, current.field, {
 			object  : target.object,
 			field   : target.field,
 			modifier: typeof modifier == 'function' ? modifier : null
 		});
 
-		_bondings.set(id, { current, target });
+		metaBind.set(id, { current, target });
 
 		return id;
 	},
@@ -139,14 +144,11 @@ const bind = {
 		const meta = `__bind__${field}`;
 		if (meta in object) return;
 
-		const sideId = getId();
-
 		define(object, meta, {
 			value: {
 				joints : new Map(),
 				value  : object[field],
-				trigger: typeof trigger == 'function' ? trigger : null,
-				sideId
+				trigger: typeof trigger == 'function' ? trigger : null
 			},
 			config: true
 		});
@@ -159,7 +161,7 @@ const bind = {
 		});
 	},
 
-	_addJoint(id, object, field, joint) {
+	_addJoint___(id, object, field, joint) {
 		const meta = object[`__bind__${field}`];
 		meta.joints.set(id, joint);
 		this._applyValue(joint.object, joint.field, meta.value, joint.modifier);
