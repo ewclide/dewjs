@@ -2,7 +2,10 @@ import {printErr, idMaker} from './functions';
 import {define} from './object';
 
 const getId = idMaker();
-const _joints = new Map();
+const _nodes = new Map();
+const _bonds = new Map();
+
+console.log(_nodes, _bonds)
 
 const bind = {
 	onchange(object, field, trigger) {
@@ -25,58 +28,6 @@ const bind = {
 		return function(){
 			return fn.apply(context, arguments);
 		}
-	},
-
-	trigger(object, field, trigger) {
-		this._genAccessors(object, field, trigger);
-	},
-
-	detachById(id) {
-		if (!metaBind.has(id)) return;
-		const { current, target } = metaBind.get(id);
-
-		this.detach(
-			current.object, current.field,
-			target.object, target.field,
-		);
-	},
-
-	detach(curObject, curField, tarObject, tarField) {
-		const meta = curObject[`__bind__${curField}`];
-		if (!meta) return;
-
-		meta.joints.has();
-	},
-
-	break(object, field, cross) {
-		const meta = `__bind__${field}`;
-		if (!object[meta]) return;
-
-		const value = object[meta].value;
-		const joints = object[meta].joints;
-
-		define(object, { [field]: value, [meta]: null });
-
-		if (cross) {
-			joints.forEach((joint, id) => this._breakJoint(joint, id));
-		}
-	},
-
-	_breakJoint(joint, id) {
-		const meta = joint.object[`__bind__${joint.field}`];
-		if (!meta) return;
-
-		if (meta.joint.has(id)) {
-			meta.joint.delete(id);
-		}
-	},
-
-	clear(object, field) {
-		const meta = object[`__bind__${field}`];
-		if (!meta) return;
-
-		meta.joints.clear();
-		meta.trigger = null;
 	},
 
 	fields(settings) {
@@ -122,83 +73,86 @@ const bind = {
 		return id;
 	},
 
-	_attach(current, target, modifier, trigger, id = getId()) {
-		this._genAccessors(current.object, current.field, trigger);
+	_attach(current, target, modifier, trigger, bondId = getId()) {
+		const currentNode = this._createNode(current.object, current.field, trigger);
+		const targetNode = this._createNode(target.object, target.field);
 
-		_joints.set(id, {
-			// current, target, 
-		});
+		if (typeof modifier !== 'function') {
+			modifier = (v) => v;
+		}
 
-		this._addJoint(id, current.object, current.field, {
-			object  : target.object,
-			field   : target.field,
-			modifier: typeof modifier == 'function' ? modifier : null
-		});
+		const bond =  {
+			current : currentNode,
+			target  : targetNode,
+			modifier
+		};
 
-		metaBind.set(id, { current, target });
+		_bonds.set(bondId, bond);
+		currentNode.bonds.set(targetNode.id, bond);
+		targetNode.value = modifier(currentNode.value);
 
-		return id;
+		return bondId;
 	},
 
-	_genAccessors(object, field, trigger) {
-		const meta = `__bind__${field}`;
-		if (meta in object) return;
+	_createNode(object, field, trigger) {
+		if (!object.__bind__) {
+			const id = getId();
+			define(object, '__bind__', {
+				value: id,
+				config: true
+			});
+		}
 
-		define(object, meta, {
-			value: {
-				joints : new Map(),
-				value  : object[field],
-				trigger: typeof trigger == 'function' ? trigger : null
-			},
-			config: true
-		});
+		if (typeof trigger !== 'function') {
+			trigger = null;
+		}
 
-		define(object, field, {
-			get: () => object[meta].value,
-			set: (value) => { this._setData(object, field, value) },
-			config: true,
-			enumer: true
-		});
-	},
+		const nodeId = object.__bind__ + field;
 
-	_addJoint___(id, object, field, joint) {
-		const meta = object[`__bind__${field}`];
-		meta.joints.set(id, joint);
-		this._applyValue(joint.object, joint.field, meta.value, joint.modifier);
-	},
+		if (_nodes.has(nodeId)) {
+			const node = _nodes.get(nodeId);
+			if (trigger) node.trigger = trigger;
 
-	_applyValue(object, field, value, modifier) {
-		const meta = `__bind__${field}`;
-		const val = typeof modifier == 'function' ? modifier(value) : value;
+			return node;
 
-		if (meta in object) {
-			object[meta].value = val;
 		} else {
-			object[field] = val;
+			const node = {
+				object, field,
+				id: nodeId,
+				value: object[field],
+				bonds: new Map(),
+				trigger
+			}
+
+			_nodes.set(nodeId, node);
+
+			define(object, field, {
+				get: () => _nodes.get(nodeId).value,
+				set: (value) => this._set(nodeId, nodeId, value),
+				config: true,
+				enumer: true
+			});
+
+			return node;
 		}
 	},
 
-	_setData(object, field, data) {
-		const srcValue = data.value !== undefined ? data.value : data;
-		const meta = object[`__bind__${field}`];
-		meta.value = srcValue;
+	_set(nodeId, srcId, value) {
+		const node = _nodes.get(nodeId);
+		node.value = value;
 
-		if (data.value === undefined && meta.trigger) {
-			meta.trigger(srcValue);
+		if (nodeId === srcId && node.trigger) {
+			node.trigger(value);
 		}
 
-		meta.joints.forEach((joint) => {
-			const { object: jObject, field: jField, modifier } = joint;
-			const value = modifier ? modifier(srcValue) : srcValue;
+		if (!node.bonds.size) return;
 
-			if (jObject === data.object && jField === data.field) {
-				return;
+		node.bonds.forEach((bond) => {
+			const { modifier, target } = bond;
 
-			} else if (('__bind__' + jField) in jObject) {
-				jObject[jField] = { value, object, field };
-
-			} else {
-				jObject[jField] = value;
+			if (target.id !== srcId) {
+				console.log(target.id, srcId)
+				this._set(target.id, srcId, modifier(value));
 			}
 		});
 	}

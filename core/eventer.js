@@ -1,53 +1,55 @@
 import CallBacker from "./callbacker";
 
-const _eventList = {};
-const _lockList = {};
+export default class Eventer {
+	constructor() {
+		this._events = {};
+		this._locks = {};
+	}
 
-const eventer = {
-	listen: (type, handler) => {
-		const event = _eventList[type];
+	listen(type, handler) {
+		const event = this._events[type];
 
 		if (event) {
 			event.push(handler);
 		} else {
-			_eventList[type] = new CallBacker(handler);
+			this._events[type] = new CallBacker(handler);
 		}
-	},
+	}
 
-	refuse: (type, handler) => {
-		const event = _eventList[type];
+	refuse(type, handler) {
+		const event = this._events[type];
 		if (event) event.remove(handler);
-	},
+	}
 
-	detach: (type) => {
-		_eventList[type] = null;
-	},
+	detach(type) {
+		this._events[type] = null;
+	}
 
-	clear: (type) => {
-		const event = _eventList[type];
+	clear(type) {
+		const event = this._events[type];
 		if (event) event.clear();
-	},
+	}
 
-	lock: (type) => {
-		const event = _eventList[type];
+	lock(type) {
+		const event = this._events[type];
 
 		if (event) {
-			_lockList[type] = event;
+			this._locks[type] = event;
 		}
-	},
+	}
 
-	unLock: (type) => {
-		const locked = _lockList[type];
+	unlock(type) {
+		const locked = this._locks[type];
 
 		if (locked) {
-			_eventList[type] = locked;
-			_lockList[type] = null;
+			this._events[type] = locked;
+			this._locks[type] = null;
 		}
-	},
+	}
 
-	dispatch: (type, data) => {
-		const event = _eventList[type];
-		const locked = _lockList[type];
+	dispatch(type, data) {
+		const event = this._events[type];
+		const locked = this._locks[type];
 
 		if (event.isCallBacker) {
 			if (!locked) event.call(data);
@@ -56,5 +58,3 @@ const eventer = {
 		}
 	}
 }
-
-export default eventer;

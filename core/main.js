@@ -8,6 +8,7 @@ import html from './html';
 import bind from './bind';
 import bind2 from './bind2';
 import CallBacker from './callbacker';
+import Eventer from './eventer';
 import Template from './template';
 import Timer from './timer';
 import Async from './async';
@@ -39,6 +40,7 @@ const DEW = {
 	object,
 
 	CallBacker,
+	Eventer,
 	Template,
 	Async,
 	Timer,
