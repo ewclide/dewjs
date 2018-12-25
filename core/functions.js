@@ -289,7 +289,7 @@ export function randKey(length = 15, types = ['all']) {
 	return result;
 }
 
-export function idMaker() {
+export function idGetter() {
 	return (() => {
 		let id = 0;
 		return () => id++;

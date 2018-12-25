@@ -1,7 +1,7 @@
-import {printErr, idMaker} from './functions';
+import {printErr, idGetter} from './functions';
 import {define} from './object';
 
-const getId = idMaker();
+const getId = idGetter();
 const _bondings = new Map();
 
 const bind = {

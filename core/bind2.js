@@ -1,11 +1,9 @@
-import {printErr, idMaker} from './functions';
+import {printErr, idGetter} from './functions';
 import {define} from './object';
 
-const getId = idMaker();
-const _nodes = new Map();
-const _bonds = new Map();
-
-console.log(_nodes, _bonds)
+const getId = idGetter();
+const _nodeList = new Map();
+const _bondList = new Map();
 
 const bind = {
 	onchange(object, field, trigger) {
@@ -67,13 +65,13 @@ const bind = {
 		const left = { object: current[0], field: current[1] };
 		const right = { object: target[0], field: target[1] };
 
-		this._attach(left, right, current[2], current[3], id);
-		this._attach(right, left, target[2], target[3], id);
+		this._attach(left, right, target[2], current[3], id);
+		this._attach(right, left, current[2], target[3], id);
 
 		return id;
 	},
 
-	_attach(current, target, modifier, trigger, bondId = getId()) {
+	_attach(current, target, modifier, trigger) {
 		const currentNode = this._createNode(current.object, current.field, trigger);
 		const targetNode = this._createNode(target.object, target.field);
 
@@ -81,13 +79,14 @@ const bind = {
 			modifier = (v) => v;
 		}
 
+		const bondId = getId();
 		const bond =  {
 			current : currentNode,
 			target  : targetNode,
 			modifier
 		};
 
-		_bonds.set(bondId, bond);
+		_bondList.set(bondId, bond);
 		currentNode.bonds.set(targetNode.id, bond);
 		targetNode.value = modifier(currentNode.value);
 
@@ -96,9 +95,9 @@ const bind = {
 
 	_createNode(object, field, trigger) {
 		if (!object.__bind__) {
-			const id = getId();
+			const objectId = getId();
 			define(object, '__bind__', {
-				value: id,
+				value: objectId,
 				config: true
 			});
 		}
@@ -109,8 +108,8 @@ const bind = {
 
 		const nodeId = object.__bind__ + field;
 
-		if (_nodes.has(nodeId)) {
-			const node = _nodes.get(nodeId);
+		if (_nodeList.has(nodeId)) {
+			const node = _nodeList.get(nodeId);
 			if (trigger) node.trigger = trigger;
 
 			return node;
@@ -124,11 +123,11 @@ const bind = {
 				trigger
 			}
 
-			_nodes.set(nodeId, node);
+			_nodeList.set(nodeId, node);
 
 			define(object, field, {
-				get: () => _nodes.get(nodeId).value,
-				set: (value) => this._set(nodeId, nodeId, value),
+				get: () => _nodeList.get(nodeId).value,
+				set: (value) => this._set(nodeId, [nodeId], value),
 				config: true,
 				enumer: true
 			});
@@ -137,11 +136,11 @@ const bind = {
 		}
 	},
 
-	_set(nodeId, srcId, value) {
-		const node = _nodes.get(nodeId);
+	_set(nodeId, steps, value) {
+		const node = _nodeList.get(nodeId);
 		node.value = value;
 
-		if (nodeId === srcId && node.trigger) {
+		if (nodeId === steps[0] && node.trigger) {
 			node.trigger(value);
 		}
 
@@ -150,9 +149,9 @@ const bind = {
 		node.bonds.forEach((bond) => {
 			const { modifier, target } = bond;
 
-			if (target.id !== srcId) {
-				console.log(target.id, srcId)
-				this._set(target.id, srcId, modifier(value));
+			if (!steps.includes(target.id)) {
+				steps.push(target.id);
+				this._set(target.id, steps, modifier(value));
 			}
 		});
 	}

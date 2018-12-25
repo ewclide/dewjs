@@ -25,7 +25,7 @@ const DEW = {
 	randi: fn.randi,
 	randf: fn.randf,
 	randKey: fn.randKey,
-	idMaker: fn.idMaker,
+	idGetter: fn.idGetter,
 	vmin: fn.vmin,
 	vmax: fn.vmax,
 	vw: fn.vw,
