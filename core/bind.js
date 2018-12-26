@@ -2,7 +2,8 @@ import {printErr, idGetter} from './functions';
 import {define} from './object';
 
 const getId = idGetter();
-const _bondings = new Map();
+const _nodeList = new Map();
+const _bondList = new Map();
 
 const bind = {
 	onchange(object, field, trigger) {
@@ -28,55 +29,44 @@ const bind = {
 	},
 
 	trigger(object, field, trigger) {
-		this._genAccessors(object, field, trigger);
+		this._createNode(object, field, trigger);
 	},
 
-	detachById(id) {
-		if (!_bondings.has(id)) return;
-		const { current, target } = _bondings.get(id);
+	break(id) {
+		if (Array.isArray(id)) {
+			id.forEach((i) => this.break(i));
 
-		this.detach(
-			current.object, current.field,
-			target.object, target.field,
-		);
-	},
+		} else {
+			if (!_bondList.has(id)) return;
 
-	detach(curObject, curField, tarObject, tarField) {
-		const meta = curObject[`__bind__${curField}`];
-		if (!meta) return;
+			const bond = _bondList.get(id);
+			const node = bond.current;
 
-		meta.joints.has();
-	},
-
-	break(object, field, cross) {
-		const meta = `__bind__${field}`;
-		if (!object[meta]) return;
-
-		const value = object[meta].value;
-		const joints = object[meta].joints;
-
-		define(object, { [field]: value, [meta]: null });
-
-		if (cross) {
-			joints.forEach((joint, id) => this._breakJoint(joint, id));
+			node.bonds.delete(bond.target.id);
+			_bondList.delete(id);
 		}
 	},
 
-	_breakJoint(joint, id) {
-		const meta = joint.object[`__bind__${joint.field}`];
-		if (!meta) return;
+	detach(object, field) {
+		const nodeId = object.__bind__ + field;
+		if (!_nodeList.has(nodeId)) return;
 
-		if (meta.joint.has(id)) {
-			meta.joint.delete(id);
-		}
+		const { bonds, value } = _nodeList.get(nodeId);
+
+		bonds.forEach((bond) => _bondList.delete(bond.id));
+		bonds.clear();
+
+		_nodeList.delete(nodeId);
+
+		define(object, field, { value, enumer: true });
 	},
 
 	clear(object, field) {
-		const meta = object[`__bind__${field}`];
-		if (!meta) return;
+		const nodeId = object.__bind__ + field;
 
-		meta.joints.clear();
-		meta.trigger = null;
+		if (_nodeList.has(nodeId)) {
+			_nodeList.get(nodeId).nodes.clear();
+		}
 	},
 
 	fields(settings) {
@@ -84,6 +74,7 @@ const bind = {
 
 		if (type === 'sided') {
 			return this._attach(left, right, modifier, trigger);
+
 		} else if (type === 'cross') {
 			const id = getId();
 			this._attach(left, right, left.modifier, left.trigger, id);
@@ -94,7 +85,7 @@ const bind = {
 
 	sided(current, target, modifier, trigger) {
 		if (!Array.isArray(current) && !Array.isArray(target)) {
-			printErr(`DEW bind error - "${current}" and "${target}" arguments must be an array!`);
+			printErr('DEW bind error - first two arguments must be an array!');
 			return;
 		}
 
@@ -108,95 +99,104 @@ const bind = {
 
 	cross(current, target) {
 		if (!Array.isArray(current) && !Array.isArray(target)) {
-			printErr(`DEW bind error - "${current}" and "${target}" arguments must be an array!`);
+			printErr('DEW bind error - first two arguments must be an array!');
 			return;
 		}
 
-		const id = getId();
+		const ids = [];
 		const left = { object: current[0], field: current[1] };
 		const right = { object: target[0], field: target[1] };
 
-		this._attach(left, right, current[2], current[3], id);
-		this._attach(right, left, target[2], target[3], id);
+		const leftBind = this._attach(left, right, target[2], current[3]);
+		const rightBind = this._attach(right, left, current[2], target[3]);
 
-		return id;
+		ids.push(leftBind, rightBind);
+
+		return ids;
 	},
 
-	_attach(current, target, modifier, trigger, id = getId()) {
-		this._genAccessors(current.object, current.field, trigger);
-		this._addJoint(id, current.object, current.field, {
-			object  : target.object,
-			field   : target.field,
-			modifier: typeof modifier == 'function' ? modifier : null
-		});
+	_attach(current, target, modifier, trigger) {
+		const currentNode = this._createNode(current.object, current.field, trigger);
+		const targetNode = this._createNode(target.object, target.field);
 
-		_bondings.set(id, { current, target });
+		if (typeof modifier !== 'function') {
+			modifier = (v) => v;
+		}
 
-		return id;
+		const bondId = getId();
+		const bond =  {
+			id     : bondId,
+			current: currentNode,
+			target : targetNode,
+			modifier
+		};
+
+		_bondList.set(bondId, bond);
+		currentNode.bonds.set(targetNode.id, bond);
+		targetNode.value = modifier(currentNode.value);
+
+		return bondId;
 	},
 
-	_genAccessors(object, field, trigger) {
-		const meta = `__bind__${field}`;
-		if (meta in object) return;
+	_createNode(object, field, trigger) {
+		if (!object.__bind__) {
+			const objectId = getId();
+			define(object, '__bind__', {
+				value: objectId,
+				config: true
+			});
+		}
 
-		const sideId = getId();
+		if (typeof trigger !== 'function') {
+			trigger = null;
+		}
 
-		define(object, meta, {
-			value: {
-				joints : new Map(),
-				value  : object[field],
-				trigger: typeof trigger == 'function' ? trigger : null,
-				sideId
-			},
-			config: true
-		});
+		const nodeId = object.__bind__ + field;
 
-		define(object, field, {
-			get: () => object[meta].value,
-			set: (value) => { this._setData(object, field, value) },
-			config: true,
-			enumer: true
-		});
-	},
+		if (_nodeList.has(nodeId)) {
+			const node = _nodeList.get(nodeId);
+			if (trigger) node.trigger = trigger;
 
-	_addJoint(id, object, field, joint) {
-		const meta = object[`__bind__${field}`];
-		meta.joints.set(id, joint);
-		this._applyValue(joint.object, joint.field, meta.value, joint.modifier);
-	},
+			return node;
 
-	_applyValue(object, field, value, modifier) {
-		const meta = `__bind__${field}`;
-		const val = typeof modifier == 'function' ? modifier(value) : value;
-
-		if (meta in object) {
-			object[meta].value = val;
 		} else {
-			object[field] = val;
+			const node = {
+				object, field,
+				id: nodeId,
+				value: object[field],
+				bonds: new Map(),
+				trigger
+			}
+
+			_nodeList.set(nodeId, node);
+
+			define(object, field, {
+				get: () => _nodeList.get(nodeId).value,
+				set: (value) => this._set(nodeId, [nodeId], value),
+				config: true,
+				enumer: true
+			});
+
+			return node;
 		}
 	},
 
-	_setData(object, field, data) {
-		const srcValue = data.value !== undefined ? data.value : data;
-		const meta = object[`__bind__${field}`];
-		meta.value = srcValue;
+	_set(nodeId, steps, value) {
+		const node = _nodeList.get(nodeId);
+		node.value = value;
 
-		if (data.value === undefined && meta.trigger) {
-			meta.trigger(srcValue);
+		if (nodeId === steps[0] && node.trigger) {
+			node.trigger(value);
 		}
 
-		meta.joints.forEach((joint) => {
-			const { object: jObject, field: jField, modifier } = joint;
-			const value = modifier ? modifier(srcValue) : srcValue;
+		if (!node.bonds.size) return;
 
-			if (jObject === data.object && jField === data.field) {
-				return;
+		node.bonds.forEach((bond) => {
+			const { modifier, target } = bond;
 
-			} else if (('__bind__' + jField) in jObject) {
-				jObject[jField] = { value, object, field };
-
-			} else {
-				jObject[jField] = value;
+			if (target && !steps.includes(target.id)) {
+				steps.push(target.id);
+				this._set(target.id, steps, modifier(value));
 			}
 		});
 	}

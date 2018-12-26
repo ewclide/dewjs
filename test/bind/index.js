@@ -14,12 +14,12 @@ const third = {
     c: 20
 }
 
-DEW.bind2.onchange(first, 'b', (v) => console.log(v));
+DEW.bind.onchange(first, 'b', (v) => console.log(v));
 first.b = 'New value!';
 /** New value! */
 console.log('----------------');
 
-DEW.bind2.fields({
+DEW.bind.fields({
     type: 'sided',
     left: { object: first, field: 'a' },
     right: { object: second, field: 'a' },
@@ -34,13 +34,13 @@ console.log(second.a);
 */
 console.log('----------------');
 
-DEW.bind2.sided([first, 'a'], [second, 'a'], (v) => v + '...', (v) => console.log(v));
+DEW.bind.sided([first, 'a'], [second, 'a'], (v) => v + '...', (v) => console.log(v));
 first.a = 'first.a changed - 2';
 console.log(second.a);
 /** first changed... */
 console.log('----------------');
 
-DEW.bind2.cross(
+DEW.bind.cross(
     [first,  'c', (v) => v-10, (v) => console.log('first.c changed to: ' + v)],
     [second, 'c', (v) => v+10, (v) => console.log('second.c changed to: ' + v)]
 );
@@ -56,7 +56,7 @@ console.log(first.c, second.c);
  */
 console.log('----------------');
 
-DEW.bind2.cross(
+DEW.bind.cross(
     [second, 'c', (v) => v-10 ],
     [third, 'c', (v) => v+10, (v) => console.log('third.c changed to: ' + v)]
 );

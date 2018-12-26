@@ -6,7 +6,6 @@ import {http} from './http';
 import {url} from './url';
 import html from './html';
 import bind from './bind';
-import bind2 from './bind2';
 import CallBacker from './callbacker';
 import Eventer from './eventer';
 import Template from './template';
@@ -47,7 +46,6 @@ const DEW = {
 	Lerp,
 
 	bind,
-	bind2,
 	http,
 	url,
 	html
