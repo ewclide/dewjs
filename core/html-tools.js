@@ -1,9 +1,11 @@
-import {printErr} from './functions';
+import {printErr, idGetter} from './functions';
 import JSONConverter from './json-converter';
 import CSSTransformer from './css-transformer';
 import CallBacker from './callbacker';
 
-export let eventList = {};
+export const eventList = {};
+
+export const getId = idGetter();
 
 export class HTMLTools
 {
