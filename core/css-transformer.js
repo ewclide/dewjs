@@ -1,3 +1,5 @@
+import {printErr} from './functions';
+
 const CSSTransformer = {
 	apply(element, actions, settings = {}) {
 
@@ -39,17 +41,18 @@ const CSSTransformer = {
 		let result = '';
 
 		const userUnits = actions.units || {};
+		const { matrix2d, matrix3d } = actions;
 		const units = {
 			translate: userUnits.translate || 'px',
 			rotate: userUnits.rotate || 'deg',
 			skew: userUnits.skew || 'deg'
 		}
 
-		if (actions.matrix2d && actions.matrix2d.length) {
-			result += `matrix2d(${actions.matrix2d.join(',')}) `;
+		if (Array.isArray(matrix2d) && matrix2d.length == 9) {
+			result += `matrix2d(${matrix2d.join(',')}) `;
 
-		} else if (actions.matrix3d && actions.matrix3d.length) {
-			result += `matrix3d(${actions.matrix3d.join(',')}) `;
+		} else if (Array.isArray(matrix3d) && matrix3d.length == 16) {
+			result += `matrix3d(${matrix3d.join(',')}) `;
 
 		} else {
 			const { scale, scaleX, scaleY, skew, rotate, translate } = actions;
@@ -92,6 +95,14 @@ const CSSTransformer = {
 		}
 	},
 
+	matrix2d(elements, matrix, save) {
+		this._applyMatrix(elements, matrix, 9, save);
+	},
+
+	matrix3d(elements, matrix, save) {
+		this._applyMatrix(elements, matrix, 16, save);
+	},
+
 	scale(elements, value, save) {
 		this._applySingle(elements, 'scale', value, save, '');
 	},
@@ -99,14 +110,14 @@ const CSSTransformer = {
 	scaleX(elements, value, save) {
 		for (let i = 0; i < elements.length; i++) {
 			let transform = save ? elements[i].style.transform : '';
-			elements[i].style.transform = transform + `scaleX(${value})`;
+			elements[i].style.transform = transform + ` scaleX(${value})`;
 		}
 	},
 
 	scaleY(elements, value, save) {
 		for (let i = 0; i < elements.length; i++) {
 			let transform = save ? elements[i].style.transform : '';
-			elements[i].style.transform = transform + `scaleY(${value})`;
+			elements[i].style.transform = transform + ` scaleY(${value})`;
 		}
 	},
 
@@ -129,7 +140,18 @@ const CSSTransformer = {
 
 		for (let i = 0; i < elements.length; i++) {
 			let transform = save ? elements[i].style.transform : '';
-			elements[i].style.transform = transform + result;
+			elements[i].style.transform = transform + ' ' +result;
+		}
+	}
+
+	_applyMatrix(elements, matrix, size, save, units) {
+		if (Array.isArray(matrix) && matrix.length == size) {
+			for (let i = 0; i < elements.length; i++) {
+				let transform = save ? elements[i].style.transform : '';
+				elements[i].style.transform = transform + ` matrix3d(${matrix.join(',')})`;
+			}
+		} else {
+			printErr(`matrix must be an array with length "${size}"`);
 		}
 	}
 }

@@ -508,6 +508,16 @@ export class HTMLTools
         return this;
     }
 
+    matrix2d(matrix, save) {
+        CSSTransformer.matrix2d(this.elements, actions, save);
+        return this;
+    }
+
+    matrix3d(matrix, save) {
+        CSSTransformer.matrix3d(this.elements, matrix, save);
+        return this;
+    }
+
     scale(value, save) {
         CSSTransformer.scale(this.elements, value, save);
         return this;
