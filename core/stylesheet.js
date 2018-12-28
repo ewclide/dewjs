@@ -1,53 +1,71 @@
+import {printErr} from './functions';
+
 export default class StyleSheet
 {
-	constructor()
-	{
-		this.styleSheet;
-		this._create();
+	constructor() {
+		this.element = this._createElement();
 	}
 
-	_create()
-	{
-		if (document.createStyleSheet)
-			this.styleSheet = document.createStyleSheet();
+	_createElement() {
+		if (document.createStyleSheet) {
+			return document.createStyleSheet();
 
-		else
-		{
-			let head = document.getElementsByTagName("head")[0],
-				style = document.createElement("style");
+		} else {
+			const head = document.getElementsByTagName('head')[0];
+			const style = document.createElement('style');
 
 			head.appendChild(style);
 
-			this.styleSheet = document.styleSheets[document.styleSheets.length - 1];
+			return document.styleSheets[document.styleSheets.length - 1];
 		}
 	}
 
-	addRule(selector, styles)
-	{
-		let strStyles = this._stylesToString(styles);
+	_add(rule, styles) {
+		if (typeof rule !== 'string') {
+			printErr(`rule "${rule}" argument must be a string`);
+			return;
 
-		this.styleSheet.insertRule
-		? this.styleSheet.insertRule(`${selector} {${strStyles}}`, this.styleSheet.cssRules.length)
-		: this.styleSheet.addRule(selector, strStyles, this.styleSheet.cssRules.length)
+		} else if (typeof styles !== 'object') {
+			printErr(`styles "${styles}" argument must be an object`);
+			return;
+		}
+
+		const strStyles = this._convertToString(styles);
+		const index = this.element.cssRules.length;
+
+		if ('insertRule' in this.element) {
+			this.element.insertRule(`${rule} {${strStyles}}`, index)
+		} else {
+			this.element.addRule(rule, strStyles, index)
+		}
+
+		return index;
 	}
 
-	addRules(styles)
-	{
-		for (selector in styles)
-			this.addRule(selector, styles[selector]);
+	add() {
+		if (arguments.length > 1) {
+			const [ rule, styles ] = arguments;
+			this._add(rule, styles);
+
+		} else if (typeof arguments[0] == 'object') {
+			const styles = arguments[0];
+
+			for (rule in styles) {
+				this._add(rule, styles[rule]);
+			}
+		}
 	}
 
-	deleteRule(index)
-	{
-		this.styleSheet.deleteRule(index) 
+	remove(index) {
+		this.element.deleteRule(index);
 	}
 
-	_stylesToString(styles)
-	{
-		let result = "";
+	_convertToString(styles) {
+		let result = '';
 
-		for (let name in styles)
+		for (const name in styles) {
 			result += `${name}:${styles[name]};`;
+		}
 
 		return result;
 	}
