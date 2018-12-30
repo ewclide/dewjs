@@ -2,58 +2,58 @@ import {printErr}  from './functions';
 
 export default class Template
 {
-    constructor(str, name)
-    {
+    constructor(str, name) {
         this._htl = null;
-        this._render = function(){};
+        this._render = () => {};
         this._create(str, name);
     }
 
-    get isTemplate()
-    {
+    get isTemplate() {
         return true;
     }
 
-    appendTo(htl)
-    {
+    appendTo(htl) {
         this._htl = $html.convert(htl);
         return this;
     }
 
-    draw(data)
-    {
+    draw(data) {
         try {
-            this._htl
-            ? this._htl.html(this._render(data))
-            : printErr('DEW template error: "it must be append to DOM before drawing"');
-        }
-        catch (e) {
-            printErr('DEW template error: "' + e.message + '"');
+            if (this._htl) {
+                this._htl.html(this._render(data))
+
+            } else {
+                printErr('DEW template must be append to DOM before drawing');
+            }
+        } catch (e) {
+            printErr(`DEW template error - ${e.message}`);
         }
     }
 
-    _create(str, args)
-    {
-        let fn = "let ", 
-            tokens = str.replace(/\<&/g, "<&#").split(/\<&|&\>/gi);
+    _create(str, args) {
+        const tokens = str.replace(/\<&/g, '<&#').split(/\<&|&\>/gi);
+        let func = 'let ';
 
-        if (Array.isArray(args))
-            args.forEach( arg => fn += arg + "=data." + arg + "," );
+        if (Array.isArray(args)) {
+            args.forEach( arg => func += arg + '=data.' + arg + ',' );
+        } 
 
-        fn += "_r='';";
+        func += "__output__='';";
+
         tokens.forEach( token => {
-            token[0] == "#"
-            ? fn += token.slice(1).replace(/:=/g, "_r+=") + ";\n"
-            : fn += "_r+='" + token.replace(/('|\n)/g, "\\$1") + "';";
-        })
-        fn += " return _r";
+            func += token[0] == "#"
+            ? token.slice(1).replace(/:=/g, '__output__+=') + ';\n'
+            : "__output__+='" + token.replace(/('|\n)/g, '\\$1') + "';";
+        });
+
+        func += ' return __output__';
 
         try {
-            this._render = new Function("data", fn);
-        }
-        catch (e) {
-            printErr('DEW template error: "' + e.message + '"');
-            this._render = function(){};
+            this._render = new Function('data', func);
+
+        } catch (e) {
+            printErr(`DEW template error - ${e.message}`);
+            this._render = () => {};
         }
     }
 }

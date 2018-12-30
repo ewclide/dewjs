@@ -142,7 +142,7 @@ const CSSTransformer = {
 			let transform = save ? elements[i].style.transform : '';
 			elements[i].style.transform = transform + ' ' +result;
 		}
-	}
+	},
 
 	_applyMatrix(elements, matrix, size, save, units) {
 		if (Array.isArray(matrix) && matrix.length == size) {
