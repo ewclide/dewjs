@@ -1,9 +1,13 @@
-import {printErr} from './functions';
+import { printErr, camelCaseToDash } from './functions';
 
 export default class StyleSheet
 {
 	constructor() {
 		this.element = this._createElement();
+	}
+
+	get isStyleSheet() {
+		return true;
 	}
 
 	_createElement() {
@@ -20,6 +24,10 @@ export default class StyleSheet
 		}
 	}
 
+	_getLastIndex() {
+		return this.element.cssRules.length;
+	}
+
 	_add(rule, styles) {
 		if (typeof rule !== 'string') {
 			printErr(`rule "${rule}" argument must be a string`);
@@ -30,10 +38,10 @@ export default class StyleSheet
 			return;
 		}
 
-		const strStyles = this._stylesToString(styles);
-		const index = this.element.cssRules.length;
+		const strRule = this._serialize(rule, styles);
+		const index = this._getLastIndex();
 
-		this._insert(rule, strStyles, index);
+		this.element.insertRule(strRule, index);
 
 		return index;
 	}
@@ -43,20 +51,11 @@ export default class StyleSheet
 			const [ rule, styles ] = arguments;
 			this._add(rule, styles);
 
-		} else if (typeof arguments[0] == 'object') {
-			const styles = arguments[0];
-
-			for (rule in styles) {
-				this._add(rule, styles[rule]);
-			}
-		}
-	}
-
-	_insert(rule, styles, index) {
-		if ('insertRule' in this.element) {
-			this.element.insertRule(`${rule} {${styles}}`, index);
-		} else {
-			this.element.addRule(rule, styles, index);
+		} else if (Array.isArray(arguments[0])) {
+			arguments[0].forEach((styles) => {
+				const { rule } = styles;
+				this._add(rule, style);
+			});
 		}
 	}
 
@@ -66,18 +65,67 @@ export default class StyleSheet
 			return;
 		}
 
-		const index = this.element.cssRules.length;
+		const index = this._getLastIndex();
 		const keyCounts = keyFrames.length;
 		const rule = '@keyframes ' + name;
 		let styles = '';
 
 		keyFrames.forEach((keyFrame, i) => {
 			const { offset = i / keyCounts } = keyFrame;
-			const keyStyles = this._stylesToString(keyFrame);
-			styles += `${offset * 100}% {${keyStyles}}`;
+			styles += this._serialize((offset * 100) + '%', keyFrame);
 		});
 
-		this._insert(rule, styles, index);
+		this.element.insertRule(`${rule} {${styles}}`, index);
+
+		return index;
+	}
+
+	media(request, arrStyles) {
+		if (typeof request !== 'object') {
+			printErr('media request must be an object');
+			return;
+		}
+
+		const { only } = request;
+
+		let media = '@media';
+		let first = true;
+
+		if (only) {
+			media += ' only';
+			request.only = null;
+		}
+
+		for (let name in request) {
+			const value = request[name];
+			if (!value) continue;
+
+			const option = camelCaseToDash(name);
+
+			media += first ? ' ' : ' and ';
+
+			if (typeof value == 'boolean') {
+				media += option;
+			} else if (typeof value == 'number') {
+				media += `(${option}:${value}px)`;
+			} else {
+				media += `(${option}:${value})`;
+			}
+
+			first = false;
+		}
+
+		const index = this._getLastIndex();
+		let strRule = '';
+
+		if (Array.isArray(arrStyles)) {
+			arrStyles.forEach((styles) => {
+				const { rule } = styles;
+				strRule += this._serialize(rule, styles);
+			});
+		}
+
+		this.element.insertRule(`${media} {${strRule}}`, index);
 
 		return index;
 	}
@@ -86,13 +134,14 @@ export default class StyleSheet
 		this.element.deleteRule(index);
 	}
 
-	_stylesToString(styles) {
-		let result = '';
+	_serialize(rule, styles) {
+		let str = rule + '{';
 
 		for (const name in styles) {
-			result += `${name}:${styles[name]};`;
+			if (name === 'rule') continue;
+			str += `${name}:${styles[name]};`;
 		}
 
-		return result;
+		return str + '}';
 	}
 }
