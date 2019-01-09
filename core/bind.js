@@ -23,9 +23,7 @@ const bind = {
 	},
 
 	context(fn, context) {
-		return function(){
-			return fn.apply(context, arguments);
-		}
+		return () => fn.apply(context, arguments);
 	},
 
 	trigger(object, field, trigger) {
