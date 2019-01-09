@@ -1,6 +1,6 @@
 import Lerp from "./lerp";
 
-export default class LerpStack
+export default class Animation
 {
     constructor() {
         this._lerp = new Lerp();

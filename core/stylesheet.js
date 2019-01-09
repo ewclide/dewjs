@@ -30,14 +30,10 @@ export default class StyleSheet
 			return;
 		}
 
-		const strStyles = this._convertToString(styles);
+		const strStyles = this._stylesToString(styles);
 		const index = this.element.cssRules.length;
 
-		if ('insertRule' in this.element) {
-			this.element.insertRule(`${rule} {${strStyles}}`, index)
-		} else {
-			this.element.addRule(rule, strStyles, index)
-		}
+		this._insert(rule, strStyles, index);
 
 		return index;
 	}
@@ -56,11 +52,41 @@ export default class StyleSheet
 		}
 	}
 
+	_insert(rule, styles, index) {
+		if ('insertRule' in this.element) {
+			this.element.insertRule(`${rule} {${styles}}`, index);
+		} else {
+			this.element.addRule(rule, styles, index);
+		}
+	}
+
+	addKeyFrames(name, keyFrames) {
+		if (!Array.isArray(keyFrames) || keyFrames.length < 2) {
+			printErr('KeyFrames must be an array with more than 2 elements');
+			return;
+		}
+
+		const index = this.element.cssRules.length;
+		const keyCounts = keyFrames.length;
+		const rule = '@keyframes ' + name;
+		let styles = '';
+
+		keyFrames.forEach((keyFrame, i) => {
+			const { offset = i / keyCounts } = keyFrame;
+			const keyStyles = this._stylesToString(keyFrame);
+			styles += `${offset * 100}% {${keyStyles}}`;
+		});
+
+		this._insert(rule, styles, index);
+
+		return index;
+	}
+
 	remove(index) {
 		this.element.deleteRule(index);
 	}
 
-	_convertToString(styles) {
+	_stylesToString(styles) {
 		let result = '';
 
 		for (const name in styles) {

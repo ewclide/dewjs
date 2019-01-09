@@ -96,7 +96,7 @@ export function strParse(value) {
 		if (value.search(/\{.+\}/gm) != -1) return jsonParse(value);
 
 		return value.replace(/^\s+|\s+$/g, '');
-		
+
 	} else {
 		printErr('strParse error - type of argument must be "string"');
 	}
@@ -116,7 +116,7 @@ export function jsonParse(str) {
 
 	let quot = '', word = '', isString = false, left = false;
 	let result = '';
- 
+
     for (let i = 0; i < str.length; i++) {
 
     	if (isString && str[i] == quot) {
@@ -145,11 +145,11 @@ export function jsonParse(str) {
 
             result += str[i];
 			word = '';
-			
+
         } else {
 			word += str[i];
 		}
-		
+
     }
 
     return JSON.parse(result);
@@ -217,10 +217,10 @@ export function getElementData(settings, defaults, attributes, element) {
 
             else if (attr !== null && !isNaN(num)) {
 				attr = num;
-			} 
+			}
 
 			result[i] = attr !== null ? attr : defaults[i];
-			
+
 		} else {
 			result[i] = settings[i];
 		}
@@ -237,7 +237,7 @@ export function fetchSettings(settings, defaults, types = {}, rates = {}) {
 		const type = types[i];
 		const rate = rates[i];
 		const defValue = defaults[i];
-		
+
 		let writeValue = true;
 
 		if (value === undefined) writeValue = false;
@@ -289,11 +289,29 @@ export function randKey(length = 15, types = ['all']) {
 	return result;
 }
 
-export function idGetter() {
+export function idGetter(prefix = 0) {
 	return (() => {
 		let id = 0;
-		return () => id++;
+		return () => prefix + id++;
 	})();
+}
+
+export function camelCaseToDash(str) {
+	return str.replace(/[A-Z]/g, s => '-' + s.toLowerCase());
+}
+
+export function dashToCamelCase(str) {
+	return str.replace(/-\w/g, s => s.toUpperCase().slice(1));
+}
+
+export function camelCaseMerge(...list) {
+	return list.reduce((res, cur, index) => {
+		return res + (index ? cur.charAt(0).toUpperCase() + cur.slice(1) : cur)
+	}, '');
+}
+
+export function capitalize(str) {
+	return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
 export function vmin(value) {
@@ -312,7 +330,7 @@ export function vw(value) {
 
 export function vh(value) {
 	return value / 100 * window.innerHeight;
-} 
+}
 
 export function log() {
 	let args = Array.from(arguments),

@@ -1,11 +1,11 @@
-import {printErr, idGetter} from './functions';
+import { printErr, idGetter } from './functions';
 import JSONConverter from './json-converter';
 import CSSTransformer from './css-transformer';
 import CallBacker from './callbacker';
 
 export const eventList = {};
 
-export const getId = idGetter();
+export const getId = idGetter('__elem__');
 
 export class HTMLTools
 {
@@ -17,9 +17,10 @@ export class HTMLTools
         }
 
         this._srcLength = this.elements.length;
-        this.query = '';
-        this._id = Math.random();
+        this._id = getId();
         this._ready = false;
+
+        this.query = '';
     }
 
     native() {
@@ -634,9 +635,8 @@ export class HTMLTools
     style(name, value) {
         if (value === undefined) {
             return this.elements[0].style[name];
-        }
 
-        else if (typeof name == 'string') {
+        } else if (typeof name == 'string') {
             for (let i = 0; i < this.elements.length; i++) {
                 this.elements[i].style[name] = value;
             }
@@ -645,10 +645,21 @@ export class HTMLTools
         return this;
     }
 
-    styles(list) {
+    styles() {
+        let list, prefix = '';
+
+        if (arguments.length == 1) {
+            list = arguments[0];
+        } else {
+            list = arguments[1];
+            prefix = arguments[0];
+        }
+
+        if (prefix) prefix += '-';
+
         for (let i = 0; i < this.elements.length; i++) {
             for (let item in list) {
-                this.elements[i].style[item] = list[item];
+                this.elements[i].style[prefix + item] = list[item];
             }
         }
 

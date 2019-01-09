@@ -1,69 +1,49 @@
 ﻿import StyleSheet from './stylesheet';
+import html from './html';
+import { printErr, idGetter } from './functions';
 
-export class Animation
+const _stylesheet = new StyleSheet();
+const getName = idGetter('__anim__');
+
+export class CSSAnimation
 {
-	constructor(element)
-	{
-		
+	constructor(selector, keyFrames, settings) {
+		this._elements = html.select(selector);
+		this._list = new Map();
+		this._duration = 0;
 	}
 
-	play()
-	{
-	
+	play() {
+		this._elements.style('animationPlayState', 'running');
 	}
 
-	pause()
-	{
+	pause(){
+		this._elements.style('animationPlayState', 'paused');
+	}
+
+	finish() {
 
 	}
 
-	start()
-	{
-	
-	}
-
-	finish()
-	{
-		
-	}
-
-	reset()
-	{
-	
-	}
-
-	addKey(key, settings)
-	{
-		
-	}
-}
-
-class Element
-{
-	constructor(element)
-	{
-		
-	}
-}
-
-class KeyFrame
-{
-	constructor(element, keys, settings)
-	{
-		
-	}
-
-	apply()
-	{
+	reset() {
 
 	}
-}
 
-class CSSManager
-{
-	constructor()
-	{
-		
+	add(keyFrames, settings = {}) {
+		const name = getName();
+		let animation = name;
+
+		_stylesheet.addKeyFrames(name, keyFrames);
+
+		const { duration, easing, steps, fillMode, counts, delay } = settings;
+	}
+
+	attach() {
+
+	}
+
+	_convert() {
+
 	}
 }
 
