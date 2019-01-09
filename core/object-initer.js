@@ -1,82 +1,91 @@
-import {strParse, isType, printErr} from './functions';
+import {strParse, isType} from './functions';
+import html from './html';
 
 export default class ObjectIniter
 {
-	constructor(object)
-	{
+	constructor(object) {
 		this._object = object;
 		this.errors = [];
 		this.errors.title = `DEW object init error at ${object.constructor.name} constructor`;
 	}
 
-	checkout(field, settings, value)
-	{
-		let result = this._validate(field, settings, value);
+	checkout(field, settings, value) {
+		const result = this._validate(field, settings, value);
 
-		if (result !== undefined)
+		if (result !== undefined) {
 			this._setValue(field, settings, result);
+		}
 	}
 
-	_setValue(field, settings, value)
-	{
-		let object = settings.root ? settings.root : this._object;
+	_setValue(field, settings, value) {
+		const { root, desc } = settings;
+		const { write, enumer, config } = desc;
 
-		if (settings.desc)
+		const object = root || this._object;
+
+		if (settings.desc) {
 			Object.defineProperty(object, String(field), {
-				writable     : settings.desc.write  !== undefined ? settings.desc.write  : true,
-				enumerable   : settings.desc.enumer !== undefined ? settings.desc.enumer : true,
-				configurable : settings.desc.config !== undefined ? settings.desc.config : true,
-				value : value
-			})
+				writable     : typeof write  == 'boolean' ? write  : true,
+				enumerable   : typeof enumer == 'boolean' ? enumer : true,
+				configurable : typeof config == 'boolean' ? config : true,
+				value
+			});
 
-		else object[field] = value
+		} else {
+			object[field] = value;
+		}
 	}
 
-	_validate(field, settings, value)
-	{
-		if (settings.attr)
-			value = this._getAttrValue(field, settings.attr, value);
+	_validate(field, settings, value) {
+		const { required, def, type, filter, range, attr } = settings;
 
-		if (value === undefined)
-		{
-			if (settings.required)
+		let result = value;
+
+		if (attr) {
+			result = this._fetchFromAttribute(field, settings, value);
+		}
+
+		if (value === undefined) {
+			if (required) {
 				this.errors.push(`empty required option "${field}"`);
 
-			else if (settings.def)
-				value = settings.def;
-		}
-		else
-		{
-			if (settings.type && !isType(value, settings.type))
-			{
-				this.errors.push(`value of "${field}" option must be a "${settings.type}" type`);
+			} else if (def) {
+				value = def;
+			}
+
+		} else {
+			if (type && !isType(value, type)) {
+				this.errors.push(`value of "${field}" option must be a "${type}" type`);
 				value = undefined;
 			}
 
-			if (settings.filter)
-				value = settings.filter(value);
+			if (typeof filter == 'function') {
+				value = filter(value);
+			}
 		}
 
 		return value;
 	}
 
-	_getAttrValue(field, settings, value)
-	{
-		if (settings.element)
-		{
-			if (!settings.prefix) settings.prefix = "data-";
+	_fetchFromAttribute(field, settings, value) {
+		const { element,  prefix = 'data-', attrOnly } = settings;
 
-			let attr = $html.convert(settings.element).getAttr(settings.prefix + field);
-
-			if (settings.only)
-				!attr ? ( value = undefined, this.errors.push(`empty required attribute of option "${field}"`) )
-				: value = strParse(attr);
-
-			else if (value == undefined && attr)
-				value = strParse(attr);
+		if (!element) {
+			this.errors.push(`field "${field}" must have element option`);
+			return;
 		}
-		else this.errors.push(`setting "attr" of option "${field}" must have element`);
 
-		return value;
-	} 
+		const attr = html.convert(element).getAttr(prefix + field);
+
+		if (attrOnly && !attr) {
+			this.errors.push(`empty required attribute of field "${field}"`);
+			return;
+
+		} else if (value === undefined && attr) {
+			return strParse(attr);
+
+		} else {
+			return value;
+		}
+	}
 }
