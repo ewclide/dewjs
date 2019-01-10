@@ -28,24 +28,6 @@ export default class StyleSheet
 		return this.element.cssRules.length;
 	}
 
-	_add(rule, styles) {
-		if (typeof rule !== 'string') {
-			printErr(`rule "${rule}" argument must be a string`);
-			return;
-
-		} else if (typeof styles !== 'object') {
-			printErr(`styles "${styles}" argument must be an object`);
-			return;
-		}
-
-		const strRule = this._serialize(rule, styles);
-		const index = this._getLastIndex();
-
-		this.element.insertRule(strRule, index);
-
-		return index;
-	}
-
 	add() {
 		if (arguments.length > 1) {
 			const [ rule, styles ] = arguments;
@@ -59,20 +41,38 @@ export default class StyleSheet
 		}
 	}
 
-	addKeyFrames(name, keyFrames) {
+	_add(rule, styles) {
+		if (typeof rule !== 'string') {
+			printErr(`rule "${rule}" argument must be a string`);
+			return;
+
+		} else if (typeof styles !== 'object') {
+			printErr(`styles "${styles}" argument must be an object`);
+			return;
+		}
+
+		const strRule = StyleSheet.serialize(rule, styles);
+		const index = this._getLastIndex();
+
+		this.element.insertRule(strRule, index);
+
+		return index;
+	}
+
+	keyFrames(name, keyFrames) {
 		if (!Array.isArray(keyFrames) || keyFrames.length < 2) {
-			printErr('KeyFrames must be an array with more than 2 elements');
+			printErr('keyframes must be an array with more than 1 elements');
 			return;
 		}
 
 		const index = this._getLastIndex();
 		const keyCounts = keyFrames.length;
 		const rule = '@keyframes ' + name;
-		let styles = '';
 
+		let styles = '';
 		keyFrames.forEach((keyFrame, i) => {
 			const { offset = i / keyCounts } = keyFrame;
-			styles += this._serialize((offset * 100) + '%', keyFrame);
+			styles += StyleSheet.serialize((offset * 100) + '%', keyFrame);
 		});
 
 		this.element.insertRule(`${rule} {${styles}}`, index);
@@ -86,13 +86,31 @@ export default class StyleSheet
 			return;
 		}
 
+		const mediaRule = this._buildMediaRule(request);
+		const index = this._getLastIndex();
+
+		this.element.insertRule(`${mediaRule} {}`, index);
+
+		const media = new Media(this.element, index);
+
+		if (Array.isArray(arrStyles)) {
+			arrStyles.forEach((styles) => {
+				const { rule } = styles;
+				media.add(rule, styles);
+			});
+		}
+
+		return media;
+	}
+
+	_buildMediaRule(request) {
 		const { only } = request;
 
-		let media = '@media';
+		let rule = '@media';
 		let first = true;
 
 		if (only) {
-			media += ' only';
+			rule += ' only';
 			request.only = null;
 		}
 
@@ -102,39 +120,28 @@ export default class StyleSheet
 
 			const option = camelCaseToDash(name);
 
-			media += first ? ' ' : ' and ';
+			rule += first ? ' ' : ' and ';
 
 			if (typeof value == 'boolean') {
-				media += option;
+				rule += option;
 			} else if (typeof value == 'number') {
-				media += `(${option}:${value}px)`;
+				rule += `(${option}:${value}px)`;
 			} else {
-				media += `(${option}:${value})`;
+				rule += `(${option}:${value})`;
 			}
 
 			first = false;
 		}
 
-		const index = this._getLastIndex();
-		let strRule = '';
-
-		if (Array.isArray(arrStyles)) {
-			arrStyles.forEach((styles) => {
-				const { rule } = styles;
-				strRule += this._serialize(rule, styles);
-			});
-		}
-
-		this.element.insertRule(`${media} {${strRule}}`, index);
-
-		return index;
+		return rule;
 	}
 
-	remove(index) {
+	remove(rule) {
+		const index = rule.isMedia ? rule.index : rule;
 		this.element.deleteRule(index);
 	}
 
-	_serialize(rule, styles) {
+	static serialize(rule, styles) {
 		let str = rule + '{';
 
 		for (const name in styles) {
@@ -143,5 +150,37 @@ export default class StyleSheet
 		}
 
 		return str + '}';
+	}
+}
+
+class Media
+{
+	constructor(parent, index) {
+		this._media = parent.cssRules[index];
+		this._rules = this._media.cssRules;
+		this.index = index;
+	}
+
+	get isMedia() {
+		return true;
+	}
+
+	add(rule, styles) {
+		const index = this._rules.length;
+		const strRule = StyleSheet.serialize(rule, styles);
+
+		this._media.insertRule(strRule, index);
+
+		return index;
+	}
+
+	remove(index) {
+		this._media.deleteRule(index);
+	}
+
+	clear() {
+		for (let i = 0; i < this._rules.length; i++) {
+			this._media.deleteRule(i)
+		}
 	}
 }

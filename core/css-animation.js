@@ -33,7 +33,7 @@ export class CSSAnimation
 		const name = getName();
 		let animation = name;
 
-		_stylesheet.addKeyFrames(name, keyFrames);
+		_stylesheet.keyFrames(name, keyFrames);
 
 		const { duration, easing, steps, fillMode, counts, delay } = settings;
 	}
