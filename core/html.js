@@ -92,7 +92,7 @@ html.parseXML = function(data) {
     return errors ? printErr(errors) : parse(data);
 }
 
-html.cascad = function() {
+html.createStyleSheet = function() {
     return new StyleSheet();
 }
 

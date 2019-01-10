@@ -1,4 +1,4 @@
-const cascad = $html.cascad();
+const cascad = $html.createStyleSheet();
 
 const fade = cascad.keyFrames('fade', [
     { opacity: 0 },
