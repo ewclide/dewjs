@@ -3,7 +3,8 @@ import html from './html';
 import { printErr, idGetter } from './functions';
 
 const _stylesheet = new StyleSheet();
-const getName = idGetter('__anim__');
+const getAnimName = idGetter('__anim__');
+const getKeyFramesName = idGetter('__keyframes__');
 
 export class CSSAnimation
 {
@@ -11,39 +12,50 @@ export class CSSAnimation
 		this._elements = html.select(selector);
 		this._list = new Map();
 		this._duration = 0;
+		this._animStr = '';
 	}
 
 	play() {
 		this._elements.style('animationPlayState', 'running');
 	}
 
-	pause(){
+	pause() {
 		this._elements.style('animationPlayState', 'paused');
 	}
 
 	finish() {
-
-	}
-
-	reset() {
-
+		this._elements.removeClass();
 	}
 
 	add(keyFrames, settings = {}) {
-		const name = getName();
-		let animation = name;
-
-		_stylesheet.keyFrames(name, keyFrames);
-
 		const { duration, easing, steps, fillMode, counts, delay } = settings;
+
+		const kfName = getKeyFramesName();
+		const kfIndex = _stylesheet.keyFrames(kfName, keyFrames);
+
+		this._animStr = kfName;
+
+		const animIndex = _stylesheet.add(name, { animation });
+		this._list.set(name, { anim: animIndex, keyFrames: kfIndex });
 	}
 
-	attach() {
+	merge() {
+
+	}
+
+	_add() {
 
 	}
 
 	_convert() {
 
+	}
+
+	clear() {
+		this._list.forEach((idx) => {
+			_stylesheet.remove(idx.anim);
+			_stylesheet.remove(idx.keyFrames);
+		});
 	}
 }
 

@@ -1,3 +1,4 @@
+import CSSTransformer from './css-transformer';
 import { printErr, camelCaseToDash } from './functions';
 
 export default class StyleSheet
@@ -146,7 +147,13 @@ export default class StyleSheet
 
 		for (const name in styles) {
 			if (name === 'rule') continue;
-			str += `${name}:${styles[name]};`;
+
+			let value = styles[name];
+			if (name === 'transform' && typeof value == 'object') {
+				value = CSSTransformer.serialize(value);
+			}
+
+			str += `${name}:${value};`;
 		}
 
 		return str + '}';

@@ -26,18 +26,18 @@ const CSSTransformer = {
 			transform += `perspective(${perspective + perspUnits}) `;
 		}
 
-        element.style('transform', transform + this._build(actions));
+        element.style('transform', transform + this.serialize(actions));
 	},
 
-	_build(actions) {
+	serialize(actions) {
 		if (Array.isArray(actions)) {
-			return actions.reduce((res, next) => res = this._buildLocal(next) + res, '');
+			return actions.reduce((res, next) => res = this._build(next) + res, '');
 		} else {
-			return this._buildLocal(actions);
+			return this._build(actions);
 		}
 	},
 
-	_buildLocal(actions) {
+	_build(actions) {
 		let result = '';
 
 		const userUnits = actions.units || {};
