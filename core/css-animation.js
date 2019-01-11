@@ -13,6 +13,7 @@ export class CSSAnimation
 		this._list = new Map();
 		this._duration = 0;
 		this._animStr = '';
+		this._className = '';
 	}
 
 	play() {
@@ -28,33 +29,48 @@ export class CSSAnimation
 	}
 
 	add(keyFrames, settings = {}) {
-		const { duration, easing, steps, fillMode, counts, delay } = settings;
+		const {
+			duration = 1000,
+			easing = null,
+			steps = null,
+			stepType = 'end',
+			fillMode = null,
+			delay
+		} = settings;
 
 		const kfName = getKeyFramesName();
-		const kfIndex = _stylesheet.keyFrames(kfName, keyFrames);
+		const kfClass = _stylesheet.keyFrames(kfName, keyFrames);
 
-		this._animStr = kfName;
+		let animation = this._animStr;
+		animation += (this._animStr ? '' : ',') + kfName;
 
-		const animIndex = _stylesheet.add(name, { animation });
-		this._list.set(name, { anim: animIndex, keyFrames: kfIndex });
+		if (delay) animation += ` ${delay}ms`;
+		animation += ` ${duration}ms`;
+
+		if (steps) animation += ` steps(${steps}, ${stepType})`;
+		if (easing) animation += ` ${easing}`;
+		if (fillMode) animation += ` ${fillMode}`;
+
+		const anName = getAnimName();
+		const anClass = _stylesheet.add(anName, { animation });
+
+		this._list.set(name, { anClass, kfClass });
 	}
 
-	merge() {
+	merge(keyFrames, settings) {
+		if (!settings.delay) {
+			settings.delay = 0;
+		}
 
-	}
+		settings.delay += this._duration;
 
-	_add() {
-
-	}
-
-	_convert() {
-
+		this.add(keyFrames, settings);
 	}
 
 	clear() {
 		this._list.forEach((idx) => {
-			_stylesheet.remove(idx.anim);
-			_stylesheet.remove(idx.keyFrames);
+			_stylesheet.remove(idx.anClass);
+			_stylesheet.remove(idx.kfClass);
 		});
 	}
 }
