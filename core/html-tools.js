@@ -182,6 +182,13 @@ export class HTMLTools
         return result;
     }
 
+    getById(id) {
+        const result = new HTMLTools(document.getElementById(id));
+        result.query = '#' + id;
+
+        return result;
+    }
+
     before(htl) {
         this._insert(htl, "beforebegin");
         return this;

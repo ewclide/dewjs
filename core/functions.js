@@ -332,11 +332,39 @@ export function vh(value) {
 	return value / 100 * window.innerHeight;
 }
 
-export function log() {
-	let args = Array.from(arguments),
-		source = _getSourceLog();
+export function clamp(val, from, to) {
+    let res = val;
+    if (val < from) res = from;
+    else if (val > to) res = to;
+    return res;
+}
 
-    if (source) args.push(`\n-----\nSource: ${source}`);
+export function clampOut(val, from, to) {
+    let res = val;
+    if (Number.isFinite(from) || Number.isFinite(to)) {
+        const half = from + ((to - from) / 2);
+        if (val >= half && val < to) res = to;
+        else if (val < half && val > from) res = from;
+    }
+    return res;
+}
+
+export function clampSide(value, border, flip) {
+    const f = flip ? -1 : 1;
+    return (f * value) > (f * border) ? border : value;
+}
+
+export function entry(val, from, to) {
+    return val >= from && val <= to;
+}
+
+export function log() {
+	const args = Array.from(arguments);
+	const source = _getSourceLog();
+
+    if (source) {
+		args.push(`\n-----\nSource: ${source}`);
+	}
 
 	console.log.apply(null, args);
 }
