@@ -32,6 +32,8 @@ printErr(err);
  * Error: You cant do it!
   --> first error
   --> second error
+  -----
+  Source: http://localhost:3000/core/index.js:81:11
 */
 ```
 
