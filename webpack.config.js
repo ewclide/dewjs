@@ -2,10 +2,10 @@ const path = require('path');
 
 const npmlib = {
 	entry: {
-        'index.min': './lib-build/lib-main.js',
-        'funcs.min': './lib-build/lib-funcs.js',
-        'array.min': './lib-build/lib-array.js',
-		'object.min': './lib-build/lib-object.js'
+        'index.min': './core/lib-main',
+        'funcs.min': './core/functions',
+        'array.min': './core/array',
+		'object.min': './core/object'
     },
 	output: {
 		path: path.resolve(__dirname, './lib/src'),
