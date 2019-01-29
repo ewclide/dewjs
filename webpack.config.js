@@ -1,15 +1,26 @@
-const output = 'dew';
-const entry  = './core/main.js';
-const build = 'build';
-
 const path = require('path');
 
-module.exports = {
-	entry: entry,
+const npmlib = {
+	entry: {
+        'index.min': './lib-build/lib-main.js',
+        'funcs.min': './lib-build/lib-funcs.js',
+        'array.min': './lib-build/lib-array.js',
+		'object.min': './lib-build/lib-object.js'
+    },
 	output: {
-		path: path.resolve(__dirname, build),
-		filename: output + '.min.js',
-		publicPath: build
+		path: path.resolve(__dirname, './lib/src'),
+        filename: '[name].js',
+		library: 'DEW',
+		libraryTarget: 'commonjs2'
+	}
+};
+
+const script = {
+	entry: './core/main',
+	output: {
+		path: path.resolve(__dirname, './dist'),
+		filename: 'dew.min.js',
+		publicPath: './dist'
 	},
 	module: {
 		rules: [{
@@ -33,3 +44,7 @@ module.exports = {
 		}
 	}
 };
+
+const prod = process.argv.includes('production');
+
+module.exports = prod ? [ npmlib, script ] : script;

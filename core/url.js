@@ -1,53 +1,48 @@
-class Url
-{
-	constructor()
-	{
-		this._search = this._getSearch(location.search);
-		this._path = this._getPath(location.pathname);
-		this._strPath = location.pathname;
-		this._strSearch = location.search;
+class Url {
+	constructor() {
+		const { pathname, search } = location;
+
+		this._search = this._getSearch(search);
+		this._path = this._getPath(pathname);
+		this._strPath = pathname;
+		this._strSearch = search;
 	}
 
-	_getSearch(search)
-	{
-		let result = {};
+	_getSearch(search) {
+		const result = new Map();
 
-		if (search)
-		{
-			search = search.replace("?", "").split("&");
-			search.forEach( str => {
-				let p = str.split("=");
-				result[p[0].replace("-", "_")] = p[1];
+		if (search) {
+			const pairs = search.replace('?', '').split('&');
+			pairs.forEach( pair => {
+				const p = pair.split('=');
+				const name = p[0].replace('-', '_');
+				result.set(name, p[1]);
 			});
 		}
 
 		return result;
 	}
 
-	_getPath(path)
-	{
-		return path.replace(/^\/|\/$/g, "").split("/");
+	_getPath(path) {
+		return path.replace(/^\/|\/$/g, '').split('/');
 	}
 
-	changeState()
-	{
+	changeState() {
 		history.replaceState(null, document.title, this._strPath + this._strSearch);
 	}
 
-	addState()
-	{
+	addState() {
 		history.pushState(null, document.title, this._strPath + this._strSearch);
 	}
 
-	getPath()
-	{
+	getPath() {
 		return this._path;
 	}
 
-	setPath(path, changeState)
-	{
-		if (Array.isArray(path))
-			path = "/" + path.join("/") + "/";
+	setPath(path, changeState) {
+		if (Array.isArray(path)) {
+			path = `/${path.join('/')}/`;
+		}
 
 		this._strPath = path;
 
@@ -56,26 +51,30 @@ class Url
 		return this;
 	}
 
-	getSearch(name)
-	{
-		if (name === undefined) return this._search;
-		else if (typeof name == "string") return this._search[name];
-		else if (Array.isArray(name))
-		{
-			let result = {};
+	getSearch(name) {
+		if (name === undefined) {
+			return this._search;
 
-			name.forEach( p => {
-				if (p in this._search) result[p] = this._search[p];
+		} else if (this._search.has(name)) {
+			return this._search.get(name);
+
+		} else if (Array.isArray(name)) {
+			const result = {};
+
+			name.forEach((n) => {
+				if (this._search.has(n)) {
+					result[n] = this._search.get(n);
+				}
 			});
 
 			return result;
 		}
 	}
 
-	setSearch(params, changeState)
-	{
-		for (let i in params)
-			this._search[i] = params[i];
+	setSearch(params, changeState) {
+		for (const key in params) {
+			this._search.set(key, params[key]);
+		}
 
 		this._strSearch = this.serialize(this._search);
 
@@ -84,14 +83,18 @@ class Url
 		return this;
 	}
 
-	removeSearch(name, changeState)
-	{
-		if (name === undefined) this._search = {};
-		else if (typeof name == "string") delete this._search[name];
-		else if (Array.isArray(name))
-			name.forEach( p => {
-				if (p in this._search) delete this._search[p];
-			})
+	removeSearch(name, changeState) {
+		if (name === undefined) {
+			this._search.clear();
+
+		} else if (this._search.has(name)) {
+			this._search.delete(name);
+
+		} else if (Array.isArray(name)) {
+			name.forEach((n) => {
+				if (this._search.has(n)) this._search.delete(n)
+			});
+		}
 
 		this._strSearch = this.serialize(this._search);
 
@@ -100,31 +103,30 @@ class Url
 		return this;
 	}
 
-	setFullPath(path, search, changeState)
-	{
+	setFullPath(path, search, changeState) {
 		if (path) this.setPath(path);
 		if (search) this.setSearch(search);
 		if (changeState) this.changeState();
 	}
 
-	go(path)
-	{
+	go(path) {
 		if (!path) path = this._strPath;
 		location.href = path + this._strSearch;
 	}
 
-	serialize(data)
-	{
-		let request = "?";
+	serialize(data) {
+		let request = '?';
 
-		for (let i in data)
-		{
-			if (typeof data[i] == "number" || typeof data[i] == "string" || typeof data[i] == "boolean")
-				request += i + "=" + data[i] + "&";
+		for (let name in data) {
+			const val = data[name];
+			if (typeof val == 'number' || typeof val == 'string' || typeof val == 'boolean') {
+				request += `${name}=${val}&`
+			}
 		}
-			
+
 		return request.slice(0, -1);
 	}
 }
 
-export let url = new Url();
+const url = new Url();
+export default url;

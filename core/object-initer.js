@@ -1,8 +1,7 @@
 import {strParse, isType} from './functions';
 import html from './html';
 
-export default class ObjectIniter
-{
+export default class ObjectIniter {
 	constructor(object) {
 		this._object = object;
 		this.errors = [];

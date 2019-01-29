@@ -1,6 +1,6 @@
 {
   "name": "dewjs",
-  "version": "1.0.1",
+  "version": "2.0.0",
   "description": "Experimental JavaScript library for UI programming",
   "author": "ewclide",
   "license": "MIT",
@@ -11,8 +11,10 @@
   "repository": "ewclide/dewjs",
   "main": "index.js",
   "files": [
-    "dew.lib.min.js",
     "index.js",
+    "funcs.js",
+    "object.js",
+    "array.js",
     "LICENSE",
     "README.md"
   ],
