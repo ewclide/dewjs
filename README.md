@@ -16,7 +16,7 @@ I would also like to note that some solutions that may have analogues were devel
 - *DOM API* - manage DOM objects without connecting other libraries
 - *Async* - create and organize asynchronous objects
 - *Binding* - organize objects interaction throught binding
-- *Access* - allows to hide or publish fields and methods
+- *Access* - hide or publish fields and methods of classes
 - *Templating* - create views throught templates
 - Many other good solutions
 
@@ -27,7 +27,7 @@ For using this library on the site just link CDN hosted script into your page:
 ```html
 <script src="https://cdn.jsdelivr.net/gh/ewclide/dewjs@2.0.0/dist/dew.min.js"></script>
 ```
-Also you can get a local copy using git or download by **[link][1]**.
+Also you can get a local copy using git or **[download][1]** latest version.
 The script located in dist folder.
 
 	$ git clone https://github.com/ewclide/dewjs.git
@@ -61,8 +61,7 @@ $html.ready.then(() => $html.body.append(hello));
 ```
 
 ##
-Thank's for using.
-Developed by **Max Ustinov** - [ewclide][4]
+*Thank's for using* @ Developed by ***Max Ustinov*** - *[ewclide][4]*
 
 [1]: https://github.com/ewclide/dewjs/archive/master.zip  "download"
 [2]: https://dew.ewclide.com/support  "support"
