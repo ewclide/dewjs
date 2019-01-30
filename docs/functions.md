@@ -2,7 +2,7 @@
 just import the file before using.
 
 ```js
-import { /* function */ } from 'dewjs/funcs';
+import { /* functions */ } from 'dewjs/funcs';
 ```
 
 ### browser
@@ -42,8 +42,8 @@ printErr(err);
 ( **value** : *Any*, **type** : *String* ) => *Boolean* | *String*
 
 Checks type of the value. Returns result of checking as Boolean.
-Function wich called with one argument will returns type of the passed value as string.
-*HTMLTools* - is a special type of objects produced throught library html object.
+Function, wich called with one argument will returns type of the passed value as string.
+*HTMLTools* - is a special type of objects produced through library html object.
 
 - *value* - value itself.
 - *type* - type as string. It supports types: *number, string, boolean, array, function, DOM, HTMLTools*.
@@ -64,7 +64,7 @@ if (isType(some) == 'array') {
 
 Parses and converts a string to type. Uses when result come as string and his necessary convert to the correct type. Supports types - *number, boolean, json, array*. If it can't converts a value, then it trims spaces and returns a string
 
-- *value* - a string wich must converted
+- *value* - a string, wich must converted
 
 ```js
 const arr = strParse('[1, 2, 3]');
@@ -77,7 +77,7 @@ console.log(arr) // [1,2,3]
 
 Removes all not number chars from the string and returns integer number.
 
-- *value* - a string wich contains int number.
+- *value* - a string, wich contains int number.
 
 ```js
 const val = intParse('as125%7d');
@@ -90,7 +90,7 @@ console.log(val) // 1257
 
 Removes all not number chars from the string and returns float number. Recognizes points and commas for separating real and fractional parts. If it founds two points (commas), then it removed all chars after second separator.
 
-- *value* - a string wich contains float number.
+- *value* - a string, wich contains float number.
 
 ```js
 const val = intParse('as12,5%7d');
@@ -103,7 +103,7 @@ console.log(val) // 12.57
 
 Recognizes json object in the string. More permissive then JSON.parse method. Not sensitive to quots.
 
-- *value* - a string wich contains json object.
+- *value* - a string, wich contains json object.
 
 ```js
 const json = intParse(`{ a: text, b: 'text2', "c": 123 }`);
@@ -135,8 +135,8 @@ const inst = construct(Test, [1,2,3]);
 Allows to publish specified fields and methods and encapsulate others. Returns new class.
 
 - *class* - a class.
-- *methods* - a methods list, wich you want to publish.
-- *fields* - a fields list, wich you want to publish.
+- *methods* - methods list, wich you want to publish.
+- *fields* - fields list, wich you want to publish.
 
 ```js
 class Test {
@@ -161,26 +161,133 @@ console.log(inst.first, inst.second); // 1 undefined
 inst.doSomeThing(); // something completed!
 inst.doAnother(); // Uncaught TypeError: inst.doAnother is not a function
 ```
-#
-getElementData(settings, defaults, attributes, element)
-fetchSettings(settings, defaults, types = {}, rates = {})
-randi(min = 0, max = 9999999)
-randf(min, max)
-randKey(length = 15, types = ['all'])
-idGetter(prefix = 0)
-camelCaseToDash(str)
-dashToCamelCase(str)
-camelCaseMerge(...list)
-capitalize(str)
-vmin(value)
-vmax(value)
-vw(value)
-vh(value)
-clamp(val, from, to)
-clampOut(val, from, to)
-clampSide(value, border, flip)
-entry(val, from, to)
-log()
-log.json = (json, spaces = 4)
-log.time = (name)
-log.timeEnd = (name)
+##
+### getElementData
+( **settings** : *Object*, **defaults** : *Object*, **element** : *DOM Element*, **attributes** : *Object* ) => *Object*
+
+Compiles settings from different sources - *defaults, user settings and element data-attributes*.  
+At the begin it gets value from user object, after from attribute and at the end gets default.  
+If attribute founds but is empty, then considers as *true* value.    
+If you want give special name to the attribute, then use attribute object, by default name of attribute considers as name of option with prefix "data-". Options writed through camel-case spelling will replaced by dash-case attributes.  
+Function also detects *Boolean* values in attrubtes.
+
+- **settings* - object with user settings.
+- **defaults* - default values.
+- *element* - DOM element, wich contains attrubites.
+- *attributes* - list of attributes, which corresponds to the settings.
+
+```html
+<!-- some where in template -->
+<div
+    data-other-option
+    data-some-option="good"
+    data-color="blue"
+></div>
+```
+
+```js
+// some where in code
+const elem = document.getElementById('#spec');
+const defs = {
+    size: 150, 
+    color: 'red',
+    otherOption: false,
+    theSomeLongNamedOption: 'easy',
+}
+
+const attrs = {
+    theSomeLongNamedOption: 'some-option'
+}
+
+const data = getElementData(settings, defs, elem, attrs);
+console.log(data);
+/* {
+    size: 150,
+    color: "blue",
+    otherOption: true,
+    theSomeLongNamedOption: "good"
+} */
+```
+
+##
+### fetchSettings
+(**settings**, **defaults**, **types** = {}, **rates** = {})
+
+##
+### randi
+(min = 0, max = 9999999)
+
+## 
+### randf
+(min, max)
+
+##
+### randKey
+(length = 15, types = ['all'])
+
+##
+### idGetter
+(prefix = 0)
+
+##
+### camelCaseToDash
+(str)
+
+##
+### dashToCamelCase
+(str)
+
+##
+### camelCaseMerge
+(...list)
+
+##
+### capitalize
+(str)
+
+##
+### vmin
+(value)
+
+##
+### vmax
+(value)
+
+##
+### vw
+(value)
+
+##
+### vh
+(value)
+
+##
+### clamp
+(val, from, to)
+
+##
+### clampOut
+(val, from, to)
+
+##
+### clampSide
+(value, border, flip)
+
+##
+### entry(val, from, to)
+
+##
+### log
+()
+
+##
+### log.json
+(json, spaces = 4)
+
+##
+### log.time
+(name)
+
+##
+### log.timeEnd
+(name)

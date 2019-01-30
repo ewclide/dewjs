@@ -209,12 +209,12 @@ export function publish(Input, methods, fields) {
     return Output;
 }
 
-export function getElementData(settings, defaults, attributes, element) {
+export function getElementData(settings, defaults, element, attributes) {
 	const result = {}
 
-    for (let i in defaults) {
-        if (settings[i] === undefined) {
-            let attr = 'data-' + (attributes[i] || i), num;
+    for (let name in defaults) {
+        if (settings[name] === undefined) {
+            let attr = 'data-' + (attributes[name] || camelCaseToDash(name)), num;
 
             attr = element ? element.getAttribute(attr) : null;
             num = +attr;
@@ -229,10 +229,10 @@ export function getElementData(settings, defaults, attributes, element) {
 				attr = num;
 			}
 
-			result[i] = attr !== null ? attr : defaults[i];
+			result[name] = attr !== null ? attr : defaults[name];
 
 		} else {
-			result[i] = settings[i];
+			result[name] = settings[name];
 		}
     }
 
