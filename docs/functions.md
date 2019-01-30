@@ -110,7 +110,8 @@ const json = intParse(`{ a: text, b: 'text2', "c": 123 }`);
 console.log(json) // { a: "text", b: "text2", c: 123 }
 ```
 
-## construct
+##
+### construct
 *Deprecated* - you can use ES6 spread syntax ~ new Class(...args).
 
 ( **class** : *Class*, **arguments** : *Array* ) => *Object - instance*
@@ -131,8 +132,11 @@ const inst = construct(Test, [1,2,3]);
 ### publish
 ( **class** : *Class*, **methods** : *Array*, **fields** : *Array* ) => *Class*
 
-Returns new class wich haves public specified fields and methods and encapsulates all other.
+Allows to publish specified fields and methods and encapsulate others. Returns new class.
 
+- *class* - a class.
+- *methods* - a methods list, wich you want to publish.
+- *fields* - a fields list, wich you want to publish.
 
 ```js
 class Test {
@@ -141,21 +145,21 @@ class Test {
         this.second = 'second';
     }
 
-    do() {
-        console.log('do!')
+    doSomeThing() {
+        console.log('something completed!')
     }
 
-    make() {
-        console.log('make')
+    doAnother() {
+        console.log('another completed!')
     }
 }
 
-const TestPub = publish(Test, ['first'], ['do']);
+const TestPub = publish(Test, ['doSomeThing'], ['first']);
 const inst = new TestPub();
 
 console.log(inst.first, inst.second); // 1 undefined
-inst.do(); // do!
-inst.make(); // Uncaught TypeError: inst.make is not a function
+inst.doSomeThing(); // something completed!
+inst.doAnother(); // Uncaught TypeError: inst.doAnother is not a function
 ```
 #
 getElementData(settings, defaults, attributes, element)

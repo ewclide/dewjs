@@ -18,7 +18,7 @@ I would also like to note that some solutions that may have analogues were devel
 - *Binding* - organize objects interaction throught binding
 - *Access* - hide or publish fields and methods of classes
 - *Templating* - create views throught templates
-- Many other good solutions
+- Many others good solutions ;)
 
 ### Install
 
@@ -27,7 +27,7 @@ For using this library on the site just link CDN hosted script into your page:
 ```html
 <script src="https://cdn.jsdelivr.net/gh/ewclide/dewjs@2.0.0/dist/dew.min.js"></script>
 ```
-Also you can get a local copy using git or **[download][1]** latest version.
+Also you can get a local copy using git or simply **[download][1]**.
 The script located in dist folder.
 
 	$ git clone https://github.com/ewclide/dewjs.git
@@ -55,13 +55,15 @@ As library on the page:
 <script src="../user-script.js"></script>
 ```
 ```js
+// user-script
 const hello = $html.create('h1').text('Hello world!');
 
 $html.ready.then(() => $html.body.append(hello));
 ```
 
 ##
-*Thank's for using* @ Developed by ***Max Ustinov*** - *[ewclide][4]*
+*Thank's for using*  
+@ Developed by ***Max Ustinov*** - *[ewclide][4]*
 
 [1]: https://github.com/ewclide/dewjs/archive/master.zip  "download"
 [2]: https://dew.ewclide.com/support  "support"
