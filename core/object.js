@@ -35,7 +35,7 @@ function _createClone(object, full) {
     else if (typeof object == 'object') {
         Clone.prototype = '__proto__' in object
         ? object.__proto__ : Object.getPrototypeOf(object);
-        
+
         Clone.constructor = object.constructor;
 
         return new Clone();
@@ -72,7 +72,7 @@ export function outerAssign(target, list, copy) {
     _assign(list, result, (item, obj) => {
         for (let i in item) {
             if (!(i in obj)) obj[i] = item[i];
-        }  
+        }
     });
 
     return result;
@@ -82,7 +82,7 @@ export function fullAssign(target, list, copy) {
     target = copy ? _defineProperties(target, {}) : target;
 
     _assign(list, target, item => _defineProperties(item, target));
-    
+
     return target;
 }
 
@@ -114,11 +114,11 @@ export function define(obj, fields, options = {}) {
 		writable    : typeof write  == 'boolean' ? write  : true
 	};
 
-	if (typeof fields == "string") {
-        
+	if (typeof fields == 'string') {
+
 		if (value !== undefined) {
             desc.value = value;
-            
+
 		} else if (typeof get == 'function' && typeof set == 'function') {
 			desc.get = get;
 			desc.set = set;
@@ -132,7 +132,7 @@ export function define(obj, fields, options = {}) {
 		}
 
 	} else {
-		for (const key in fields) {
+		for (let key in fields) {
 			desc.value = fields[key];
 			Object.defineProperty(obj, String(key), desc);
 		}

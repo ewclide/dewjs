@@ -145,7 +145,7 @@ export default class StyleSheet
 	static serialize(rule, styles) {
 		let str = rule + '{';
 
-		for (const name in styles) {
+		for (let name in styles) {
 			if (name === 'rule') continue;
 
 			let value = styles[name];

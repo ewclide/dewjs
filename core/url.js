@@ -72,7 +72,7 @@ class Url {
 	}
 
 	setSearch(params, changeState) {
-		for (const key in params) {
+		for (let key in params) {
 			this._search.set(key, params[key]);
 		}
 

@@ -1,3 +1,10 @@
+export function idGetter(prefix = 0) {
+	return (() => {
+		let id = 0;
+		return () => prefix + id++;
+	})();
+}
+
 function _getBrowser() {
     const agent = navigator.userAgent;
 
@@ -161,38 +168,43 @@ export function construct(Cls, args) {
 	return new (Function.bind.apply(Cls, args))();
 }
 
-export function publish(TheClass, fields, methods) {
-    const list = {};
+export function publish(Input, methods, fields) {
+	const list = {};
+	const getInstId = idGetter(Input.name + '__');
 
     function Output() {
-        const id = Math.random();
-        list[id] = construct(TheClass, arguments);
+        const id = getInstId();
+        list[id] = new Input(...arguments);
         this.id = id;
     }
 
-    if (fields)
-    for (let i = 0; i < fields.length; i++) {
-        let field = fields[i];
+    if (methods) {
+		methods.forEach((method) => {
+			if (!(method in Input.prototype)) {
+				console.error(`${Input.name} class have not the "${method}" method!`);
+				return;
+			}
 
-        Object.defineProperty(Output.prototype, field, {
-            configurable : false,
-            get : function() {
-                return list[this.id][field];
-            },
-            set : function(value) {
-                list[this.id][field] = value;
-            }
-        });
-    }
+			Output.prototype[method] = function() {
+				const obj = list[this.id];
+				return obj[method].apply(obj, arguments);
+			}
+		});
+	}
 
-    if (methods)
-    for (let i = 0; i < methods.length; i++) {
-        let method = methods[i];
-        Output.prototype[method] = function(){
-            let obj = list[this.id];
-            return obj[method].apply(obj, arguments);
-        }
-    }
+	if (fields) {
+		fields.forEach((field) => {
+			Object.defineProperty(Output.prototype, field, {
+				configurable: false,
+				get: function() {
+					return list[this.id][field]
+				},
+				set: function(value) {
+					list[this.id][field] = value;
+				}
+			});
+		});
+	}
 
     return Output;
 }
@@ -209,13 +221,11 @@ export function getElementData(settings, defaults, attributes, element) {
 
             if (attr === '' || attr === 'true') {
 				attr = true;
-			}
 
-            else if (attr === 'false') {
+			} else if (attr === 'false') {
 				attr = false;
-			}
 
-            else if (attr !== null && !isNaN(num)) {
+			} else if (attr !== null && !isNaN(num)) {
 				attr = num;
 			}
 
@@ -287,13 +297,6 @@ export function randKey(length = 15, types = ['all']) {
 	}
 
 	return result;
-}
-
-export function idGetter(prefix = 0) {
-	return (() => {
-		let id = 0;
-		return () => prefix + id++;
-	})();
 }
 
 export function camelCaseToDash(str) {

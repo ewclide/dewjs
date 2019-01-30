@@ -56,7 +56,7 @@ class HTTP {
 		const formData = new FormData();
 		const result = {};
 
-		for (const key in data) {
+		for (let key in data) {
 			formData.append(key, data[key]);
 		}
 
