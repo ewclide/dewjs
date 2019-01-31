@@ -77,9 +77,8 @@ export function isType(value, type) {
 			case 'HTMLTools': return value.isHTMLTools ? true : false;
 			default : printErr(`the type "${type}" is unknown!`); return false;
 		}
-	}
 
-	else {
+	} else {
 		if (typeof value == 'number') return 'number';
 		else if (typeof value == 'string') return 'string';
 		else if (typeof value == 'boolean') return 'boolean';
@@ -178,7 +177,7 @@ export function publish(Input, methods, fields) {
         this.id = id;
     }
 
-    if (methods) {
+    if (methods && methods.length) {
 		methods.forEach((method) => {
 			if (!(method in Input.prototype)) {
 				console.error(`${Input.name} class have not the "${method}" method!`);
@@ -190,6 +189,9 @@ export function publish(Input, methods, fields) {
 				return obj[method].apply(obj, arguments);
 			}
 		});
+
+	} else {
+		throw new Error(`The class "${Input.name}" must have at least one public method`);
 	}
 
 	if (fields) {
@@ -248,16 +250,16 @@ export function fetchSettings(settings, defaults, types = {}, rates = {}) {
 		const rate = rates[i];
 		const defValue = defaults[i];
 
-		let writeValue = true;
+		let canWrite = true;
 
-		if (value === undefined) writeValue = false;
-		else
-		{
-			if (type) writeValue = isType(value, type);
-			if (rate) writeValue = rate.indexOf(value) >= 0;
+		if (value === undefined) {
+			canWrite = false;
+		} else {
+			if (type) canWrite = isType(value, type);
+			if (rate) canWrite = rate.indexOf(value) >= 0;
 		}
 
-		result[i] = writeValue ? value : defValue;
+		result[i] = canWrite ? value : defValue;
 	}
 
 	return result;
