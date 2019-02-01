@@ -258,19 +258,53 @@ console.log(settings);
 
 ##
 ### randi
-(min = 0, max = 9999999)
+( ***min*** : *Number*, ***max*** : *Number* ) => *Number*
+
+Returns random integer value.
+
+- *min* [0] - min range value.
+- *max* [999999] - max range value.
 
 ##
 ### randf
-(min, max)
+( ***min*** : *Number*, ***max*** : *Number* ) => *Number*
+
+Returns random float value.
+
+- *min* - min range value.
+- *max* - max range value.
 
 ##
 ### randKey
-(length = 15, types = ['all'])
+( ***length*** : *Number*, ***types*** : *Array* ) => *String*
+
+Returns string of random chars.
+
+- *length* [15] - length of result string.
+- *types* [all] - List of char types, wich will be used. Available types - *all, lower, upper, numbers, specials*;
+
+```js
+const id = randKey(10, ['upper', 'lower']);
+console.log(id); // mkFqWeTGdp
+```
 
 ##
 ### idGetter
-(prefix = 0)
+( ***prefix*** : *String* ) => *Function*
+
+Returns function, wich returns unique value in own space (Just increment value)
+
+- *prefix* - a tring, wich will be added before value.
+
+```js
+const getName = idGetter('unique_');
+console.log(getName()); // unique_1
+console.log(getName()); // unique_2
+// ...unique_3 and so on
+
+const getId = idGetter();
+console.log(getId(), getId() /*...*); // 1, 2 ...
+```
 
 ##
 ### camelCaseToDash
