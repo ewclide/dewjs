@@ -317,9 +317,7 @@ export function camelCaseMerge(...list) {
 }
 
 export function trim(str, all) {
-	let res =  str.replace(/^\s+|\s+$/g, '');
-	if (all) res = res.replace(/\s+/g, ' ');
-	return res;
+	return all ? str.trim().replace(/\s+/g, ' ') : str.trim();
 }
 
 export function capitalize(str, each) {
@@ -331,7 +329,7 @@ export function capitalize(str, each) {
 	return res.charAt(0).toUpperCase() + res.slice(1);
 }
 
-function zeroPad(num, size) {
+export function zeroPad(num, size) {
     let result = num + '';
     while (result.length < size) {
         result = '0' + result;
@@ -378,14 +376,14 @@ export function clampSide(value, border, flip) {
     return (f * value) > (f * border) ? border : value;
 }
 
-export function clampAngle(val, rad) {
+export function clampAngle(val, rad = true) {
     if (!Number.isFinite(val)) return val;
     const max = rad ? Math.PI * 2 : 360;
     const mod = val % max;
     return mod < 0 ? max + mod : mod;
 }
 
-export function mirrAngle(val, rad) {
+export function mirrAngle(val, rad = true) {
     if (!Number.isFinite(val)) return val;
     const max = rad ? Math.PI * 2 : 360;
     const mod = val % max;

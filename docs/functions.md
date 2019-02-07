@@ -71,8 +71,7 @@ Parses and converts a string to type. Uses when result come as string and his ne
 - **value* - a string, wich must converted
 
 ```js
-const arr = strParse('[1, 2, 3]');
-console.log(arr) // [1,2,3]
+strParse('[1, 2, 3]'); // [1,2,3]
 ```
 
 ##
@@ -84,8 +83,7 @@ Removes all not number chars from the string and returns integer number.
 - **value* - a string, wich contains int number.
 
 ```js
-const val = intParse('as125%7d');
-console.log(val) // 1257
+intParse('as125%7d'); // 1257
 ```
 
 ##
@@ -97,8 +95,7 @@ Removes all not number chars from the string and returns float number. Recognize
 - **value* - a string, wich contains float number.
 
 ```js
-const val = floatParse('as12,5%7d');
-console.log(val) // 12.57
+floatParse('as12,5%7d'); // 12.57
 ```
 
 ##
@@ -110,8 +107,8 @@ Recognizes json object in the string. More permissive then JSON.parse method. No
 - **value* - a string, wich contains json object.
 
 ```js
-const json = jsonParse(`{ a: text, b: 'text2', "c": 123 }`);
-console.log(json) // { a: "text", b: "text2", c: 123 }
+jsonParse(`{ a: text, b: 'text2', "c": 123 }`);
+// { a: "text", b: "text2", c: 123 }
 ```
 
 ##
@@ -161,7 +158,8 @@ class Test {
 const TestPub = publish(Test, ['doSomeThing'], ['first']);
 const inst = new TestPub();
 
-console.log(inst.first, inst.second); // 1 undefined
+inst.first; // 1
+inst.second; // undefined
 inst.doSomeThing(); // something completed!
 inst.doAnother(); // Uncaught TypeError: inst.doAnother is not a function
 ```
@@ -276,8 +274,7 @@ Returns random float value.
 - *size* - size of rounding.
 
 ```js
-const val = randf(3, 10, 2);
-console.log(val); // 4.12
+randf(3, 10, 2); // 4.12
 ```
 
 ##
@@ -290,8 +287,7 @@ Returns string of random chars.
 - *types* [all] - List of char types, wich will be used. Available types - *all, lower, upper, numbers, specials*;
 
 ```js
-const id = randKey(10, ['upper', 'lower']);
-console.log(id); // mkFqWeTGdp
+randKey(10, ['upper', 'lower']); // "mkFqWeTGdp"
 ```
 
 ##
@@ -304,12 +300,14 @@ Returns function, wich returns unique value in own space (Just increment value)
 
 ```js
 const getName = idGetter('unique_');
-console.log(getName()); // unique_1
-console.log(getName()); // unique_2
-// ...unique_3 and so on
+getName(); // unique_1
+getName(); // unique_2
+// ...unique_++
 
 const getId = idGetter();
-console.log(getId(), getId() /*...*); // 1, 2 ...
+getId(); // 1
+getId(); // 2
+// ...++
 ```
 
 ##
@@ -321,8 +319,7 @@ Converts string to camel-case spelling.
 - **string* - a string itself.
 
 ```js
-const str = camelCaseToDash('camelCaseToDash');
-console.log(str); // camel-case-to-dash
+camelCaseToDash('camelCaseToDash'); // "camel-case-to-dash"
 ```
 
 ##
@@ -334,8 +331,7 @@ Converts string to dash-case spelling.
 - **string* - a string itself.
 
 ```js
-const str = dashToCamelCase('dash-to-camel-case');
-console.log(str); // dashToCamelCase
+dashToCamelCase('dash-to-camel-case'); // "dashToCamelCase"
 ```
 
 ##
@@ -347,13 +343,21 @@ Merges list of words to camel-sace spelling word.
 - **word1, word2 ...* - an arguments of words.
 
 ```js
-const str = camelCaseMerge('hello', 'world', 'have', 'fun');
-console.log(str); // helloWorldHaveFun
+camelCaseMerge('hello', 'world', 'have', 'fun'); // "helloWorldHaveFun"
 ```
 
 ##
 ### trim
-(string)
+(***string*** : *String*, ***all*** : *Boolean*) => *String*
+
+Is a wrapper of native function. Deletes spaces from both ends of a string. If you pass second argument as true, then all repeated spaces on the string will be replaced by once space.
+
+- **string* - a sring itself.
+- *all* - a flag, wich allows to replace all spaces by one.
+
+```js
+trim(' hello world,   have fun! '); // "hello world, have fun!"
+```
 
 ##
 ### capitalize
@@ -365,54 +369,177 @@ Trimes spaces in the string and converts first char in the word to upper-case.
 - *each* - if it's true, then all words in the string will be converted.
 
 ```js
-const str = capitalize('hello world!');
-const str2 = capitalize(' have   fun! ', true);
-console.log(str, str2); // Hello world!, Have Fun!
+capitalize('hello world!'); // "Hello world!"
+capitalize(' have   fun! ', true); // "Have Fun!"
 ```
 
 ##
 ### zeroPad
-(number, size)
+(***number*** : *Number*, ***size*** : *Number*) => *String*
+
+Addes zero chars to the begin of number and returns string.
+
+- **number* - a number itself.
+- *size* [2] - length of a result string.
+
+```js
+zeroPad(5, 3); // "005"
+zeroPad(25, 3); // "025"
+```
 
 ##
 ### vmin
-(value)
+(***value*** : *Number*) => *Number*
+
+Converts a value specified in CSS units "vmin" to value in pixels.
+
+- **value* - a value itself.
+
+```js
+// window - 1920 x 969
+vmin(25); // 242.25
+```
 
 ##
 ### vmax
-(value)
+(***value*** : *Number*) => *Number*
+
+Converts a value specified in CSS units "vmax" to value in pixels.
+
+- **value* - a value itself.
+
+```js
+// window - 1920 x 969
+vmax(25); // 480
+```
 
 ##
 ### vw
-(value)
+(***value*** : *Number*) => *Number*
+
+Converts a value specified in CSS units "vw" to value in pixels.
+
+- **value* - a value itself.
+
+```js
+// window - 1920 x 969
+vw(25); // 480
+```
 
 ##
 ### vh
-(value)
+(***value*** : *Number*) => *Number*
+
+Converts a value specified in CSS units "vh" to value in pixels.
+
+- **value* - a value itself.
+
+```js
+// window - 1920 x 969
+vh(25); // 242.25
+```
 
 ##
 ### clamp
-(val, from, to)
+(***value*** : *Number*, ***from*** : *Number*, ***to*** : *Number*) => *Number*
+
+Truncates the value between a upper and lower borders.
+
+- **value* - a value itself.
+- **from* - lower border of the value.
+- **to* - upper border of the value.
+
+```js
+clamp(125, 50, 100); // 100
+clamp(25, 50, 100); // 50
+clamp(70, 50, 100); // 70
+```
 
 ##
 ### clampOut
-(val, from, to)
+(***value*** : *Number*, ***from*** : *Number*, ***to*** : *Number*) => *Number*
+
+Truncates the value outside of a upper and lower borders. If value specified between borders, then the value truncates to a neares border.
+
+- **value* - a value itself.
+- **from* - smaller border of the value.
+- **to* - larger border of the value.
+
+```js
+clampOut(125, 50, 100); // 125
+clampOut(25, 50, 100); // 25
+clampOut(70, 50, 100); // 50
+clampOut(80, 50, 100); // 100
+```
 
 ##
 ### clampSide
-(value, border, flip)
+(***value*** : *Number*, ***border*** : *Number*, ***flip*** : *Boolean*) => *Number*
+
+Truncates the value from one side of a border - between infinity and border value.
+
+- **value* - a value itself.
+- **border* - border value.
+- *flip* [false]- flag, value truncates from other side of a border.
+
+```js
+clampSide(125, 50); // 50
+clampSide(25, 50); // 25
+clampSide(25, 50, true); // 50
+```
 
 ##
 ### clampAngle
-(angle, radians = false)
+(***angle*** : *Number*, ***radians*** : *Boolean*) => *Number*
+
+Translates angle in radians to value between *0* and *Math.PI * 2*.
+
+- **angle* - a angle itself.
+- *radians* [true] - if false, then will works in degrees.
+
+```js
+clampAngle(390, true); // 30
+clampAngle(-90, true); // 270
+clampAngle(30, true); // 30
+```
 
 ##
 ### mirrAngle
-(angle, radians = false)
+(***angle*** : *Number*, ***radians*** : *Boolean*) => *Number*
+
+Translates angle in radians to value between *-Math.PI* and *Math.PI*.
+
+- **angle* - a angle itself.
+- *radians* [true] - if false, then will works in degrees.
+
+```js
+mirrAngle(390, true); // 30
+mirrAngle(270, true); // -90
+mirrAngle(-30, true); // -30
+```
 
 ##
 ### limitCalls
-(function, count = 1)
+(***function*** : *Function*, ***count*** : *Number*) => *Function*
+
+Returns wrapper function, wich can be called a certain number of times.
+
+- **function* - a function.
+- *count* [1] - permissible number of calling.
+
+**Methods**  
+- *resetCalls()* - resets count of calls.
+- *getSource()* - returns source function.
+
+
+```js
+const func = limitCalls((a) => 'you called with: ' + a, true);
+func(1); // you called with: 1;
+func(2); // nothing
+
+func.resetCalls();
+func(3); // you called with: 3;
+```
 
 ##
 ### entry(val, from, to)
