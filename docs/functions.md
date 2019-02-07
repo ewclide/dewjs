@@ -277,7 +277,7 @@ Returns random float value.
 
 ```js
 const val = randf(3, 10, 2);
-console.log(val); // mkFqWeTGdp
+console.log(val); // 4.12
 ```
 
 ##
@@ -366,7 +366,7 @@ Trimes spaces in the string and converts first char in the word to upper-case.
 
 ```js
 const str = capitalize('hello world!');
-const str2 = capitalize(' have   fun! ');
+const str2 = capitalize(' have   fun! ', true);
 console.log(str, str2); // Hello world!, Have Fun!
 ```
 
