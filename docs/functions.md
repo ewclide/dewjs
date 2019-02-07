@@ -12,7 +12,7 @@ It supports browsers - *Chrome, Firefox, Opera, Safari, IE*
 
 ##
 ### printErr
-( **error** : *Array*, **source** : *Boolean* ) => *false*
+( ***error*** : *Array*, ***source*** : *Boolean* ) => *false*
 
 Allows to print errors in the console.
 
@@ -39,7 +39,7 @@ printErr(err);
 
 ##
 ### isType
-( **value** : *Any*, **type** : *String* ) => *Boolean* | *String*
+( ***value*** : *Any*, ***type*** : *String* ) => *Boolean* | *String*
 
 Checks type of the value. Returns result of checking as Boolean.
 Function, wich called with one argument will returns type of the passed value as string. If you pass array of types, then it checks value with each type in the array and returns true if value is one of this types.
@@ -64,7 +64,7 @@ if (isType(other, ['string', 'number']) {
 ```
 ##
 ### strParse
-( **value** : *String* ) => *Any*
+( ***value*** : *String* ) => *Any*
 
 Parses and converts a string to type. Uses when result come as string and his necessary convert to the correct type. Supports types - *number, boolean, json, array*. If it can't converts a value, then it trims spaces and returns a string
 
@@ -77,7 +77,7 @@ console.log(arr) // [1,2,3]
 
 ##
 ### intParse
-( **value** : *String* ) => *Integer Number*
+( ***value*** : *String* ) => *Integer Number*
 
 Removes all not number chars from the string and returns integer number.
 
@@ -90,7 +90,7 @@ console.log(val) // 1257
 
 ##
 ### floatParse
-( **value** : *String* ) => *Float Number*
+( ***value*** : *String* ) => *Float Number*
 
 Removes all not number chars from the string and returns float number. Recognizes points and commas for separating real and fractional parts. If it founds two points (commas), then it removed all chars after second separator.
 
@@ -103,7 +103,7 @@ console.log(val) // 12.57
 
 ##
 ### jsonParse
-( **value** : *String* ) => *JSON*
+( ***value*** : *String* ) => *JSON*
 
 Recognizes json object in the string. More permissive then JSON.parse method. Not sensitive to quots.
 
@@ -118,7 +118,7 @@ console.log(json) // { a: "text", b: "text2", c: 123 }
 ### construct
 *Deprecated* - you can use ES6 spread syntax ~ new Class(...args).
 
-( **class** : *Class*, **arguments** : *Array* ) => *Object - instance*
+( ***class*** : *Class*, ***arguments*** : *Array* ) => *Object - instance*
 
 Allows to invoke constructor with arguments as array. Uses when arguments generates in run time.
 
@@ -134,7 +134,7 @@ const inst = construct(Test, [1,2,3]);
 
 ##
 ### publish
-( **class** : *Class*, **methods** : *Array*, **fields** : *Array* ) => *Class*
+( ***class*** : *Class*, ***methods*** : *Array*, ***fields*** : *Array* ) => *Class*
 
 Allows to publish specified fields and methods and encapsulate others. Returns new class.
 
@@ -167,7 +167,7 @@ inst.doAnother(); // Uncaught TypeError: inst.doAnother is not a function
 ```
 ##
 ### getElementData
-( **settings** : *Object*, **defaults** : *Object*, **element** : *DOM Element*, **attributes** : *Object* ) => *Object*
+( ***settings*** : *Object*, ***defaults*** : *Object*, ***element*** : *DOM Element*, ***attributes*** : *Object* ) => *Object*
 
 Compiles settings from different sources - *defaults, user settings and element data-attributes*.
 At the begin it gets value from user object, after from attribute and at the end gets default.
@@ -216,7 +216,7 @@ console.log(data);
 
 ##
 ### fetchSettings
-( **settings** : *Object*, **defaults** : *Object*, **types** : *Object*, **rates** : *Object* ) => *Object*
+( ***settings*** : *Object*, ***defaults*** : *Object*, ***types*** : *Object*, ***rates*** : *Object* ) => *Object*
 
 Compiles settings from defaults and user settings. It also allows to assign permissible types and values. All settings must have defaults values.
 
@@ -267,12 +267,18 @@ Returns random integer value.
 
 ##
 ### randf
-( ***min*** : *Number*, ***max*** : *Number* ) => *Number*
+( ***min*** : *Number*, ***max*** : *Number*, ***size*** : *Number* ) => *Number*
 
 Returns random float value.
 
-- *min* - min range value.
-- *max* - max range value.
+- *min* [0] - min range value.
+- *max* [1] - max range value.
+- *size* - size of rounding.
+
+```js
+const val = randf(3, 10, 2);
+console.log(val); // mkFqWeTGdp
+```
 
 ##
 ### randKey
@@ -294,7 +300,7 @@ console.log(id); // mkFqWeTGdp
 
 Returns function, wich returns unique value in own space (Just increment value)
 
-- *prefix* - a tring, wich will be added before value.
+- *prefix* - a string, wich will be added before value.
 
 ```js
 const getName = idGetter('unique_');
@@ -308,19 +314,65 @@ console.log(getId(), getId() /*...*); // 1, 2 ...
 
 ##
 ### camelCaseToDash
-(str)
+(***string*** : *String*) => *String*
+
+Converts string to camel-case spelling.
+
+- **string* - a string itself.
+
+```js
+const str = camelCaseToDash('camelCaseToDash');
+console.log(str); // camel-case-to-dash
+```
 
 ##
 ### dashToCamelCase
-(str)
+(***string*** : *String*) => *String*
+
+Converts string to dash-case spelling.
+
+- **string* - a string itself.
+
+```js
+const str = dashToCamelCase('dash-to-camel-case');
+console.log(str); // dashToCamelCase
+```
 
 ##
 ### camelCaseMerge
-(...list)
+(***word1, word2 ...*** : *Arguments*) => *String*
+
+Merges list of words to camel-sace spelling word.
+
+- **word1, word2 ...* - an arguments of words.
+
+```js
+const str = camelCaseMerge('hello', 'world', 'have', 'fun');
+console.log(str); // helloWorldHaveFun
+```
+
+##
+### trim
+(string)
 
 ##
 ### capitalize
-(str)
+(***string*** : *String*, ***each*** : *Boolean*) => *String*
+
+Trimes spaces in the string and converts first char in the word to upper-case.
+
+- **string* - a string itself.
+- *each* - if it's true, then all words in the string will be converted.
+
+```js
+const str = capitalize('hello world!');
+const str2 = capitalize(' have   fun! ');
+console.log(str, str2); // Hello world!, Have Fun!
+```
+
+##
+### zeroPad
+(number, size)
 
 ##
 ### vmin
@@ -351,11 +403,23 @@ console.log(getId(), getId() /*...*); // 1, 2 ...
 (value, border, flip)
 
 ##
+### clampAngle
+(angle, radians = false)
+
+##
+### mirrAngle
+(angle, radians = false)
+
+##
+### limitCalls
+(function, count = 1)
+
+##
 ### entry(val, from, to)
 
 ##
 ### log
-()
+(arguments)
 
 ##
 ### log.json

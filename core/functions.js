@@ -101,7 +101,7 @@ export function strParse(value) {
 		}
 		if (value.search(/\{.+\}/gm) != -1) return jsonParse(value);
 
-		return value.replace(/^\s+|\s+$/g, '');
+		return trim(value);
 
 	} else {
 		printErr('strParse error - type of argument must be "string"');
@@ -269,8 +269,9 @@ export function randi(min = 0, max = 9999999) {
 	return Math.floor(Math.random() * (max - min)) + min;
 }
 
-export function randf(min, max) {
-	return Math.random() * (max - min) + min;
+export function randf(min = 0, max = 1, size) {
+    const num = Math.random() * (max - min) + min;
+    return size ? parseFloat(num.toFixed(size)) : num;
 }
 
 export function randKey(length = 15, types = ['all']) {
@@ -315,8 +316,27 @@ export function camelCaseMerge(...list) {
 	}, '');
 }
 
-export function capitalize(str) {
-	return str.charAt(0).toUpperCase() + str.slice(1);
+export function trim(str, all) {
+	let res =  str.replace(/^\s+|\s+$/g, '');
+	if (all) res = res.replace(/\s+/g, ' ');
+	return res;
+}
+
+export function capitalize(str, each) {
+	if (each) {
+		return trim(str, true).replace().split(' ').map((w) => capitalize(w)).join(' ');
+	}
+
+	let res = trim(str);
+	return res.charAt(0).toUpperCase() + res.slice(1);
+}
+
+function zeroPad(num, size) {
+    let result = num + '';
+    while (result.length < size) {
+        result = '0' + result;
+    }
+    return result;
 }
 
 export function vmin(value) {
@@ -338,10 +358,9 @@ export function vh(value) {
 }
 
 export function clamp(val, from, to) {
-    let res = val;
-    if (val < from) res = from;
-    else if (val > to) res = to;
-    return res;
+    if (val < from) return from;
+	else if (val > to) return to;
+	else return val;
 }
 
 export function clampOut(val, from, to) {
@@ -357,6 +376,34 @@ export function clampOut(val, from, to) {
 export function clampSide(value, border, flip) {
     const f = flip ? -1 : 1;
     return (f * value) > (f * border) ? border : value;
+}
+
+export function clampAngle(val, rad) {
+    if (!Number.isFinite(val)) return val;
+    const max = rad ? Math.PI * 2 : 360;
+    const mod = val % max;
+    return mod < 0 ? max + mod : mod;
+}
+
+export function mirrAngle(val, rad) {
+    if (!Number.isFinite(val)) return val;
+    const max = rad ? Math.PI * 2 : 360;
+    const mod = val % max;
+    const ang = mod < 0 ? max + mod : mod;
+    return ang > max / 2 ? ang - max : ang;
+}
+
+export function limitCalls(fn, count = 1) {
+	let used = 0;
+	const res = (...arg) => {
+		if (used < count) {
+			fn(...arg);
+			used++;
+		}
+	}
+	res.resetCalls = () => { used = 0; }
+	res.getSource = () => fn;
+	return res;
 }
 
 export function entry(val, from, to) {
