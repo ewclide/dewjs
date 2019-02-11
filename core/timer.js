@@ -1,10 +1,13 @@
 import CallBacker from './callbacker';
+import { idGetter } from './functions';
 
-const _timerList = [];
+const _timerList = new Map();
+const getId = idGetter('__timer__');
 
 export default class Timer
 {
 	constructor(settings = {}) {
+		this.id = getId();
 		this.count = settings.count || 0;
 		this.duration = settings.duration || 0;
 		this.delay = settings.delay || 0;
@@ -30,7 +33,7 @@ export default class Timer
 		this._tickLimited = this._tickLimited.bind(this);
 		this._tickInfinity = this._tickInfinity.bind(this);
 
-		_timerList.push(this);
+		_timerList.set(this.id, this);
 	}
 
 	_init() {
@@ -130,16 +133,24 @@ export default class Timer
 		}
 	}
 
-	static globalPlay() {
+	destroy() {
+		_timerList.delete(this.id);
+	}
+
+	static play() {
 		_timerList.forEach((timer) => timer.play());
 	}
 
-	static globalPause() {
+	static pause() {
 		_timerList.forEach((timer) => timer.pause());
 	}
 
-	static globalFinish() {
+	static finish() {
 		_timerList.forEach((timer) => timer.finish());
+	}
+
+	static clear() {
+		_timerList.clear();
 	}
 
 	_tickInfinity(t) {
