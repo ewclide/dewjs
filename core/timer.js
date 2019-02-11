@@ -153,7 +153,7 @@ export default class Timer
 		_timerList.clear();
 	}
 
-	_tickInfinity(t) {
+	_tickInfinity(time) {
 		const dt = (time - this._prevTime) / 1000 * this.flow;
 
 		this._prevTime = time;
@@ -167,7 +167,7 @@ export default class Timer
 		}
 	}
 
-	_tickInfinityStep(t) {
+	_tickInfinityStep(time) {
 		const dt = (time - this._prevTime) / 1000 * this.flow;
 
 		this._prevTime = time;
@@ -199,7 +199,7 @@ export default class Timer
 		}
 	}
 
-	_tickLimitedStep(t) {
+	_tickLimitedStep(time) {
 		const dt = (time - this._prevTime) / 1000 * this.flow;
 
 		this._prevTime = time;
