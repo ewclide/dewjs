@@ -43,7 +43,7 @@ export default class Lerp
         this._stepResolver = () => {}
 
         this._timer = new Timer({
-            action: (t) => this._update(t)
+            action: (dt, elapsed) => this._update(elapsed)
         });
     }
 
@@ -54,7 +54,7 @@ export default class Lerp
     onStart(handler) {
         if (typeof handler == 'function') {
             this._handlerStart = handler;
-        } 
+        }
     }
 
     onFinish(handler) {
@@ -74,7 +74,7 @@ export default class Lerp
         this._delta = to - from;
         this.value = from;
         this.progress = 0;
-        
+
         if (typeof duration == 'number') {
             this.duration = duration;
         }
@@ -109,35 +109,35 @@ export default class Lerp
     }
 
     run(from, to, duration, timing) {
-        return this.setState(from, to, duration, timing).start();
+        return this.setState(from, to, duration, timing).play();
     }
 
     sleep(time) {
         return this._timer.sleep(time);
     }
 
-    start() {
+    play() {
         if (this._completed) {
             if (this._handlerStart) this._handlerStart();
             this._completed = false;
         }
 
-        this._timer.start();
+        this._timer.play();
 
         return new Promise((res) => this._stepResolver = res);
     }
 
-    startSync() {
+    playSync() {
         if (this._completed) {
             if (this._handlerStart) this._handlerStart();
             this._completed = false;
         }
 
-        this._timer.start();
+        this._timer.play();
     }
 
-    stop() {
-        this._timer.stop();
+    pause() {
+        this._timer.pause();
     }
 
     finish() {
@@ -145,11 +145,11 @@ export default class Lerp
         this.progress = 1;
 
         this._timer.finish();
-        
+
         if (this._handlerFinish) {
             this._handlerFinish();
         }
-        
+
         this._stepResolver();
     }
 }

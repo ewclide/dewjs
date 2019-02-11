@@ -9,18 +9,20 @@ export default class Timer
 		this.duration = settings.duration || 0;
 		this.delay = settings.delay || 0;
 		this.step = settings.step || 0;
+		this.flow = settings.flow || 1;
 
 		this._actions = new CallBacker(settings.action);
-		this._onStart = settings.onStart || null;
-		this._onStop = settings.onStop || null;
+		this._onPLay = settings.onPLay || null;
+		this._onPause = settings.onPause || null;
 		this._onFinish = settings._onFinish || null;
 
-		this._pauseStartTime = 0;
+		this._prevTime = 0;
+		this._pauseTime = 0;
 		this._startTime = 0;
-		this._timePassed = 0;
+		this._elapsedTime = 0;
 		this._iteration = 0;
 
-		this._stop = true;
+		this._pause = true;
 		this._sleepTimeout = null;
 
 		this._init();
@@ -63,60 +65,64 @@ export default class Timer
 	sleep(time) {
 		clearTimeout(this._sleepTimeout);
 
-		this.stop();
+		this.pause();
 
 		return new Promise((resolve) => {
 			this._sleepTimeout = setTimeout(() => {
-				if (this._startTime) this.start(0);
+				if (this._startTime) this.play(0);
 				resolve();
 			}, time);
 		});
 	}
 
-	start(delay) {
+	play(delay) {
 		const wait = typeof delay == 'number' ? delay : this.delay;
 
 		if (wait) {
-			setTimeout(() => this._start(), wait);
+			setTimeout(() => this._play(), wait);
 		} else {
-			this._start();
+			this._play();
 		}
 	}
 
-	_start() {
-		this._stop = false;
+	_play() {
+		this._pause = false;
 
 		const now = performance.now();
+		this._prevTime = now;
 
 		if (!this._startTime) {
 			this._startTime = now;
 		} else {
-			this._startTime += now - this._pauseStartTime;
+			this._startTime += now - this._pauseTime;
 		}
 
-		if (typeof this._onStart == 'function') {
-			this._onStart(now);
+		if (typeof this._onPLay == 'function') {
+			this._onPLay(now);
 		}
 
-		this[this._tickMethod](this._startTime + this._timePassed);
+		requestAnimationFrame(() => {
+			this[this._tickMethod](this._startTime + this._elapsedTime / this.flow);
+		});
 	}
 
-	stop() {
-		this._pauseStartTime = performance.now();
-		this._stop = true;
+	pause() {
+		this._pauseTime = performance.now();
+		this._pause = true;
 
-		if (typeof this._onStop == 'function') {
-			this._onStop();
+		if (typeof this._onPause == 'function') {
+			this._onPause();
 		}
 	}
 
 	finish() {
-		this._stop = true;
 		clearTimeout(this._sleepTimeout);
 
-		this._pauseStartTime = 0;
+		this._pause = true;
+		this._prevTime = 0;
+		this._pauseTime = 0;
 		this._startTime = 0;
-		this._timePassed = 0;
+		this._elapsedTime = 0;
 		this._iteration = 0;
 
 		if (typeof this._onFinish == 'function') {
@@ -124,57 +130,78 @@ export default class Timer
 		}
 	}
 
-	static globalStart() {
-		_timerList.forEach((timer) => timer.start());
+	static globalPlay() {
+		_timerList.forEach((timer) => timer.play());
 	}
 
-	static globalStop() {
-		_timerList.forEach((timer) => timer.stop());
+	static globalPause() {
+		_timerList.forEach((timer) => timer.pause());
 	}
 
 	static globalFinish() {
 		_timerList.forEach((timer) => timer.finish());
 	}
 
-	_tickInfinity(time) {
-		this._timePassed = time - this._startTime;
-		this._actions.call(this._timePassed);
-		this._stop ? this.stop() : requestAnimationFrame(this._tickInfinity);
+	_tickInfinity(t) {
+		const dt = (time - this._prevTime) / 1000 * this.flow;
+
+		this._prevTime = time;
+		this._elapsedTime = (time - this._startTime) * this.flow;
+		this._actions.call(dt, this._elapsedTime);
+
+		if (this._pause) {
+			this.pause();
+		} else {
+			requestAnimationFrame(this._tickInfinity);
+		}
 	}
 
-	_tickInfinityStep() {
-		this._timePassed = time - this._startTime;
-		this._actions.call(this._timePassed);
+	_tickInfinityStep(t) {
+		const dt = (time - this._prevTime) / 1000 * this.flow;
 
-		if (this._stop) {
-			this.stop();
+		this._prevTime = time;
+		this._elapsedTime = (time - this._startTime) * this.flow;
+		this._actions.call(dt, this._elapsedTime);
+
+		if (this._pause) {
+			this.pause();
 		} else {
 			setTimeout(() => this._tickInfinityStep(performance.now()), this.step);
 		}
 	}
 
 	_tickLimited(time) {
-		this._timePassed = time - this._startTime;
-		this._actions.call(this._timePassed);
+		const dt = (time - this._prevTime) / 1000 * this.flow;
 
-		if (this._timePassed >= this.duration) {
-			this._stop = true;
+		this._prevTime = time;
+		this._elapsedTime = (time - this._startTime) * this.flow;
+		this._actions.call(dt, this._elapsedTime);
+
+		if (this._elapsedTime >= this.duration) {
+			this._pause = true;
 		}
 
-		this._stop ? this.stop() : requestAnimationFrame(this._tickLimited);
+		if (this._pause) {
+			this.pause();
+		} else {
+			requestAnimationFrame(this._tickLimited);
+		}
 	}
 
-	_tickLimitedStep(time) {
-		this._timePassed = time - this._startTime;
-		this._actions.call(this._timePassed, this._iteration);
+	_tickLimitedStep(t) {
+		const dt = (time - this._prevTime) / 1000 * this.flow;
+
+		this._prevTime = time;
+		this._elapsedTime = (time - this._startTime) * this.flow;
+		this._actions.call(dt, this._elapsedTime, this._iteration);
 
 		if (this._iteration++ >= this.count - 1) {
-			this._stop = true;
+			this._pause = true;
 			this._iteration--;
 		}
 
-		if (this._stop) {
-			this.stop();
+		if (this._pause) {
+			this.pause();
 		} else {
 			setTimeout(() => this._tickLimitedStep(performance.now()), this.step);
 		}
