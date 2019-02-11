@@ -170,8 +170,8 @@ inst.doAnother(); // Uncaught TypeError: inst.doAnother is not a function
 Compiles settings from different sources - *defaults, user settings and element data-attributes*.
 At the begin it gets value from user object, after from attribute and at the end gets default.
 All settings must have defaults values.
-If attribute founds but is empty, then regards as *true* value.
-If you want give special name to the attribute, then use attribute object, by default name of attribute regards as name of option with prefix "data-". Options writed through camel-case spelling will replaced by dash-case attributes.
+If attribute founds but is empty, then take as *true* value.
+If you want give special name to the attribute, then use attribute object, by default name of attribute takes as name of option with prefix "data-". Options writed through camel-case spelling will replaced by dash-case attributes.
 Function also detects *Boolean* values in attrubtes.
 
 - **settings* - object with user settings.
@@ -443,11 +443,11 @@ vh(25); // 242.25
 ### clamp
 (***value*** : *Number*, ***from*** : *Number*, ***to*** : *Number*) => *Number*
 
-Truncates the value between a upper and lower borders.
+Truncates the value inside of the interval.
 
 - **value* - a value itself.
-- **from* - lower border of the value.
-- **to* - upper border of the value.
+- **from* - lower border of the interval.
+- **to* - upper border of the interval.
 
 ```js
 clamp(125, 50, 100); // 100
@@ -459,11 +459,11 @@ clamp(70, 50, 100); // 70
 ### clampOut
 (***value*** : *Number*, ***from*** : *Number*, ***to*** : *Number*) => *Number*
 
-Truncates the value outside of a upper and lower borders. If value specified between borders, then the value truncates to a neares border.
+Truncates the value outside of the interval. If value specified inside of the interval, then the value truncates to a neares border.
 
 - **value* - a value itself.
-- **from* - smaller border of the value.
-- **to* - larger border of the value.
+- **from* - lower border of the interval.
+- **to* - upper border of the interval.
 
 ```js
 clampOut(125, 50, 100); // 125
@@ -527,7 +527,7 @@ Returns wrapper function, wich can be called a certain number of times.
 - **function* - a function.
 - *count* [1] - permissible number of calling.
 
-**Methods**  
+**Methods**
 - *resetCalls()* - resets count of calls.
 - *getSource()* - returns source function.
 
@@ -542,20 +542,61 @@ func(3); // you called with: 3;
 ```
 
 ##
-### entry(val, from, to)
+### entry
+(***value*** : *Numeber*, ***from*** : *Number*, ***to*** : *Number*) => *Boolean*
+
+Determines occurrence of the value in the interval, including borders.
+
+- **value* - a value.
+- **from* - lower border of the interval.
+- **to* - upper border of the interval.
+
+```js
+entry(7, 5, 10); // true
+entry(12, 5, 10); // false
+```
 
 ##
 ### log
-(arguments)
+(***arg1, arg2, ...***) => *Void*
+
+Wrapper of native console.log function. It's more short recording. Also it prints name of the source file where it was called.
+
+```js
+log('Hello');
+/*
+  "Hello"
+  -----
+  Source: http://localhost:3000/index.js:10:11
+*/
+```
 
 ##
 ### log.json
-(json, spaces = 4)
+(***json*** : *JSON*, ***spaces*** : *Number*) => *Void*
+
+Prints to the console parsed to string a json object. Works as JSON.stringify and console.log together.
+
+- **json* - a json object.
+- **spaces* [4] - number of spaces.
+
+```js
+log.json({ first: "1", second: "2" });
+/* {
+    first: "1",
+    second: "2"
+} */
+```
 
 ##
-### log.time
-(name)
+### log.time, log.timeEnd
+(***name*** : *String*) => *Void*
 
-##
-### log.timeEnd
-(name)
+Wrapper of native console.time function. Prints time of execution code.
+
+```js
+log.time('speed test');
+// ...code
+log.timeEnd('speed test');
+// speed test: 0.25ms
+```
