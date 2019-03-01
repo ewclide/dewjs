@@ -519,6 +519,37 @@ mirrAngle(-30, true); // -30
 ```
 
 ##
+### roundBetween
+(***value*** : *Number*, ***begin*** : *Number*, ***end*** : *Number*) => *Number*
+
+Rounds a value between two number borders.
+
+- **value* - a number.
+- **begin* - lower border value.
+- **end* - upper border value.
+
+```js
+roundBetween(11, 5, 15); // 15
+roundBetween(7, 5, 15); // 5
+roundBetween(3, 5, 15); // 5
+roundBetween(10, 5, 15); // 5
+```
+
+##
+### clampBySteps
+(***value*** : *Number*, ***steps*** : *Array*) => *Number*
+
+Trancates a value between steps defined as array. Minimum length of the array is 2.
+
+- **value* - a number.
+- **steps* - array of steps.
+
+```js
+clampBySteps(16, [0, 10, 20, 30]); // 20
+clampBySteps(-1, [0, 2, 4]); // 0
+```
+
+##
 ### limitCalls
 (***function*** : *Function*, ***count*** : *Number*) => *Function*
 
