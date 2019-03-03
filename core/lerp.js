@@ -1,111 +1,105 @@
 import Timer from "./timer";
+import CallBacker from './callbacker';
 
-const _easing = {
+const EASING = {
     linear     : (t) => t,
     InQuad     : (t) => t*t,
     OutQuad    : (t) => t*(2-t),
-    InOutQuad  : (t) => t<.5 ? 2*t*t : -1+(4-2*t)*t,
+    InOutQuad  : (t) => t < 0.5 ? 2*t*t : -1+(4-2*t)*t,
     InCubic    : (t) => t*t*t,
     OutCubic   : (t) => (--t)*t*t+1,
-    InOutCubic : (t) => t<.5 ? 4*t*t*t : (t-1)*(2*t-2)*(2*t-2)+1,
+    InOutCubic : (t) => t < 0.5 ? 4*t*t*t : (t-1)*(2*t-2)*(2*t-2)+1,
     InQuart    : (t) => t*t*t*t,
     OutQuart   : (t) => 1-(--t)*t*t*t,
-    InOutQuart : (t) => t<.5 ? 8*t*t*t*t : 1-8*(--t)*t*t*t,
+    InOutQuart : (t) => t < 0.5 ? 8*t*t*t*t : 1-8*(--t)*t*t*t,
     InQuint    : (t) => t*t*t*t*t,
     OutQuint   : (t) => 1+(--t)*t*t*t*t,
-    InOutQuint : (t) => t<.5 ? 16*t*t*t*t*t : 1+16*(--t)*t*t*t*t
+    InOutQuint : (t) => t < 0.5 ? 16*t*t*t*t*t : 1+16*(--t)*t*t*t*t
 }
 
 export default class Lerp
 {
     constructor(settings = {}) {
+        // common
+        let { timing, duration = 500 } = settings;
 
-        let { timing, duration, action, onStart, onFinish } = settings;
-
-        if (typeof timing == 'string' && timing in _easing) {
-            timing = _easing[timing];
+        if (typeof timing == 'string' && timing in EASING) {
+            timing = EASING[timing];
         }
 
-        this.timing = timing || _easing.linear;
-        this.duration = duration || 500;
-        this.from = 0;
-        this.to = 1;
-        this.value = 0;
-        this.progress = 0;
+        this._timing = timing || EASING.linear;
+        this._duration = duration;
+        this._from = 0;
+        this._to = 1;
+        this._value = 0;
+        this._progress = 0;
 
+        // callbacks
+        const { action = () => {}, onStart, onFinish } = settings;
+        this._action = action;
+        this._onStart  = new CallBacker(onStart);
+        this._onFinish = new CallBacker(onFinish);
+
+        // spacials
         this._delta = 1;
         this._completed = true;
-        this._stateStack = [];
-
-        this._handlerAction = action ? action : () => {};
-        this._handlerStart  = onStart  || null;
-        this._handlerFinish = onFinish || null;
-        this._stepResolver = () => {}
-
+        this._stepResolver = () => {};
         this._timer = new Timer({
-            action: (dt, elapsed) => this._update(elapsed)
+            onUpdate: (dt, elapsed) => this._update(elapsed)
         });
+        console.log(this)
     }
 
-    action(handler) {
-        this._handlerAction = handler;
+    addAction(handler) {
+        this._action = handler;
     }
 
     onStart(handler) {
-        if (typeof handler == 'function') {
-            this._handlerStart = handler;
-        }
+        this._onStart.push(handler);
     }
 
     onFinish(handler) {
-        if (typeof handler == 'function') {
-            this._handlerFinish = handler;
-        }
+        this._onFinish.push(handler);
     }
 
     setState(from, to, duration, timing) {
         if (typeof from != 'number' && typeof to != 'number') {
-            console.warn('state object must have required fields [from: numeric, to: numeric]');
+            console.warn('setState must to recieve required arguments - from, to');
             return;
         }
 
-        this.from = from;
-        this.to = to;
+        this._from = from;
+        this._to = to;
         this._delta = to - from;
-        this.value = from;
-        this.progress = 0;
+        this._value = from;
+        this._progress = 0;
 
         if (typeof duration == 'number') {
-            this.duration = duration;
+            this._duration = duration;
         }
 
-        if (typeof timing == 'string' && timing in _easing) {
-            this.timing = _easing[timing];
+        if (typeof timing == 'string' && timing in EASING) {
+            this._timing = EASING[timing];
         } else if (typeof timing == 'function') {
-            this.timing = timing;
+            this._timing = timing;
         }
 
         return this;
     }
 
-    _update(time) {
-        let fraction = time / this.duration;
+    _update(elapsed) {
+        const fraction = elapsed / this._duration;
 
-        if (fraction < 0) {
-            return;
-        } else if (fraction > 1) {
-            fraction = 1;
-            this._completed = true;
-        }
-
-        this.progress = this.timing(fraction);
-        this.value = this.from + this.progress * this._delta;
-
-        this._handlerAction(this.value);
-
-        if (this._completed) {
+        if (fraction >= 1) {
+            this._action(this._to);
             this.finish();
+            return;
         }
+
+        this._progress = this._timing(fraction);
+        this._value = this._from + this._progress * this._delta;
+
+        this._action(this._value);
     }
 
     run(from, to, duration, timing) {
@@ -118,7 +112,7 @@ export default class Lerp
 
     play() {
         if (this._completed) {
-            if (this._handlerStart) this._handlerStart();
+            this._onStart.call();
             this._completed = false;
         }
 
@@ -127,29 +121,17 @@ export default class Lerp
         return new Promise((res) => this._stepResolver = res);
     }
 
-    playSync() {
-        if (this._completed) {
-            if (this._handlerStart) this._handlerStart();
-            this._completed = false;
-        }
-
-        this._timer.play();
-    }
-
     pause() {
         this._timer.pause();
     }
 
     finish() {
-        this.value = this.to;
-        this.progress = 1;
+        this._value = this._from;
+        this._progress = 0;
+        this._completed = true;
 
         this._timer.finish();
-
-        if (this._handlerFinish) {
-            this._handlerFinish();
-        }
-
+        this._onFinish.call();
         this._stepResolver();
     }
 }

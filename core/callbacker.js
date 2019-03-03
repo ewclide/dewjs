@@ -43,12 +43,12 @@ export default class CallBacker
 	filter(filter, ...args) {
 		let index = 0;
 
-		for (let handler of this._handlers) {
+		for (const handler of this._handlers) {
 			const product = Array.isArray(args)
-			? handler[1](...args) : handler[1](args);
+				? handler[1](...args) : handler[1](args);
 
 			const skip = Array.isArray(product)
-			? filter(index, ...product) : filter(index, product);
+				? filter(index, ...product) : filter(index, product);
 
 			if (skip) {
 				args = product;

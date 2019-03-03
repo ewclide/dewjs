@@ -430,6 +430,11 @@ export function limitCalls(fn, count = 1) {
 	return res;
 }
 
+export function sleep(time) {
+	if (!time) return Promise.resolve();
+	return new Promise((resolve) => setTimeout(resolve, time));
+}
+
 export function entry(val, from, to) {
     return val >= from && val <= to;
 }

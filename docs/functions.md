@@ -550,6 +550,25 @@ clampBySteps(-1, [0, 2, 4]); // 0
 ```
 
 ##
+### sleep
+(***time*** : *Number*) => *Promise*
+
+Returns promise, wich will be resolved after specified time. If you not pass a time, that function return resolved promise.
+
+- *time* - a time in milliseconds.
+
+```js
+async function logAsync(messages) {
+    for (const mess of messages) {
+        await sleep(1000);
+        console.log(mess)
+    }
+}
+
+logAsync(['hello', 'world']);
+```
+
+##
 ### limitCalls
 (***function*** : *Function*, ***count*** : *Number*) => *Function*
 
