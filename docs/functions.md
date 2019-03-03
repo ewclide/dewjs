@@ -490,7 +490,7 @@ clampSide(25, 50, true); // 50
 
 ##
 ### clampAngle
-(***angle*** : *Number*, ***radians*** : *Boolean*) => *Number*
+(***angle*** : *Number*, ***degrees*** : *Boolean*) => *Number*
 
 Translates angle in radians to value between *0* and *Math.PI * 2*.
 
@@ -505,7 +505,7 @@ clampAngle(30, true); // 30
 
 ##
 ### mirrAngle
-(***angle*** : *Number*, ***radians*** : *Boolean*) => *Number*
+(***angle*** : *Number*, ***degrees*** : *Boolean*) => *Number*
 
 Translates angle in radians to value between *-Math.PI* and *Math.PI*.
 
@@ -539,7 +539,7 @@ roundBetween(10, 5, 15); // 5
 ### clampBySteps
 (***value*** : *Number*, ***steps*** : *Array*) => *Number*
 
-Trancates a value between steps defined as array. Minimum length of the array is 2.
+Truncates a value between steps defined as array. Minimum length of the array is 2.
 
 - **value* - a number.
 - **steps* - array of steps.
@@ -572,7 +572,7 @@ logAsync(['hello', 'world']);
 ### limitCalls
 (***function*** : *Function*, ***count*** : *Number*) => *Function*
 
-Returns wrapper function, wich can be called a certain number of times.
+Returns wrapper of a function, wich can be called a certain number of times.
 
 - **function* - a function.
 - *count* [1] - permissible number of calling.
@@ -581,11 +581,11 @@ Returns wrapper function, wich can be called a certain number of times.
 - *resetCalls()* - resets count of calls.
 - *getSource()* - returns source function.
 
-
 ```js
-const func = limitCalls((a) => 'you called with: ' + a, true);
+const func = limitCalls((a) => 'you called with: ' + a, 2);
 func(1); // you called with: 1;
-func(2); // nothing
+func(2); // you called with: 2;
+func(3); // nothing
 
 func.resetCalls();
 func(3); // you called with: 3;
