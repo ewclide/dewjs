@@ -376,16 +376,16 @@ export function clampSide(value, border, flip) {
     return (f * value) > (f * border) ? border : value;
 }
 
-export function clampAngle(val, rad = true) {
+export function clampAngle(val, deg) {
     if (!Number.isFinite(val)) return val;
-    const max = rad ? Math.PI * 2 : 360;
+    const max = deg ? 360 : Math.PI * 2;
     const mod = val % max;
     return mod < 0 ? max + mod : mod;
 }
 
-export function mirrAngle(val, rad = true) {
+export function mirrAngle(val, deg) {
     if (!Number.isFinite(val)) return val;
-    const max = rad ? Math.PI * 2 : 360;
+    const max = deg ? 360 : Math.PI * 2;
     const mod = val % max;
     const ang = mod < 0 ? max + mod : mod;
     return ang > max / 2 ? ang - max : ang;

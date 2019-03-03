@@ -314,7 +314,7 @@ getId(); // 2
 ### camelCaseToDash
 (***string*** : *String*) => *String*
 
-Converts string to camel-case spelling.
+Converts string to dash-case spelling.
 
 - **string* - a string itself.
 
@@ -326,7 +326,7 @@ camelCaseToDash('camelCaseToDash'); // "camel-case-to-dash"
 ### dashToCamelCase
 (***string*** : *String*) => *String*
 
-Converts string to dash-case spelling.
+Converts string to camel-case spelling.
 
 - **string* - a string itself.
 
@@ -495,7 +495,7 @@ clampSide(25, 50, true); // 50
 Translates angle in radians to value between *0* and *Math.PI * 2*.
 
 - **angle* - a angle itself.
-- *radians* [true] - if false, then will works in degrees.
+- *degrees* - if true, then will works in degrees.
 
 ```js
 clampAngle(390, true); // 30
@@ -510,7 +510,7 @@ clampAngle(30, true); // 30
 Translates angle in radians to value between *-Math.PI* and *Math.PI*.
 
 - **angle* - a angle itself.
-- *radians* [true] - if false, then will works in degrees.
+- *degrees* - if true, then will works in degrees.
 
 ```js
 mirrAngle(390, true); // 30
