@@ -1,24 +1,6 @@
 import {printErr} from './functions';
 import ObjectIniter from './object-initer';
 
-function _assign(list = {}, target, method) {
-    if (Array.isArray(list)) {
-        list.forEach( item => method(item, target) );
-    } else {
-        method(list, target);
-    }
-}
-
-function _defineProperties(from, target) {
-    for (let i in from) {
-        const desc = Object.getOwnPropertyDescriptor(from, i);
-        if (desc) Object.defineProperty(target, i, desc);
-        else target[i] = from[i];
-    }
-
-    return target;
-}
-
 function _createClone(object, full) {
     function Clone() {
         for (let field in object) {
@@ -44,19 +26,29 @@ function _createClone(object, full) {
     else return object;
 }
 
-export function fastClone() {
-
-}
-
 export function clone(target, full) {
     return target.constructor != Object
     ? Object.assign((new target.constructor()), target)
     : _createClone(target, full)
 }
 
+function _fetchProp(prop, objects) {
+    for (const obj of objects) {
+        if (prop in obj) return obj;
+    }
+}
+
 export function innerAssign(target, attachment, copy) {
     const result = copy ? Object.assign({}, target) : target;
-    const keys = Object.keys(target);
+    
+    if (Array.isArray(attachment)) {
+        for (const prop in result) {
+            const val = _fetchProp(prop, attachment);
+            if (val !== undefined) result[prop] = val;
+        }
+
+        return result;
+    }
 
     for (const prop in result) {
         if (prop in attachment) {
@@ -64,33 +56,48 @@ export function innerAssign(target, attachment, copy) {
         }
     }
 
-    // _assign(list, result, (item, obj) => {
-    //     for (let i in item) {
-    //         if (i in obj) obj[i] = item[i];
-    //     }
-    // });
-
     return result;
 }
 
-export function outerAssign(target, list, copy) {
+export function outerAssign(target, attachment, copy) {
     const result = copy ? Object.assign({}, target) : target;
 
-    _assign(list, result, (item, obj) => {
-        for (let i in item) {
-            if (!(i in obj)) obj[i] = item[i];
+    if (Array.isArray(attachment)) {
+        attachment.forEach((source) => outerAssign(result, source));
+        return result;
+    }
+
+    for (const prop in attachment) {
+        if (!(prop in result)) {
+            result[prop] = attachment[prop];
         }
-    });
+    }
 
     return result;
 }
 
-export function fullAssign(target, list, copy) {
-    target = copy ? _defineProperties(target, {}) : target;
-
-    _assign(list, target, item => _defineProperties(item, target));
+function _defineProperties(target, source) {
+    for (const prop in from) {
+        const desc = Object.getOwnPropertyDescriptor(source, prop);
+        if (desc) {
+            Object.defineProperty(target, prop, desc);
+        } else {
+            target[prop] = source[prop];
+        }
+    }
 
     return target;
+}
+
+export function fullAssign(target, attachment, copy) {
+    const result = copy ? _defineProperties({}, target) : target;
+
+    if (Array.isArray(attachment)) {
+        attachment.forEach((source) => _defineProperties(result, source));
+        return result;
+    }
+
+    return _defineProperties(result, attachment);
 }
 
 export function init(target, values, settings, common = { errors : true }) {
