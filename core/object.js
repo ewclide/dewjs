@@ -38,12 +38,12 @@ function _fetchProp(prop, objects) {
     }
 }
 
-export function innerAssign(target, attachment, copy) {
+export function innerAssign(target, source, copy) {
     const result = copy ? Object.assign({}, target) : target;
     
-    if (Array.isArray(attachment)) {
+    if (Array.isArray(source)) {
         for (const prop in result) {
-            const val = _fetchProp(prop, attachment);
+            const val = _fetchProp(prop, source);
             if (val !== undefined) result[prop] = val;
         }
 
@@ -51,25 +51,25 @@ export function innerAssign(target, attachment, copy) {
     }
 
     for (const prop in result) {
-        if (prop in attachment) {
-            result[prop] = attachment[prop];
+        if (prop in source) {
+            result[prop] = source[prop];
         }
     }
 
     return result;
 }
 
-export function outerAssign(target, attachment, copy) {
+export function outerAssign(target, source, copy) {
     const result = copy ? Object.assign({}, target) : target;
 
-    if (Array.isArray(attachment)) {
-        attachment.forEach((source) => outerAssign(result, source));
+    if (Array.isArray(source)) {
+        source.forEach((src) => outerAssign(result, src));
         return result;
     }
 
-    for (const prop in attachment) {
+    for (const prop in source) {
         if (!(prop in result)) {
-            result[prop] = attachment[prop];
+            result[prop] = source[prop];
         }
     }
 
@@ -89,15 +89,15 @@ function _defineProperties(target, source) {
     return target;
 }
 
-export function fullAssign(target, attachment, copy) {
+export function fullAssign(target, source, copy) {
     const result = copy ? _defineProperties({}, target) : target;
 
-    if (Array.isArray(attachment)) {
-        attachment.forEach((source) => _defineProperties(result, source));
+    if (Array.isArray(source)) {
+        source.forEach((src) => _defineProperties(result, src));
         return result;
     }
 
-    return _defineProperties(result, attachment);
+    return _defineProperties(result, source);
 }
 
 export function init(target, values, settings, common = { errors : true }) {

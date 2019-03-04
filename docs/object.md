@@ -9,7 +9,8 @@ import { /* methods */ } from 'dewjs/object';
 ### clone
 ( ***target*** : *Object*, ***deep*** : *Boolean* ) => *Object*
 
-Creates copy of the object. It saves original prototype and constructor, and also supports cloning of arrays. Arrays, wich located at the first level of nesting in the object, will always clone. This method not situable for creating a lot of clones, because works not enough quickly.
+Creates copy of the object. It saves original prototype and constructor, and also supports cloning of arrays. Arrays, wich located at the first level of nesting in the object, will always clone.   
+This method not situable for creating a lot of clones, because works not enough quickly.
 
 - **target* - a target object
 - *deep* [false] - if it's true, then will created copies of all sub-objects.
@@ -37,17 +38,65 @@ user_2.friends.push({ name: "david", age: 25 });
 
 ##
 ### innerAssign
-(***target*** : *Object*, ***list*** : *Object* | *Array*, ***copy*** : *Boolean*) => *Object*
+(***target*** : *Object*, ***source*** : *Object* | *Array*, ***copy*** : *Boolean*) => *Object*
 
-Merges two object by algorithm - all properties, wich are in the target object will got values from second object.
+Merges an objects by algorithm - all properties, wich are in the target and source object will got values from a source object.  
+Also you can pass an array of source objects, and the props, wich is not found in a previous object of the list will be searched in a next object and so on.  
+Last argument allows to create copy of the target object.
+
+- **target* - a target object
+- **source* - a donor object
+- *copy* - creates copy of a target object
+
+```js
+const target = {
+  color: 'red',
+  size: 'small',
+  speed: 25
+};
+
+const source = {
+  color: 'blue',
+  speed: 10,
+  delay: 50
+}
+
+const result = innerAssign(target, source, true);
+/* result { color: "blue", size: "small", speed: 10 } */
+```
 
 ##
 ### outerAssign
-(target, list, copy)
+(***target*** : *Object*, ***source*** : *Object* | *Array*, ***copy*** : *Boolean*) => *Object*
+
+Merges an objects by algorithm - all properties of a source object, wich exists in the target object will be writen to the target object.  
+Also you can pass an array of source objects, and the props, will be fetched from each source object until the list ends.  
+Last argument allows to create copy of the target object.
+
+- **target* - a target object
+- **source* - a donor object
+- *copy* - creates copy of a target object
+
+```js
+const target = {
+  color: 'red',
+  size: 'small',
+  speed: 25
+};
+
+const source = {
+  color: 'blue',
+  speed: 10,
+  delay: 50
+}
+
+const result = innerAssign(target, source, true);
+/* result { color: "red", size: "small", speed: 25, delay: 50  } */
+```
 
 ##
 ### fullAssign
-(target, list, copy)
+(target, source, copy)
 
 ##
 ### init
@@ -55,4 +104,4 @@ Merges two object by algorithm - all properties, wich are in the target object w
 
 ##
 ### define
-(obj, fields, options = {})
+(object, fields, options = {})
