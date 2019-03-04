@@ -54,14 +54,21 @@ export function clone(target, full) {
     : _createClone(target, full)
 }
 
-export function innerAssign(target, list, copy) {
+export function innerAssign(target, attachment, copy) {
     const result = copy ? Object.assign({}, target) : target;
+    const keys = Object.keys(target);
 
-    _assign(list, result, (item, obj) => {
-        for (let i in item) {
-            if (i in obj) obj[i] = item[i];
+    for (const prop in result) {
+        if (prop in attachment) {
+            result[prop] = attachment[prop];
         }
-    });
+    }
+
+    // _assign(list, result, (item, obj) => {
+    //     for (let i in item) {
+    //         if (i in obj) obj[i] = item[i];
+    //     }
+    // });
 
     return result;
 }
