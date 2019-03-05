@@ -44,9 +44,9 @@ export class HTMLTools
     ready() {
         return new Promise((resolve, reject) => {
 
-            let list = this.select("img, link, script, iframe");
-                list = list.join(this.elements).elements;
-                list._countReady = 0;
+            const elems = this.select('img, link, script, iframe');
+            const list = elems.join(this.elements).elements;
+            list._countReady = 0;
 
             const checkout = () => {
                 list._countReady++;
@@ -55,22 +55,20 @@ export class HTMLTools
                 }
             }
 
-            list.forEach( element => {
+            list.forEach((element) => {
 
                 const tag = element.tagName.toLowerCase();
                 const errorText = `Can't load resource "${element.src}"`;
-
                 let complete = true;
 
-                if (tag == "img") {
+                if (tag === 'img') {
                     complete = element.complete;
                     if (complete && !element.width && !element.height) {
                         reject(errorText);
                         return;
                     }
-                }
 
-                else if (tag == "link" || tag == "iframe") {
+                } else if (tag === 'link' || tag === 'iframe') {
                     complete = false;
                 }
 
@@ -78,8 +76,8 @@ export class HTMLTools
                     checkout();
 
                 } else {
-                    element.addEventListener("load", checkout);
-                    element.addEventListener("error", reject);
+                    element.addEventListener('load', checkout);
+                    element.addEventListener('error', reject);
                 }
             });
         })
@@ -87,8 +85,8 @@ export class HTMLTools
 
     mutation(fn, options, replace) {
 
-        if (!("MutationObserver" in window)) {
-            printErr("Your browser not support observ mutation");
+        if (!('MutationObserver' in window)) {
+            printErr('Your browser not support observ mutation');
             return;
         }
 
@@ -97,14 +95,14 @@ export class HTMLTools
         this._mutations = [];
 
         for (let i = 0; i < this.elements.length; i++) {
-
-            let observer = new MutationObserver((data) => fn(data[0]));
-            observer.observe(this.elements[i], options);
+            const element = this.elements[i];
+            const observer = new MutationObserver((data) => fn(data[0]));
+            observer.observe(element, options);
 
             this._mutations.push({
                 options,
                 observer,
-                element: this.elements[i]
+                element
             });
         }
 
@@ -113,8 +111,8 @@ export class HTMLTools
 
     mutationStart() {
         for (let i = 0; i < this._mutations.length; i++) {
-            let mutation = this._mutations[i];
-            mutation.observer.observe(mutation.element, mutation.options);
+            const { observer, element, options } = this._mutations[i];
+            observer.observe(element, options);
         }
     }
 
@@ -133,53 +131,59 @@ export class HTMLTools
     }
 
     visible(maxDepth = 3) {
-        const found = this._findHidden(this.elements[0], maxDepth, 0)
+        const found = this._searchHidden(this.elements[0], maxDepth, 0)
         return found ? { element : found } : {}
     }
 
-    _findHidden(element, maxDepth, depth) {
+    _searchHidden(element, maxDepth, depth) {
         if (depth >= maxDepth) return false;
 
-        let result = false;
-        let parent = element.parentElement || element.parentNode || null;
+        const { parentElement, parentNode } = element;
+        const parent = parentElement || parentNode;
 
         if (parent && parent !== document) {
-            result = this.display(parent) ? this._findHidden(parent, maxDepth, ++depth) : parent;
+            return this.display(parent)
+                ? this._searchHidden(parent, maxDepth, ++depth)
+                : parent;
         }
 
-        return result;
+        return false;
     }
 
     display(element) {
         if (!element) element = this.elements[0];
 
         const display = element.style.display
-        ? element.style.display
-        : getComputedStyle(element).display;
+            ? element.style.display
+            : getComputedStyle(element).display;
 
-        return display !== "none";
+        return display !== 'none';
     }
 
     select(query) {
-        let elements = [], result;
-
         if (this.elements.length == 1) {
-            elements = this.elements[0].querySelectorAll(query);
-        } else {
-            for (let i = 0; i < this.elements.length; i++) {
-                let search = this.elements[i].querySelectorAll(query),
-                    index = elements.length;
+            const element = this.elements[0].querySelectorAll(query);
+            const htl = new HTMLTools(elements);
+            htl.query = query;
 
-                for (let j = 0; j < search.length; j++) {
-                    elements[index + j] = search[j];
-                }
+            return htl;
+        }
+
+        const elements = [];
+
+        for (let i = 0; i < this.elements.length; i++) {
+            const search = this.elements[i].querySelectorAll(query);
+            const index = elements.length;
+
+            for (let j = 0; j < search.length; j++) {
+                elements[index + j] = search[j];
             }
         }
 
-        result = new HTMLTools(elements);
-        result.query = query;
+        const htl = new HTMLTools(elements);
+        htl.query = query;
 
-        return result;
+        return htl;
     }
 
     getById(id) {
@@ -190,17 +194,17 @@ export class HTMLTools
     }
 
     before(htl) {
-        this._insert(htl, "beforebegin");
+        this._insert(htl, 'beforebegin');
         return this;
     }
 
     after(htl) {
-        this._insert(htl, "afterend");
+        this._insert(htl, 'afterend');
         return this;
     }
 
     append(htl) {
-        this._insert(htl, "beforeend");
+        this._insert(htl, 'beforeend');
         return this;
     }
 
@@ -210,7 +214,7 @@ export class HTMLTools
     }
 
     prepend(htl) {
-        this._insert(htl, remove, "afterbegin");
+        this._insert(htl, remove, 'afterbegin');
         return this;
     }
 
@@ -218,7 +222,7 @@ export class HTMLTools
         if (htl.isHTMLTools) {
 
             if (htl._jsonConv) {
-                this._insertJSON(htl, "beforeend");
+                this._insertJSON(htl, 'beforeend');
                 return;
             }
 
@@ -228,7 +232,7 @@ export class HTMLTools
 
             for (let i = 0; i < this.elements.length; i++) {
                 for (let j = 0; j < htl._srcLength; j++) {
-                    let element = htl.elements[j];
+                    const element = htl.elements[j];
                     this.elements[i].insertAdjacentElement(position, element);
                 }
             }
@@ -242,33 +246,34 @@ export class HTMLTools
 
     _insertJSON(htl, position) {
         for (let i = 0; i < this.elements.length; i++) {
-            let element = htl._jsonConv.build();
+            const element = htl._jsonConv.build();
             htl.elements.push(element);
             this.elements[i].insertAdjacentElement(position, element);
         }
     }
 
     createFromJSON(json) {
-        let jsonConv = new JSONConverter(json),
-            result = jsonConv.htl;
-            result._jsonConv = jsonConv;
-            result.node = jsonConv.nodes;
+        const jsonConv = new JSONConverter(json);
+        const { htl, nodes } = jsonConv;
+
+        const result = htl;
+        result.node = nodes;
+        result._jsonConv = jsonConv;
 
         return result;
     }
 
     createJSON(htl) {
-        let elements = htl ? htl.elements : this.elements,
-            result;
+        const elements = htl ? htl.elements : this.elements
 
         if (elements.length > 1) {
-            result = [];
+            const result = [];
             elements.forEach((elem) => result.push(JSONConverter.createJSON(elem)));
-        } else {
-            result = JSONConverter.createJSON(elements[0]);
-        }
+            return result;
 
-        return result;
+        } else {
+            return JSONConverter.createJSON(elements[0]);
+        }
     }
 
     tplAppend(tpl) {
@@ -292,40 +297,40 @@ export class HTMLTools
     }
 
     html(str, clear = true) {
-        if (str !== undefined) {
-            for (let i = 0; i < this.elements.length; i++) {
-                if (clear) this.elements[i].innerHTML = str;
-                else this.elements[i].innerHTML += str;
-            }
-
-        } else {
+        if (str === undefined) {
             return this.elements[0].innerHTML;
+        }
+
+        for (let i = 0; i < this.elements.length; i++) {
+            if (clear) {
+                this.elements[i].innerHTML = str;
+            } else {
+                this.elements[i].innerHTML += str;
+            }
         }
 
         return this;
     }
 
     text(str) {
-        if (str !== undefined) {
-            for (let i = 0; i < this.elements.length; i++) {
-                this.elements[i].innerText = str;
-            }
-
-        } else {
+        if (str === undefined) {
             return this.elements[0].innerText;
+        }
+
+        for (let i = 0; i < this.elements.length; i++) {
+            this.elements[i].innerText = str;
         }
 
         return this;
     }
 
     value(data) {
-        if (data !== undefined) {
-            for (let i = 0; i < this.elements.length; i++) {
-                this.elements[i].value = data;
-            }
-
-        } else {
+        if (data === undefined) {
             return this.elements[0].value;
+        }
+
+        for (let i = 0; i < this.elements.length; i++) {
+            this.elements[i].value = data;
         }
 
         return this;
@@ -337,15 +342,15 @@ export class HTMLTools
     }
 
     checked(enable) {
-        if (typeof enable == 'boolean') {
-            for (let i = 0; i < this.elements.length; i++) {
-                if ('checked' in this.elements[i]) {
-                    this.elements[i].checked = enable;
-                }
-            }
-        }
-        else if (enable === undefined) {
+        if (enable === undefined) {
             return this.elements[0].checked;
+        }
+
+        const checked = Boolean(enable);
+        for (let i = 0; i < this.elements.length; i++) {
+            if ('checked' in this.elements[i]) {
+                this.elements[i].checked = checked;
+            }
         }
 
         return this;
@@ -353,7 +358,7 @@ export class HTMLTools
 
     toogle() {
         for (let i = 0; i < this.elements.length; i++) {
-            if ("checked" in this.elements[i]) {
+            if ('checked' in this.elements[i]) {
                 this.elements[i].checked = !this.elements[i].checked;
             }
         }
@@ -367,7 +372,7 @@ export class HTMLTools
 
     choose(index) {
         for (let i = 0; i < this.elements.length; i++) {
-            if ("selectedIndex" in this.elements[i]) {
+            if ('selectedIndex' in this.elements[i]) {
                 this.elements[i].selectedIndex = index;
             }
         }
@@ -380,8 +385,8 @@ export class HTMLTools
             return this.elements[0].offsetWidth;
         }
 
-        if (typeof value == "number") {
-            value += "px";
+        if (typeof value == 'number') {
+            value += 'px';
         }
 
         for (let i = 0; i < this.elements.length; i++) {
@@ -396,8 +401,8 @@ export class HTMLTools
             return this.elements[0].offsetHeight;
         }
 
-        if (typeof value == "number") {
-            value += "px";
+        if (typeof value == 'number') {
+            value += 'px';
         }
 
         for (let i = 0; i < this.elements.length; i++) {
@@ -408,10 +413,10 @@ export class HTMLTools
     }
 
     offsetParent() {
-        const element = this.elements[0];
+        const { offsetTop, offsetLeft } = this.elements[0];
         return {
-            top  : element.offsetTop,
-            left : element.offsetLeft
+            top  : offsetTop,
+            left : offsetLeft
         }
     }
 
@@ -420,19 +425,19 @@ export class HTMLTools
     }
 
     offsetScroll() {
-        const element = this.elements[0];
+        const { scrollTop, scrollLeft } = this.elements[0];
         return {
-            top  : element.scrollTop,
-            left : element.scrollLeft
+            top  : scrollTop,
+            left : scrollLeft
         }
     }
 
     offsetPage() {
-        let element = this.elements[0],
-            rect = element.getBoundingClientRect(),
-            doc  = document.documentElement,
-            top  = rect.top + window.pageYOffset - doc.clientTop,
-            left = rect.left + window.pageXOffset - doc.clientLeft;
+        const element = this.elements[0];
+        const rect = element.getBoundingClientRect();
+        const doc  = document.documentElement;
+        const top  = rect.top + window.pageYOffset - doc.clientTop;
+        const left = rect.left + window.pageXOffset - doc.clientLeft;
 
         return {
             top   : Math.round(top),
@@ -447,14 +452,14 @@ export class HTMLTools
     }
 
     wrap(classList, revOrder) {
-        if (typeof classList == "string") {
-            let result = [],
-                wrapper = document.createElement("div");
-                wrapper.classList.add(classList);
+        if (typeof classList == 'string') {
+            const result = [];
+            const wrapper = document.createElement('div');
+            wrapper.classList.add(classList);
 
             for (let i = 0; i < this.elements.length; i++) {
-                let element = this.elements[i],
-                    wrapClone = wrapper.cloneNode();
+                const element = this.elements[i];
+                const wrapClone = wrapper.cloneNode();
 
                 element.parentNode.insertBefore(wrapClone, element);
                 wrapClone.appendChild(element);
@@ -463,7 +468,6 @@ export class HTMLTools
             }
 
             return new HTMLTools(result);
-
         }
 
         else if (Array.isArray(classList)) {
@@ -488,13 +492,13 @@ export class HTMLTools
 
     hide() {
         for (let i = 0; i < this.elements.length; i++) {
-            this.elements[i].style.display = "none";
+            this.elements[i].style.display = 'none';
         }
 
         return this;
     }
 
-    show(disp = "") {
+    show(disp = '') {
         for (let i = 0; i < this.elements.length; i++) {
             this.elements[i].style.display = disp;
         }
@@ -506,8 +510,12 @@ export class HTMLTools
         const parents = [];
 
         for (let i = 0; i < this.elements.length; i++) {
-            let parent = this.elements[i].parentElement || this.elements[i].parentNode || null;
-            parents.push(parent);
+            const { parentElement, parentNode } = this.elements[i];
+            const parent = parentElement || parentNode;
+
+            if (parent) {
+                parents.push(parent);
+            }
         }
 
         return new HTMLTools(parents);
