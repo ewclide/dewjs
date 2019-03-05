@@ -5,27 +5,38 @@ export function idGetter(prefix = 0) {
 	})();
 }
 
+const BROWSERS = {
+	UNKNOWN: 0,
+	CHROME: 1,
+	FIREFOX: 2,
+	OPERA: 3,
+	SAFARI: 4,
+	IE: 5
+}
+
 function _getBrowser() {
     const agent = navigator.userAgent;
 
-    if (agent.search(/Chrome/) > 0)  return 'Chrome';
-    if (agent.search(/Firefox/) > 0) return 'Firefox';
-    if (agent.search(/Opera/) > 0)   return 'Opera';
-    if (agent.search(/Safari/) > 0)  return 'Safari';
-    if (agent.search(/MSIE|\.NET/) > 0) return 'IE';
+    if (agent.search(/Chrome/) > 0)  return BROWSERS.CHROME;
+    if (agent.search(/Firefox/) > 0) return BROWSERS.FIREFOX;
+    if (agent.search(/Opera/) > 0)   return BROWSERS.OPERA;
+    if (agent.search(/Safari/) > 0)  return BROWSERS.SAFARI;
+    if (agent.search(/MSIE|\.NET/) > 0) return BROWSERS.IE;
 
-    return false;
+    return BROWSERS.UNKNOWN;
 }
 
-export const browser = _getBrowser();
+export const browser = {
+	current: _getBrowser(), BROWSERS
+}
 
 export function printErr(data, source = true) {
-	let error = "Error: ";
+	let error = 'Error: ';
 
 	if (source) source = _getSourceLog();
 
 	if (Array.isArray(data) && data.length) {
-		error += data.title || "Error list";
+		error += data.title || 'Error list';
 		error += '\n';
 
 		data.forEach((message) => error += `  --> ${message}\n` );
@@ -33,7 +44,7 @@ export function printErr(data, source = true) {
         if (source) error += `  -----\n  Source: ${source}`;
 	}
 
-	else if (typeof data == "string") {
+	else if (typeof data == 'string') {
 		error += data;
 		if (source) error += ` (${source})`;
 	}

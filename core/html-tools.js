@@ -4,14 +4,14 @@ import CSSTransformer from './css-transformer';
 import CallBacker from './callbacker';
 
 export const eventList = {};
-
 export const getId = idGetter('__elem__');
 
 export class HTMLTools
 {
     constructor(source) {
         if (source) {
-            this.elements = source instanceof NodeList || Array.isArray(source) ? source : [source];
+            this.elements = source instanceof NodeList || Array.isArray(source)
+                ? source : [source];
         } else {
             this.elements = [];
         }
@@ -24,13 +24,14 @@ export class HTMLTools
     }
 
     native() {
-        return this.elements.length == 1 ? this.elements[0] : Array.from(this.elements);
+        return this.elements.length == 1
+            ? this.elements[0] : Array.from(this.elements);
     }
 
     get length() {
         return this.elements.length > this._srcLength
-        ? this.elements.length - this._srcLength
-        : this._srcLength;
+            ? this.elements.length - this._srcLength
+            : this._srcLength;
     }
 
     get tag() {
@@ -110,29 +111,29 @@ export class HTMLTools
     }
 
     mutationStart() {
-        for (let i = 0; i < this._mutations.length; i++) {
-            const { observer, element, options } = this._mutations[i];
+        this._mutations.forEach((mutation) => {
+            const { observer, element, options } = mutation;
             observer.observe(element, options);
-        }
+        });
     }
 
     mutationEnd() {
-        for (let i = 0; i < this._mutations.length; i++) {
-            this._mutations[i].observer.disconnect();
-        }
+        this._mutations.forEach((mutation) => {
+            mutation.observer.disconnect();
+        });
     }
 
     mutationClear() {
-        for (let i = 0; i < this._mutations.length; i++) {
-            this._mutations[i].observer.disconnect();
-        }
+        this._mutations.forEach((mutation) => {
+            mutation.observer.disconnect();
+        });
 
         this._mutations = null;
     }
 
     visible(maxDepth = 3) {
-        const found = this._searchHidden(this.elements[0], maxDepth, 0)
-        return found ? { element : found } : {}
+        const element = this._searchHidden(this.elements[0], maxDepth, 0)
+        return element ? { element } : {}
     }
 
     _searchHidden(element, maxDepth, depth) {
@@ -163,7 +164,7 @@ export class HTMLTools
     select(query) {
         if (this.elements.length == 1) {
             const element = this.elements[0].querySelectorAll(query);
-            const htl = new HTMLTools(elements);
+            const htl = new HTMLTools(element);
             htl.query = query;
 
             return htl;
@@ -187,10 +188,10 @@ export class HTMLTools
     }
 
     getById(id) {
-        const result = new HTMLTools(document.getElementById(id));
-        result.query = '#' + id;
+        const htl = new HTMLTools(document.getElementById(id));
+        htl.query = '#' + id;
 
-        return result;
+        return htl;
     }
 
     before(htl) {
@@ -214,7 +215,12 @@ export class HTMLTools
     }
 
     prepend(htl) {
-        this._insert(htl, remove, 'afterbegin');
+        this._insert(htl, 'afterbegin');
+        return this;
+    }
+
+    prependTo(target) {
+        target.prepend(this);
         return this;
     }
 
@@ -256,24 +262,20 @@ export class HTMLTools
         const jsonConv = new JSONConverter(json);
         const { htl, nodes } = jsonConv;
 
-        const result = htl;
-        result.node = nodes;
-        result._jsonConv = jsonConv;
+        htl.node = nodes;
+        htl._jsonConv = jsonConv;
 
-        return result;
+        return htl;
     }
 
     createJSON(htl) {
         const elements = htl ? htl.elements : this.elements
 
         if (elements.length > 1) {
-            const result = [];
-            elements.forEach((elem) => result.push(JSONConverter.createJSON(elem)));
-            return result;
-
-        } else {
-            return JSONConverter.createJSON(elements[0]);
+            return elements.map((elem) => JSONConverter.createJSON(elem));
         }
+
+        return JSONConverter.createJSON(elements[0]);
     }
 
     tplAppend(tpl) {
@@ -440,10 +442,10 @@ export class HTMLTools
         const left = rect.left + window.pageXOffset - doc.clientLeft;
 
         return {
-            top   : Math.round(top),
-            left  : Math.round(left),
-            bottom: Math.round(top + element.offsetHeight),
-            right : Math.round(left + element.offsetWidth)
+            top    : Math.round(top),
+            left   : Math.round(left),
+            bottom : Math.round(top + element.offsetHeight),
+            right  : Math.round(left + element.offsetWidth)
         }
     }
 
@@ -512,10 +514,7 @@ export class HTMLTools
         for (let i = 0; i < this.elements.length; i++) {
             const { parentElement, parentNode } = this.elements[i];
             const parent = parentElement || parentNode;
-
-            if (parent) {
-                parents.push(parent);
-            }
+            if (parent) parents.push(parent);
         }
 
         return new HTMLTools(parents);
@@ -573,30 +572,29 @@ export class HTMLTools
 
     getAttr(name) {
         const element = this.elements[0];
-        let result;
-
-        if (!element) {
-            printErr(`Can't get attribute of undefined element`);
+        if (!element) return;
+    
+        const { attributes, nodeType } = element;
+        if (nodeType !== 1 || !attributes.length) {
             return;
         }
 
-        if (element.nodeType == 1 && element.attributes.length) {
-            result = {};
+        if (typeof name == 'string') {
+            return element.getAttribute(name);
+        }
 
-            if (typeof name == "string") {
-                result = element.getAttribute(name);
+        const result = {};
+
+        if (Array.isArray(name)) {
+            for (let i = 0; i < name.length; i++) {
+                const attr = element.getAttribute(item);
+                if (attr) result[item] = attr;
             }
-            else if (Array.isArray(name)) {
-                for (let i = 0; i < name.length; i++) {
-                    let attr = element.getAttribute(item);
-                    if (attr) result[item] = attr;
-                }
-            }
-            else if (!name) {
-                for (let i = 0; i < element.attributes.length; i++) {
-                    let attr = element.attributes[i];
-                    result[attr.name] = attr.value;
-                }
+
+        } else if (!name) {
+            for (let i = 0; i < element.attributes.length; i++) {
+                const { name, value } = element.attributes[i];
+                result[name] = value;
             }
         }
 
@@ -604,15 +602,14 @@ export class HTMLTools
     }
 
     setAttr(attr, value) {
-        if (typeof attr == "string" && value !== undefined) {
+        if (typeof attr == 'string' && value !== undefined) {
             for (let i = 0; i < this.elements.length; i++) {
                 this.elements[i].setAttribute(attr, value)
             }
-        }
-        else if (typeof attr == "object") {
+        } else if (typeof attr == 'object') {
             for (let i = 0; i < this.elements.length; i++) {
-                for (let n in attr) {
-                    this.elements[i].setAttribute(n, attr[n])
+                for (const name in attr) {
+                    this.elements[i].setAttribute(name, attr[name])
                 }
             }
         }
@@ -621,11 +618,12 @@ export class HTMLTools
     }
 
     unsetAttr(name) {
-        if (typeof name == "string") {
+        if (typeof name == 'string') {
             for (let i = 0; i < this.elements.length; i++) {
                 this.elements[i].removeAttribute(name)
             }
         }
+
         else if (Array.isArray(name)) {
             for (let i = 0; i < this.elements.length; i++) {
                 for (let j = 0; j < name.length; j++) {
@@ -633,13 +631,13 @@ export class HTMLTools
                 }
             }
         }
+
         else if (name === undefined) {
-            let list = this.getAttr();
-            if (list) {
-                for (let i = 0; i < this.elements.length; i++) {
-                    for (let item in list) {
-                        this.elements[i].removeAttribute(item)
-                    }
+            const list = this.getAttr();
+            if (!list) return this; 
+            for (let i = 0; i < this.elements.length; i++) {
+                for (let item in list) {
+                    this.elements[i].removeAttribute(item)
                 }
             }
         }
@@ -648,13 +646,14 @@ export class HTMLTools
     }
 
     style(name, value) {
+        if (typeof name != 'string') return this;
+
         if (value === undefined) {
             return this.elements[0].style[name];
-
-        } else if (typeof name == 'string') {
-            for (let i = 0; i < this.elements.length; i++) {
-                this.elements[i].style[name] = value;
-            }
+        }
+        
+        for (let i = 0; i < this.elements.length; i++) {
+            this.elements[i].style[name] = value;
         }
 
         return this;
@@ -673,7 +672,7 @@ export class HTMLTools
         if (prefix) prefix += '-';
 
         for (let i = 0; i < this.elements.length; i++) {
-            for (let item in list) {
+            for (const item in list) {
                 this.elements[i].style[prefix + item] = list[item];
             }
         }
@@ -682,19 +681,18 @@ export class HTMLTools
     }
 
     eventAttach(data, handler) {
-
         if (!eventList[this._id]) {
-            eventList[this._id] = {};
+            eventList[this._id] = new Map();
         }
 
-        let list = eventList[this._id];
+        const list = eventList[this._id];
 
         if (typeof data == 'string' && typeof handler == 'function') {
             this._eventAttach(list, data, handler);
         }
 
         else if (typeof data == 'object') {
-            for (let event in data) {
+            for (const event in data) {
                 this._eventAttach(list, event, data[event]);
             }
         }
@@ -713,25 +711,28 @@ export class HTMLTools
     }
 
     eventDetach(type) {
+        if (!eventList[this._id]) return this;
         const list = eventList[this._id];
 
-        if (type) {
-            for (let event in list) {
-                this.elements.unsetAttr(event.substr(0, 2));
+        if (!type) {
+            for (const [event] of list) {
+                this.elements.unsetAttr('on' + event);
             }
 
+            list.clear();
+            eventList[this._id] = null;
         } else {
-            eventList[this._id][type] = undefined;
+            list.delete(type);
         }
 
         return this;
     }
 
     _eventAttach(list, type, handler) {
-        if (list[type]) {
-            list[type].push(handler);
+        if (list.has(type)) {
+            list.get(type).push(handler);
         } else {
-            list[type] = new CallBacker(handler);
+            list.set(type, new CallBacker(handler));
         }
 
         this.setAttr('on' + type, `$html._eventStart(${this._id},'${type}',event)`);
@@ -756,21 +757,18 @@ export class HTMLTools
     }
 
     join(source) {
-        let elemList;
-
-        if (!source) {
-            printErr(`Can't attach the invalid elements (${source})`);
-            return;
-        }
-
         this.elements = Array.from(this.elements);
+        let elemList;
 
         if (source.isHTMLTools) {
             elemList = source.elements;
         } else if (source instanceof NodeList || Array.isArray(source)) {
             elemList = source;
-        } else {
+        } else if (source instanceof Element) {
             elemList = [source];
+        } else {
+            printErr(`Can't attach element ${source}`);
+            return this;
         }
 
         for (let i = 0; i < elemList.length; i++) {
@@ -790,11 +788,9 @@ export class HTMLTools
 
     remove() {
         for (let i = 0; i < this.elements.length; i++) {
-            let element = this.elements[i];
-
-            if (element.parentNode) {
-                element.parentNode.removeChild(element);
-            }
+            const element = this.elements[i];
+            const { parentNode } = element;
+            if (parentNode) parentNode.removeChild(element); 
         }
 
         this.elements = [];
