@@ -238,8 +238,9 @@ export class HTMLTools
 
             for (let i = 0; i < this.elements.length; i++) {
                 for (let j = 0; j < htl._srcLength; j++) {
-                    const element = htl.elements[j];
-                    this.elements[i].insertAdjacentElement(position, element);
+                    const elem = htl.elements[j].cloneNode(true);
+                    htl.elements.push(elem);
+                    this.elements[i].insertAdjacentElement(position, elem);
                 }
             }
 
@@ -256,6 +257,25 @@ export class HTMLTools
             htl.elements.push(element);
             this.elements[i].insertAdjacentElement(position, element);
         }
+    }
+
+    move(target, position = 'end', child = 0, reverse = false) {
+        let pos;
+        switch (position) {
+            case 'before': pos = 'beforebegin'; break;
+            case 'begin' : pos = 'afterbegin'; break;
+            case 'end'   : pos = 'beforeend'; break;
+            case 'after' : pos = 'afterend'; break;
+        }
+
+        const last = target.elements.length - 1; 
+        const place = target.elements[reverse ? last - child : child];
+
+        for (let i = 0; i < this.elements.length; i++) {
+            place.insertAdjacentElement(pos, this.elements[i]);
+        }
+
+        return this;
     }
 
     createFromJSON(json) {
@@ -735,7 +755,7 @@ export class HTMLTools
             list.set(type, new CallBacker(handler));
         }
 
-        this.setAttr('on' + type, `$html._eventStart(${this._id},'${type}',event)`);
+        this.setAttr('on' + type, `$event.fire(this,'${type}',event)`);
     }
 
     each(handler) {

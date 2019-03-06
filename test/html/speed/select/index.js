@@ -1,6 +1,6 @@
 let place = $html.create("div", "place").html("<span></span>");
 for (let i = 0; i < 1000; i++) {
-    $html.body.prepend(place.clone(true));
+    $html.body.prepend(place);
 }
 
 log.time("select - native");

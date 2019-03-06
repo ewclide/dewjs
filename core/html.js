@@ -5,6 +5,20 @@ import StyleSheet from './stylesheet';
 const proto = HTMLTools.prototype;
 const html = new HTMLTools(document);
 
+const $event = {
+    fire: (elem, type, e) => {
+        if (!eventList.has(elem)) {
+            printErr(`Can't dispatch event on element ${elem}`);
+            return;
+        }
+
+        const events = eventList.get(elem);
+        if (events.has(type)) {
+            events.get(type).call(e);
+        }
+    }
+}
+
 html._eventStart = function(id, type, e) {
     eventList[id][type].call(e);
 }
@@ -97,6 +111,13 @@ html.createStyleSheet = function() {
 }
 
 html._body = new HTMLTools();
+
+Object.defineProperty(window, '$event', {
+    configurable: false,
+    enumerable: false,
+    writable: false,
+    value: $event
+})
 
 Object.defineProperty(html, 'body', {
     configurable: false,
