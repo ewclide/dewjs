@@ -1,10 +1,9 @@
-import { printErr, idGetter } from './functions';
+import { printErr } from './functions';
 import JSONConverter from './json-converter';
 import CSSTransformer from './css-transformer';
 import CallBacker from './callbacker';
 
-export const eventList = {};
-export const getId = idGetter('__elem__');
+export const eventList = new Map();
 
 export class HTMLTools
 {
@@ -17,7 +16,6 @@ export class HTMLTools
         }
 
         this._srcLength = this.elements.length;
-        this._id = getId();
         this._ready = false;
 
         this.query = '';
@@ -259,7 +257,7 @@ export class HTMLTools
         }
     }
 
-    move(target, position = 'end', child = 0, reverse = false) {
+    move(htl, position = 'end', child = 0, reverse = false) {
         let pos;
         switch (position) {
             case 'before': pos = 'beforebegin'; break;
@@ -268,13 +266,19 @@ export class HTMLTools
             case 'after' : pos = 'afterend'; break;
         }
 
-        const last = target.elements.length - 1; 
-        const place = target.elements[reverse ? last - child : child];
+        const last = this.elements.length - 1;
+        const place = this.elements[reverse ? last - child : child];
 
-        for (let i = 0; i < this.elements.length; i++) {
-            place.insertAdjacentElement(pos, this.elements[i]);
+        const { elements } = htl;
+        for (let i = 0; i < elements.length; i++) {
+            place.insertAdjacentElement(pos, elements[i]);
         }
 
+        return this;
+    }
+
+    moveTo(target, position, child, reverse) {
+        target.move(this, position, child, reverse);
         return this;
     }
 
@@ -593,7 +597,7 @@ export class HTMLTools
     getAttr(name) {
         const element = this.elements[0];
         if (!element) return;
-    
+
         const { attributes, nodeType } = element;
         if (nodeType !== 1 || !attributes.length) {
             return;
@@ -654,7 +658,7 @@ export class HTMLTools
 
         else if (name === undefined) {
             const list = this.getAttr();
-            if (!list) return this; 
+            if (!list) return this;
             for (let i = 0; i < this.elements.length; i++) {
                 for (let item in list) {
                     this.elements[i].removeAttribute(item)
@@ -671,7 +675,7 @@ export class HTMLTools
         if (value === undefined) {
             return this.elements[0].style[name];
         }
-        
+
         for (let i = 0; i < this.elements.length; i++) {
             this.elements[i].style[name] = value;
         }
@@ -700,12 +704,12 @@ export class HTMLTools
         return this;
     }
 
-    eventAttach(data, handler) {
-        if (!eventList[this._id]) {
-            eventList[this._id] = new Map();
+    addEvent(data, handler) {
+        if (!eventList.has(this)) {
+            eventList.set(this, new Map());
         }
 
-        const list = eventList[this._id];
+        const list = eventList.get(this);
 
         if (typeof data == 'string' && typeof handler == 'function') {
             this._eventAttach(list, data, handler);
@@ -720,7 +724,7 @@ export class HTMLTools
         return this;
     }
 
-    eventDispatch(type) {
+    fireEvent(type) {
         const event = new Event(type);
 
         for (let i = 0; i < this.elements.length; i++) {
@@ -730,9 +734,9 @@ export class HTMLTools
         return this;
     }
 
-    eventDetach(type) {
-        if (!eventList[this._id]) return this;
-        const list = eventList[this._id];
+    removeEvent(type) {
+        if (!eventList.has(this)) return this;
+        const list = eventList.get(this);
 
         if (!type) {
             for (const [event] of list) {
@@ -740,7 +744,6 @@ export class HTMLTools
             }
 
             list.clear();
-            eventList[this._id] = null;
         } else {
             list.delete(type);
         }
@@ -748,11 +751,11 @@ export class HTMLTools
         return this;
     }
 
-    _eventAttach(list, type, handler) {
-        if (list.has(type)) {
-            list.get(type).push(handler);
+    _eventAttach(events, type, handler) {
+        if (events.has(type)) {
+            events.get(type).push(handler);
         } else {
-            list.set(type, new CallBacker(handler));
+            events.set(type, new CallBacker(handler));
         }
 
         this.setAttr('on' + type, `$event.fire(this,'${type}',event)`);
@@ -810,7 +813,7 @@ export class HTMLTools
         for (let i = 0; i < this.elements.length; i++) {
             const element = this.elements[i];
             const { parentNode } = element;
-            if (parentNode) parentNode.removeChild(element); 
+            if (parentNode) parentNode.removeChild(element);
         }
 
         this.elements = [];

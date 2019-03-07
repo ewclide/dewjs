@@ -19,10 +19,6 @@ const $event = {
     }
 }
 
-html._eventStart = function(id, type, e) {
-    eventList[id][type].call(e);
-}
-
 html.extend = function(name, method) {
     proto[name] = method;
     return this;
@@ -66,7 +62,7 @@ html.create = function(tag, attrs, styles) {
 }
 
 html.convert = function(elements) {
-    if (elements.nodeType == 1 || elements.nodeType == 9) {
+    if (elements.nodeType === 1 || elements.nodeType === 9) {
         return new HTMLTools(elements);
     }
 
@@ -76,7 +72,7 @@ html.convert = function(elements) {
 
     else if (elements.isHTMLTools) {
         return elements;
-    } 
+    }
 
     else {
         return false;
@@ -98,7 +94,7 @@ html.parseXML = function(data) {
             return xml;
         }
     }
-    
+
     else {
         errors = 'parseXML not supported by this browser!';
     }
@@ -112,22 +108,20 @@ html.createStyleSheet = function() {
 
 html._body = new HTMLTools();
 
-Object.defineProperty(window, '$event', {
+const desc = {
     configurable: false,
     enumerable: false,
-    writable: false,
-    value: $event
-})
+    writable: false
+}
 
+Object.defineProperty(window, '$event', { ...desc, value: $event })
 Object.defineProperty(html, 'body', {
-    configurable: false,
-    get: function() {
-        if (!this._body.length && document.body) {
-            this._body.join(document.body);
-        }
-
-        else if (!document.body) {
+    ...desc,
+    get: () => {
+        if (!document.body) {
             printErr('body element is currently unavailable!');
+        } else if (!this._body.length) {
+            this._body.join(document.body);
         }
 
         return this._body;

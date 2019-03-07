@@ -40,7 +40,7 @@ function _fetchProp(prop, objects) {
 
 export function innerAssign(target, source, copy) {
     const result = copy ? Object.assign({}, target) : target;
-    
+
     if (Array.isArray(source)) {
         for (const prop in result) {
             const val = _fetchProp(prop, source);
