@@ -50,7 +50,7 @@ export default class Lerp
         console.log(this)
     }
 
-    addAction(handler) {
+    setAction(handler) {
         this._action = handler;
     }
 

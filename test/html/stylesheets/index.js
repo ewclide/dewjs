@@ -9,6 +9,24 @@ cascad.add('.test', {
     animation: 'fade 5s'
 });
 
+const anim = cascad.animation()
+.add({
+    fillMode: 'forwards',
+    duration: 2000
+}, [
+    { opacity: 0 },
+    { opacity: 1 }
+])
+.add({
+    fillMode: 'forwards'
+}, [
+    { color: 'black' },
+    { color: 'red' }
+])
+.create();
+
+console.log(anim)
+
 const media = cascad.media({
     screen: true,
     maxWidth: 768,
@@ -30,6 +48,5 @@ const media = cascad.media({
 // cascad.remove(media);
 
 const h1 = $html.create('h1', 'test').text('Test');
-$html.body.append(h1);
-
-console.log(cascad, media)
+const h2 = $html.create('h2', anim.className).text('Test');
+$html.body.append([h1, h2]);

@@ -1,5 +1,5 @@
 import CSSTransformer from './css-transformer';
-import { printErr, camelCaseToDash } from './functions';
+import { printErr, camelCaseToDash, idGetter } from './functions';
 
 export default class StyleSheet
 {
@@ -32,13 +32,15 @@ export default class StyleSheet
 	add() {
 		if (arguments.length > 1) {
 			const [ rule, styles ] = arguments;
-			this._add(rule, styles);
+			return this._add(rule, styles);
 
 		} else if (Array.isArray(arguments[0])) {
+			const indeces = [];
 			arguments[0].forEach((styles) => {
 				const { rule } = styles;
-				this._add(rule, style);
+				indeces.push(this._add(rule, style));
 			});
+			return indeces;
 		}
 	}
 
@@ -67,7 +69,7 @@ export default class StyleSheet
 		}
 
 		const index = this._getLastIndex();
-		const keyCounts = keyFrames.length;
+		const keyCounts = keyFrames.length - 1;
 		const rule = '@keyframes ' + name;
 
 		let styles = '';
@@ -137,8 +139,12 @@ export default class StyleSheet
 		return rule;
 	}
 
+	animation(name) {
+		return new Animation(this, name);
+	}
+
 	remove(rule) {
-		const index = rule.isMedia ? rule.index : rule;
+		const index = rule.isSpecial ? rule.index : rule;
 		this.element.deleteRule(index);
 	}
 
@@ -168,6 +174,10 @@ class Media
 		this.index = index;
 	}
 
+	get isSpecial() {
+		return true;
+	}
+
 	get isMedia() {
 		return true;
 	}
@@ -189,5 +199,76 @@ class Media
 		for (let i = 0; i < this._rules.length; i++) {
 			this._media.deleteRule(i)
 		}
+	}
+}
+
+const getNameKF = idGetter('__kf__');
+const getNameAnim = idGetter('__anim__');
+
+class Animation
+{
+	constructor(parent, name) {
+		this._parent = parent;
+		this._timeLength = 0;
+		this._strRule = '';
+		this._keyFrames = new Map();
+
+		this.className = name || getNameAnim();
+		this.index = null;
+	}
+
+	get isSpecial() {
+		return true;
+	}
+
+	get isAnimation() {
+		return true;
+	}
+
+	create() {
+		this.index = this._parent.add('.' + this.className, {
+			animation: this._strRule
+		});
+
+		return this;
+	}
+
+	add(settings, keyFrames) {
+		this._attach(this._timeLength, settings, keyFrames);
+		this._timeLength += settings.duration;
+		return this;
+	}
+
+	concat(settings, keyFrames) {
+		this._attach(0, settings, keyFrames);
+		return this;
+	}
+
+	_attach(startTime, settings, keyFrames) {
+		const {
+			duration = 1000,
+			easing = null,
+			steps = null,
+			stepType = 'end',
+			fillMode = null,
+			delay = 0
+		} = settings;
+
+		const nameKF = getNameKF();
+		const index = this._parent.keyFrames(nameKF, keyFrames);
+		this._keyFrames.set(nameKF, index);
+
+		this._strRule += (this._strRule ? ',' : '') + nameKF;
+		this._strRule += ` ${duration}ms`;
+		if (startTime) this._strRule += ` ${startTime + delay}ms`;
+		if (steps) this._strRule += ` steps(${steps}, ${stepType})`;
+		if (easing) this._strRule += ` ${easing}`;
+		if (fillMode) this._strRule += ` ${fillMode}`;
+	}
+
+	delete() {
+		this._parent.remove(this.index);
+		this._keyFrames.forEach((index) => this._parent.remove(index));
+		this._keyFrames.clear();
 	}
 }
