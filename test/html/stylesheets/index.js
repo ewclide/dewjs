@@ -10,20 +10,33 @@ cascad.add('.test', {
 });
 
 const anim = cascad.animation()
-.add({
+.then({
     fillMode: 'forwards',
     duration: 2000
 }, [
     { opacity: 0 },
     { opacity: 1 }
 ])
-.add({
+.then({
     fillMode: 'forwards'
 }, [
     { color: 'black' },
     { color: 'red' }
 ])
-.create();
+.and({
+    fillMode: 'forwards'
+}, [
+    { fontSize: '24px' },
+    { fontSize: '32px' }
+])
+.then({
+    fillMode: 'forwards',
+    delay: 1000
+}, [
+    { color: 'red' },
+    { color: 'blue' }
+])
+.init();
 
 console.log(anim)
 

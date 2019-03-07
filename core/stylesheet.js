@@ -159,7 +159,7 @@ export default class StyleSheet
 				value = CSSTransformer.serialize(value);
 			}
 
-			str += `${name}:${value};`;
+			str += `${camelCaseToDash(name)}:${value};`;
 		}
 
 		return str + '}';
@@ -209,7 +209,8 @@ class Animation
 {
 	constructor(parent, name) {
 		this._parent = parent;
-		this._timeLength = 0;
+		this._offsetTime = 0;
+		this._prevDuration = 0;
 		this._strRule = '';
 		this._keyFrames = new Map();
 
@@ -225,7 +226,7 @@ class Animation
 		return true;
 	}
 
-	create() {
+	init() {
 		this.index = this._parent.add('.' + this.className, {
 			animation: this._strRule
 		});
@@ -233,18 +234,19 @@ class Animation
 		return this;
 	}
 
-	add(settings, keyFrames) {
-		this._attach(this._timeLength, settings, keyFrames);
-		this._timeLength += settings.duration;
+	then(settings, keyFrames) {
+		this._attach(true, settings, keyFrames);
+		this._prevThen = true;
 		return this;
 	}
 
-	concat(settings, keyFrames) {
-		this._attach(0, settings, keyFrames);
+	and(settings, keyFrames) {
+		this._attach(false, settings, keyFrames);
+		this._prevThen = false;
 		return this;
 	}
 
-	_attach(startTime, settings, keyFrames) {
+	_attach(offset, settings, keyFrames) {
 		const {
 			duration = 1000,
 			easing = null,
@@ -254,16 +256,22 @@ class Animation
 			delay = 0
 		} = settings;
 
+		const time = offset ? this._offsetTime + delay : this._offsetTime - this._prevDuration;
 		const nameKF = getNameKF();
 		const index = this._parent.keyFrames(nameKF, keyFrames);
 		this._keyFrames.set(nameKF, index);
 
 		this._strRule += (this._strRule ? ',' : '') + nameKF;
 		this._strRule += ` ${duration}ms`;
-		if (startTime) this._strRule += ` ${startTime + delay}ms`;
+		this._strRule += ` ${time}ms`;
 		if (steps) this._strRule += ` steps(${steps}, ${stepType})`;
 		if (easing) this._strRule += ` ${easing}`;
 		if (fillMode) this._strRule += ` ${fillMode}`;
+
+		if (offset) {
+			this._offsetTime += duration;
+			this._prevDuration = duration;
+		}
 	}
 
 	delete() {
