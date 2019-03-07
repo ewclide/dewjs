@@ -1,8 +1,9 @@
-import { printErr } from './functions';
+import { printErr, idGetter } from './functions';
 import JSONConverter from './json-converter';
 import CSSTransformer from './css-transformer';
 import CallBacker from './callbacker';
 
+const getIdOfElement = idGetter('__elem__');
 export const eventList = new Map();
 
 export class HTMLTools
@@ -17,6 +18,7 @@ export class HTMLTools
 
         this._srcLength = this.elements.length;
         this._ready = false;
+        this._id = getIdOfElement();
 
         this.query = '';
     }
@@ -27,9 +29,8 @@ export class HTMLTools
     }
 
     get length() {
-        return this.elements.length > this._srcLength
-            ? this.elements.length - this._srcLength
-            : this._srcLength;
+        const { length } = this.elements;
+        return length > this._srcLength ? length - this._srcLength : this._srcLength;
     }
 
     get tag() {
@@ -168,18 +169,18 @@ export class HTMLTools
             return htl;
         }
 
-        const elements = [];
+        const result = [];
 
         for (let i = 0; i < this.elements.length; i++) {
             const search = this.elements[i].querySelectorAll(query);
-            const index = elements.length;
+            const index = result.length;
 
             for (let j = 0; j < search.length; j++) {
-                elements[index + j] = search[j];
+                result[index + j] = search[j];
             }
         }
 
-        const htl = new HTMLTools(elements);
+        const htl = new HTMLTools(result);
         htl.query = query;
 
         return htl;
@@ -236,9 +237,9 @@ export class HTMLTools
 
             for (let i = 0; i < this.elements.length; i++) {
                 for (let j = 0; j < htl._srcLength; j++) {
-                    const elem = htl.elements[j].cloneNode(true);
-                    htl.elements.push(elem);
-                    this.elements[i].insertAdjacentElement(position, elem);
+                    const elemClone = htl.elements[j].cloneNode(true);
+                    htl.elements.push(elemClone);
+                    this.elements[i].insertAdjacentElement(position, elemClone);
                 }
             }
 
@@ -705,11 +706,11 @@ export class HTMLTools
     }
 
     addEvent(data, handler) {
-        if (!eventList.has(this)) {
-            eventList.set(this, new Map());
+        if (!eventList.has(this._id)) {
+            eventList.set(this._id, new Map());
         }
 
-        const list = eventList.get(this);
+        const list = eventList.get(this._id);
 
         if (typeof data == 'string' && typeof handler == 'function') {
             this._eventAttach(list, data, handler);
@@ -735,18 +736,20 @@ export class HTMLTools
     }
 
     removeEvent(type) {
-        if (!eventList.has(this)) return this;
-        const list = eventList.get(this);
+        if (!eventList.has(this._id)) return this;
+        const events = eventList.get(this._id);
 
         if (!type) {
-            for (const [event] of list) {
-                this.elements.unsetAttr('on' + event);
+            for (const [event] of events) {
+                this.unsetAttr('on' + event);
             }
 
-            list.clear();
-        } else {
-            list.delete(type);
+            events.clear();
+            return this;
         }
+
+        events.delete(type);
+        this.unsetAttr('on' + type);
 
         return this;
     }
@@ -758,7 +761,7 @@ export class HTMLTools
             events.set(type, new CallBacker(handler));
         }
 
-        this.setAttr('on' + type, `$event.fire(this,'${type}',event)`);
+        this.setAttr('on' + type, `$event.fire('${this._id}','${type}',event)`);
     }
 
     each(handler) {

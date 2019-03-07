@@ -6,13 +6,13 @@ const proto = HTMLTools.prototype;
 const html = new HTMLTools(document);
 
 const $event = {
-    fire: (elem, type, e) => {
-        if (!eventList.has(elem)) {
-            printErr(`Can't dispatch event on element ${elem}`);
+    fire: (id, type, e) => {
+        if (!eventList.has(id)) {
+            printErr(`Can't dispatch event on element with id "${id}"`);
             return;
         }
 
-        const events = eventList.get(elem);
+        const events = eventList.get(id);
         if (events.has(type)) {
             events.get(type).call(e);
         }
@@ -108,16 +108,19 @@ html.createStyleSheet = function() {
 
 html._body = new HTMLTools();
 
-const desc = {
-    configurable: false,
-    enumerable: false,
-    writable: false
+if (!window.$event) {
+    const desc = {
+        configurable: false,
+        enumerable: false,
+        writable: false
+    }
+
+    Object.defineProperty(window, '$event', { ...desc, value: $event });
 }
 
-Object.defineProperty(window, '$event', { ...desc, value: $event })
 Object.defineProperty(html, 'body', {
-    ...desc,
-    get: () => {
+    configurable: false,
+    get: function() {
         if (!document.body) {
             printErr('body element is currently unavailable!');
         } else if (!this._body.length) {
