@@ -10,6 +10,14 @@ import { /* functions */ } from 'dewjs/funcs';
 Not a function. Contains name of user browser as a string.
 It supports browsers - *Chrome, Firefox, Opera, Safari, IE*
 
+```js
+import { browser, BROWSERS } from 'dewjs/funcs';
+
+if (browser === BROWSERS.CHROME) {
+    console.log('this is chrome');
+}
+```
+
 ##
 ### printErr
 ( ***error*** : *Array*, ***source*** : *Boolean* ) => *false*

@@ -5,7 +5,7 @@ export function idGetter(prefix = 0) {
 	})();
 }
 
-const BROWSERS = {
+export const BROWSERS = {
 	UNKNOWN: 0,
 	CHROME: 1,
 	FIREFOX: 2,
@@ -26,9 +26,7 @@ function _getBrowser() {
     return BROWSERS.UNKNOWN;
 }
 
-export const browser = {
-	current: _getBrowser(), BROWSERS
-}
+export const browser = _getBrowser();
 
 export function printErr(data, source = true) {
 	let error = 'Error: ';
