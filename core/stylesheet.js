@@ -144,8 +144,12 @@ export default class StyleSheet
 	}
 
 	remove(rule) {
-		const index = rule.isSpecial ? rule.index : rule;
-		this.element.deleteRule(index);
+		if (rule.isSpecial) {
+			rule.clear();
+			this.elements.deleteRule(rule.index);
+		} else {
+			this.elements.deleteRule(rule);
+		}
 	}
 
 	static serialize(rule, styles) {
@@ -234,25 +238,25 @@ class Animation
 		return this;
 	}
 
-	then(settings, keyFrames) {
-		this._attach(true, settings, keyFrames);
+	add(keyFrames, settings) {
+		this._attach(true, keyFrames, settings);
 		this._prevThen = true;
 		return this;
 	}
 
-	and(settings, keyFrames) {
-		this._attach(false, settings, keyFrames);
+	and(keyFrames, settings) {
+		this._attach(false, keyFrames, settings);
 		this._prevThen = false;
 		return this;
 	}
 
-	_attach(offset, settings, keyFrames) {
+	_attach(offset, keyFrames, settings = {}) {
 		const {
 			duration = 1000,
 			easing = null,
 			steps = null,
 			stepType = 'end',
-			fillMode = null,
+			fillMode = 'forwards',
 			delay = 0
 		} = settings;
 
@@ -274,8 +278,7 @@ class Animation
 		}
 	}
 
-	delete() {
-		this._parent.remove(this.index);
+	clear() {
 		this._keyFrames.forEach((index) => this._parent.remove(index));
 		this._keyFrames.clear();
 	}
