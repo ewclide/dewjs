@@ -3,7 +3,7 @@ import JSONConverter from './json-converter';
 import CSSTransformer from './css-transformer';
 import CallBacker from './callbacker';
 
-const getIdOfElement = idGetter('__elem__');
+export const getIdOfElement = idGetter('__elem__');
 export const eventList = new Map();
 
 export class HTMLTools
@@ -29,8 +29,7 @@ export class HTMLTools
     }
 
     get length() {
-        const { length } = this.elements;
-        return length > this._srcLength ? length - this._srcLength : this._srcLength;
+        return this.elements.length;
     }
 
     get tag() {
@@ -151,13 +150,25 @@ export class HTMLTools
     }
 
     display(element) {
-        if (!element) element = this.elements[0];
+        const elem = element || this.elements[0];
 
-        const display = element.style.display
-            ? element.style.display
-            : getComputedStyle(element).display;
+        const display = elem.style.display
+            ? elem.style.display
+            : getComputedStyle(elem).display;
 
         return display !== 'none';
+    }
+
+    inScreen(element) {
+        const elem = element || this.elements[0];
+        const { top, left, bottom, right } = elem.getBoundingClientRect();
+        const { clientWidth, clientHeight } = document.documentElement;
+
+        if (bottom < 0 || right < 0 ||
+            top > clientHeight || left > clientWidth) {
+                return false;
+            }
+        return true;
     }
 
     select(query) {
@@ -235,7 +246,16 @@ export class HTMLTools
                 htl.elements = Array.from(htl.elements);
             }
 
-            for (let i = 0; i < this.elements.length; i++) {
+            let index = 0;
+            if (!htl.elements[0].parentNode) {
+                const [ firstElem ] = this.elements;
+                for (let i = 0; i < htl._srcLength; i++) {
+                    firstElem.insertAdjacentElement(position, htl.elements[i])
+                }
+                index++;
+            }
+
+            for (let i = index; i < this.elements.length; i++) {
                 for (let j = 0; j < htl._srcLength; j++) {
                     const elemClone = htl.elements[j].cloneNode(true);
                     htl.elements.push(elemClone);
@@ -412,12 +432,11 @@ export class HTMLTools
             return this.elements[0].offsetWidth;
         }
 
-        if (typeof value == 'number') {
-            value += 'px';
-        }
+        let val = value;
+        if (typeof value == 'number') val += 'px';
 
         for (let i = 0; i < this.elements.length; i++) {
-            this.elements[i].style.width = value;
+            this.elements[i].style.width = val;
         }
 
         return this;
@@ -428,15 +447,33 @@ export class HTMLTools
             return this.elements[0].offsetHeight;
         }
 
-        if (typeof value == 'number') {
-            value += 'px';
-        }
+        let val = value;
+        if (typeof value == 'number') val += 'px';  
 
         for (let i = 0; i < this.elements.length; i++) {
-            this.elements[i].style.height = value;
+            this.elements[i].style.height = val;
         }
 
         return this;
+    }
+
+    size(width, height) {
+        if (width === undefined && height === undefined) {
+            const { offsetWidth, offsetHeight } = this.elements[0];
+            return {
+                width: offsetWidth,
+                height: offsetHeight
+            }
+        }
+
+        let w = width; h = height;
+        if (typeof width == 'number') w += 'px';
+        if (typeof height == 'number') h += 'px';
+
+        for (let i = 0; i < this.elements.length; i++) {
+            this.elements[i].style.width = w;
+            this.elements[i].style.height = h;
+        }
     }
 
     offsetParent() {
@@ -813,6 +850,22 @@ export class HTMLTools
     }
 
     remove() {
+        for (let i = 0; i < this.elements.length; i++) {
+            const element = this.elements[i];
+            const { parentNode } = element;
+            if (parentNode) parentNode.removeChild(element);
+        }
+
+        if (!Array.isArray(this.elements)) {
+            this.elements = Array.from(this.elements)
+        }
+
+        this.elements.splice(this._srcLength);
+
+        return this;
+    }
+
+    delete() {
         for (let i = 0; i < this.elements.length; i++) {
             const element = this.elements[i];
             const { parentNode } = element;

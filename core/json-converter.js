@@ -1,4 +1,5 @@
-import {eventList, HTMLTools, getId} from './html-tools';
+import { eventList, HTMLTools, getIdOfElement } from './html-tools';
+import CallBacker from './callbacker';
 
 export default class JSONConverter
 {
@@ -46,16 +47,17 @@ export default class JSONConverter
                     break;
 
                 case 'events' :
-                    const id = getId();
-
-                    eventList[id] = {};
+                    const id = getIdOfElement();
+                    const events = new Map();
+                    eventList.set(id, events);
 
                     for (let type in json.events) {
-                        eventList[id][type] = (e) => {
+                        const handler = new CallBacker((e) => {
                             json.events[type](e, this.nodes[json.key], this.htl);
-                        }
+                        });
 
-                        element.setAttribute(`on${type}`, `$html._eventStart(${id},'${type}',event)`);
+                        events.set(type, handler);
+                        element.setAttribute(`on${type}`, `$event.fire('${id}','${type}',event)`);
                     }
 
                     break;

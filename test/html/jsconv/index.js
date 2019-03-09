@@ -16,7 +16,7 @@ let jsForm = {
             },
             events : {
                 input : function(e, that, main){
-                    log(that, main)
+                    log(e, that, main)
                     that.value(e.target.value);
                     // main.style("background", "red");
                 }
