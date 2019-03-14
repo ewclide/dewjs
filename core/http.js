@@ -42,7 +42,7 @@ class HTTP {
 		if (progress) {
 			request.onprogress = function(respose) {
 				const { loaded, total } = respose;
-				async.progress(loaded, total);
+				async.shift(loaded, total);
 			}
 		}
 
@@ -85,7 +85,7 @@ class HTTP {
 			if (settings.progress) {
 				request.onprogress = function(respose) {
 					const { loaded, total } = respose;
-					async.progress(loaded, total);
+					async.shift(loaded, total);
 				}
 			}
 

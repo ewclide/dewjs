@@ -3,13 +3,18 @@ import CallBacker from './callbacker';
 export default class Async
 {
     constructor() {
-        this.__async__status = 0;
-        this.__async__list = [];
-        this.__async__progress = null;
-        this.__async__refresh = null;
-        this.__async__ready = 0;
+        this.__asyncStatus = 0;
+        this.__asyncList = [];
+        this.__asyncProgress = null;
+        this.__asyncRefresh = null;
+        this.__asyncReady = 0;
+        this.__asyncPermit = true;
 
-        this.__async__init();
+        this.__nativePromise = null;
+        this.__nativeResolve = null;
+        this.__nativeReject = null;
+
+        this.__asyncInit();
     }
 
     get isAsync() {
@@ -17,72 +22,71 @@ export default class Async
 	}
 
     get promise() {
-        return this._promise;
+        return this.__nativePromise;
     }
 
     get ready () {
-        return this.__async__ready;
+        return this.__asyncReady;
     }
 
     get pending() {
-        return this.__async__status === 0;
+        return this.__asyncStatus === 0;
     }
 
     get fulfilled() {
-		return this.__async__status === 1;
+		return this.__asyncStatus === 1;
 	}
 
 	get rejected() {
-		return this.__async__status === -1;
+		return this.__asyncStatus === -1;
 	}
 
-    __async__init() {
-        this._resolve = null;
-        this._reject = null;
-        this.__async__permit = true;
+    __asyncInit() {
+        this.__nativeResolve = null;
+        this.__nativeReject = null;
+        this.__asyncPermit = true;
 
-        this._promise = new Promise((resolve, reject) => {
-            this._resolve = resolve;
-            this._reject = reject;
+        this.__nativePromise = new Promise((resolve, reject) => {
+            this.__nativeResolve = resolve;
+            this.__nativeReject = reject;
         });
 
-        this._promise
-            .then(() => this.__async__status = 1)
-            .catch(() => this.__async__status = -1);
+        this.__nativePromise
+            .then(() => this.__asyncStatus = 1)
+            .catch(() => this.__asyncStatus = -1);
     }
 
     then(handler) {
-        return this._promise.then(handler);
+        return this.__nativePromise.then(handler);
     }
 
     catch(handler) {
-        return this._promise.catch(handler);
+        return this.__nativePromise.catch(handler);
     }
 
     resolve(e) {
-        if (this.__async__permit) {
-            if (this.__async__progress) this.progress(1);
-            this._resolve(e);
+        if (this.__asyncPermit) {
+            if (this.__asyncProgress) this.progress(1);
+            this.__nativeResolve(e);
         } else {
-            console.warn("can't use resolve after use wait!");
+            console.warn("Can't use resolve after use wait!");
         }
     }
 
     reject(e) {
-        if (this.__async__permit) {
-            this._reject(e);
+        if (this.__asyncPermit) {
+            this.__nativeReject(e);
         } else {
-            console.warn("can't use reject after use wait!");
+            console.warn("Can't use reject after use wait!");
         }
     }
 
     wait(list, progress) {
-        let wait, promises = [];
+        const promises = [];
 
-        this.__async__list = Array.isArray(list) ? list : [list];
-
-        this.__async__list.forEach((async) => {
-            let prom = async.isAsync ? async.promise : async;
+        this.__asyncList = Array.isArray(list) ? list : [list];
+        this.__asyncList.forEach((async) => {
+            const prom = async.isAsync ? async.promise : async;
             promises.push(prom);
 
             if (progress) {
@@ -92,78 +96,78 @@ export default class Async
             }
         });
 
-        this.__async__permit = false;
+        this.__asyncPermit = false;
 
-        wait = Promise.all(promises);
+        const wait = Promise.all(promises);
         wait.then((e) => {
-            this.__async__permit = true;
-            this._resolve(e);
+            this.__asyncPermit = true;
+            this.__nativeResolve(e);
         }).catch((e) => {
-            this.__async__permit = true;
-            this._reject(e);
+            this.__asyncPermit = true;
+            this.__nativeReject(e);
         });
 
         return wait;
     }
 
     __calcReady() {
-        const rate = 1 / this.__async__list.length;
+        const rate = 1 / this.__asyncList.length;
         let ready = 0;
 
-        this.__async__list.forEach((async) => ready += async.ready * rate);
+        this.__asyncList.forEach((async) => ready += async.ready * rate);
 
 		return ready;
 	}
 
     reset() {
-        this.__async__init();
+        this.__asyncInit();
     }
 
-    onRefresh(handler) {
-		if (!this.__async__refresh) {
-            this.__async__refresh  = new CallBacker();
+    refresh(handler) {
+		if (!this.__asyncRefresh) {
+            this.__asyncRefresh  = new CallBacker();
         }
 
-		this.__async__refresh.push(handler);
+		this.__asyncRefresh.push(handler);
 	}
 
-	refresh() {
+	again() {
 		this.reset();
 
-		if (this.__async__refresh) {
-            this.__async__refresh.call();
+		if (this.__asyncRefresh) {
+            this.__asyncRefresh.call();
         }
 
-		this.__async__list.forEach((async) => {
+		this.__asyncList.forEach((async) => {
 			if (async.rejected) async.refresh();
 		});
 	}
 
-    onProgress(handler) {
-		if (!this.__async__progress) {
-            this.__async__progress = new CallBacker();
+    progress(handler) {
+		if (!this.__asyncProgress) {
+            this.__asyncProgress = new CallBacker();
         }
 
-		this.__async__progress.push(handler);
+		this.__asyncProgress.push(handler);
 
 		return this;
 	}
 
-	progress(loaded, total = 1) {
-        if (this.__async__ready == 1) return;
+	shift(loaded, total = 1) {
+        if (this.__asyncReady == 1) return;
 
-        if (typeof loaded != "number" && typeof total != "number") {
-            console.warn('progress must to receive numeric arguments');
+        if (typeof loaded != 'number' && typeof total != 'number') {
+            console.warn('Shift method must to receive numeric arguments');
             return;
         }
 
         const ready = loaded / total;
 
 		if (this.pending && ready >= 0 && ready <= 1) {
-            this.__async__ready = ready;
+            this.__asyncReady = ready;
 
-			if (this.__async__progress) {
-                this.__async__progress.call({ loaded, total });
+			if (this.__asyncProgress) {
+                this.__asyncProgress.call({ loaded, total });
             }
 		}
     }

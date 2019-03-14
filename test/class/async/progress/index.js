@@ -8,7 +8,7 @@ class Loader extends DEW.Async
         this._createBar();
         this.load(list);
     }
-    
+
     _createBar() {
         this._bar = $html.create('div', 'loadbar');
         this._bar.styles({
@@ -26,7 +26,7 @@ class Loader extends DEW.Async
 
         $html.ready.then(() => $html.body.append(this._bar));
 
-        this.onProgress(({ loaded, total }) => {
+        this.progress(({ loaded, total }) => {
             // this._bar.transform({ scaleX: loaded / total })
             console.log(loaded)
             this._bar.scaleX(loaded / total)
