@@ -151,19 +151,19 @@ function _searchInObject(root, key, value, chld, all, depth) {
     return result;
 }
 
-function search(root, key, value, settings = {}) {
+export function search(root, key, value, settings = {}) {
     if (key === undefined || value === undefined) {
         printErr(`Object.search error: settings must have "key" and "value" props!`);
         return;
     }
 
     const {
-        all,
+        all = false,
         children = 'children',
         depth = 3
     } = settings;
 
-    return this._searchInObject(root, key, value, children, all, depth);
+    return _searchInObject(root, key, value, children, all, depth);
 }
 
 export function define(obj, fields, options = {}) {

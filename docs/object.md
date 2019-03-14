@@ -103,5 +103,19 @@ const result = innerAssign(target, source, true);
 (target, values, settings, common = { errors : true })
 
 ##
+### search
+(***root*** : *Object*, ***key*** : *String*, ***value*** : *String*, ***settings*** : *Object*) => *Array*
+
+- **root*
+- **key*
+- **value*
+- *settings*
+
+settings:
+- *depth* [3]
+- *all* [false]
+- *children* ['children']
+
+##
 ### define
 (object, fields, options = {})
