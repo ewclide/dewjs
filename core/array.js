@@ -1,33 +1,23 @@
-function _checkInclude(first, second, settings) {
-	if (!second) return true;
+function _checkInclude(value1, value2, settings) {
+	if (!v2) return true;
 
-	if (!settings.caseSens) {
-		first = first.toUpperCase();
-		second = second.toUpperCase();
-	}
+	const { caseSens, wholeWord, beginWord } = settings;
+	const v1 = caseSens ? value1 : value1.toUpperCase();
+	const v2 = caseSens ? value2 : value2.toUpperCase();
 
-	if (settings.whole) {
-		return first == second  ? true : false;
+	if (wholeWord) return v1 === v2;
 
-	} else {
-		let index = first.indexOf(second);
+	const idx = v1.indexOf(v2);
+	const entry = idx !== -1;
 
-		if (settings.begin) {
-			return index != -1 && ( index == 0 || first[index - 1] == ' ' ) ? true : false;
-		} else {
-			return index != -1 ? true : false;
-		}
-	}
-
-	return;
+	return beginWord ? entry && (idx === 0 || v1[idx - 1] === ' ') : entry;
 }
 
 function _natConv(value) {
-	let dot = '', range;
-
 	if (!isNaN(+value)) return value;
 
-	range = parseInt(value.replace(/\-\s+\.,/g, ''), 10);
+	const range = parseInt(value.replace(/\-\s+\.,/g, ''), 10);
+	let dot = '';
 
 	if (!isNaN(range)) {
 		return +value.replace(/[^\d+]/g, (str) => {
@@ -38,10 +28,9 @@ function _natConv(value) {
 				return '';
 			}
 		});
-
-	} else {
-		return value.replace(/\s+/g, '').toUpperCase();
 	}
+
+	return value.replace(/\s+/g, '').toUpperCase();
 }
 
 export function contain(arr, value) {
@@ -76,17 +65,19 @@ export function unique(arr) {
 }
 
 export function natSort(arr, settings = {}) {
-	return arr.sort( (cur, next) => {
+	const { inside, reverse } = settings;
+
+	return arr.sort((cur, next) => {
 		let result = 0;
 
-		if (settings.inside) {
-			cur = cur[settings.inside];
-			next = next[settings.inside];
+		if (inside) {
+			cur = cur[inside];
+			next = next[inside];
 		}
 
 		result = _natConv(next) > _natConv(cur) ? -1 : 1;
 
-		if (settings.reverse) result *= -1
+		if (reverse) result *= -1
 
 		return result;
 	});
@@ -94,8 +85,8 @@ export function natSort(arr, settings = {}) {
 
 export function search(arr, val, settings = {}) {
 	const result = settings.inside
-	? arr.filter( item => _checkInclude(item[settings.inside], val, settings) )
-	: arr.filter( item => _checkInclude(item, val, settings) );
+		? arr.filter((item) => _checkInclude(item[settings.inside], val, settings))
+		: arr.filter((item) => _checkInclude(item, val, settings));
 
 	return result.length ? result : false;
 }
@@ -103,14 +94,15 @@ export function search(arr, val, settings = {}) {
 export function removeValue(arr, value) {
 	const list = Array.isArray(value) ? value : [value];
 
-	return list.filter( item => {
-		let index = arr.indexOf(item);
-		if (index != -1) {
+	return list.filter((item) => {
+		const index = arr.indexOf(item);
+
+		if (index !== -1) {
 			arr.splice(index, 1);
 			return true;
-		} else {
-			return false;
 		}
+
+		return false;
 	});
 }
 
