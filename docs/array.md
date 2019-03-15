@@ -1,39 +1,87 @@
+### Usage
+just import the file before using.
+
+```js
+import { /* methods */ } from 'dewjs/array';
+```
+
 ##
 ### contain
-(arr, value)
+(***source*** : *Array*, ***value*** : *Any*) => *Object* | *Boolean (false)*
+
+- **source*
+- **value*
 
 ##
 ### subtract
-(arr, arr2)
+(***source*** : *Array*, ***target*** : *Array*) => *Array*
+
+- **source*
+- **target*
 
 ##
 ### difference
-(arr, arr2)
+(***source*** : *Array*, ***target*** : *Array*) => *Array*
+
+- **source*
+- **target*
 
 ##
 ### compare
-(arr, arrComp)
+(***source*** : *Array*, ***target*** : *Array*) => *Array*
+
+- **source*
+- **target*
 
 ##
 ### unique
-(arr)
+(***source*** : *Array*) => *Boolean*
+
+- **source*
 
 ##
 ### natSort
-(arr, settings = {})
+(***source*** : *Array*, ***settings*** : *Array*) => *Array*
+
+- **source*
+- *settings*
+
+settings:
+
+- *inside*
+- *reverse*
 
 ##
 ### search
-(arr, val, settings = {})
+(***source*** : *Array*, ***value*** : *Array*, ***settings*** : *Array*) => *Array* | *Boolean (false)*
+
+- **source*
+- **value*
+- *settings*
+
+settings:
+
+- *wholeWord*
+- *beginWord*
+- *caseSens*
 
 ##
 ### removeValue
-(arr, value)
+(***source*** : *Array*, ***value*** : *Any* | *Array*) => *Boolean*
+
+- **source*
+- **value*
 
 ##
 ### removeIndex
-(arr, index)
+(***source*** : *Array*, ***index*** : *Number* | *Array*) => *Boolean*
+
+- **source*
+- **index*
 
 ##
 ### equal
-(arr1, arr2)
+(***source*** : *Array*, ***target*** : *Array*) => *Boolean*
+
+- **source*
+- **target*

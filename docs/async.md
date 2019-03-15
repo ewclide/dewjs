@@ -1,52 +1,78 @@
 # Async
-### constructor ()
+### constructor
 
 Description...
 
+### Usage
+
+```js
+import { Async } from 'dewjs';
+```
+
 ## fields
-- **isAsync** : *get*
-- **promise** : *get*
-- **ready** : *get*
-- **pending** : *get*
-- **fulfilled** : *get*
-- **rejected** : *get*
+
+- **isAsync** : *Boolean* -
+- **promise** : *Promise* -
+- **ready** : *Boolean* -
+- **pending** : *Boolean* -
+- **fulfilled** : *Boolean* -
+- **rejected** : *Boolean* -
 
 ## Methods
+
 ### then
-(handler)
+(***handler*** : *Function*) => *This*
+
+- **handler*
 
 ##
 ### catch
-(handler)
+(***handler*** : *Function*) => *This*
+
+- **handler*
 
 ##
 ### resolve
-(data)
+(***data*** : *Any*) => *This*
+
+- *data*
 
 ##
 ### reject
-(data)
+(***data*** : *Any*) => *This*
+
+- *data*
 
 ##
 ### wait
-(list, progress)
+(***list*** : *Array of Async (Promises)*, ***progress*** : *Boolean*) => *This*
+
+- **list*
+- *progress* [false]
 
 ##
 ### reset
-()
+() => *This*
 
 ##
 ### refresh
-(handler)
+(***handler*** : *Function*) => *This*
+
+- **handler*
 
 ##
 ### again
-()
+() => *This*
 
 ##
 ### progress
-(handler)
+(***handler*** : *Function*) => *This*
+
+- **handler*
 
 ##
 ### shift
-(loaded, total = 1)
+(***loaded*** : *Number*, ***total***  : *Number*) => *This*
+
+- **loaded*
+- *total* [1]
