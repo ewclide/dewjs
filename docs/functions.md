@@ -672,3 +672,34 @@ log.time('speed test');
 log.timeEnd('speed test');
 // speed test: 0.25ms
 ```
+
+##
+### LOG_IGNORE : *Array*
+
+It is represents list of script names, which will not prints as source in console with using library *"log"* or *"printErr"* functions.  
+Also it can to recognize "min" or "dev" postfix after script name.
+
+```js
+// your project script
+import { LOG_IGNORE, log } from 'dewjs/funcs';
+LOG_IGNORE.push('my-project');
+/*
+    now "my-project.js" or "my-project.min.js"
+    will not prints as source
+*/
+
+function doSomethingImportant() {
+	// ...code
+	log('Important action is completed!');
+}
+```
+
+```js
+// common.js
+doSomethingImportant();
+/*
+Important action is completed!
+-----
+Source: http://localhost:3000/scripts/common.js:1:1 <= not my-project.js
+*/
+```

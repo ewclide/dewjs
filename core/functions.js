@@ -54,7 +54,7 @@ export function printErr(data, source = true) {
 	return false;
 }
 
-export const LOG_EXCEPTIONS = [];
+export const LOG_IGNORE = [];
 
 function _getSourceLog() {
 	let stack = (new Error()).stack;
@@ -62,7 +62,7 @@ function _getSourceLog() {
 	if (stack) stack = stack.split('\n');
 	else return '';
 
-	let scripts = LOG_EXCEPTIONS.join('|');
+	let scripts = LOG_IGNORE.join('|');
 	if (scripts) scripts += '|';
 	const reg = new RegExp(`(${scripts}dew)(\.min|\.dev)?\.js|anonymous`, 'g');
 

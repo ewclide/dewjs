@@ -1,4 +1,4 @@
-﻿import Callbacker from '../core/calCallbacker
+﻿import Callbacker from '../core/callbacker';
 import Eventer from '../core/eventer';
 import Template from '../core/template';
 import Timer from '../core/timer';

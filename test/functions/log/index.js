@@ -1,4 +1,4 @@
-DewFunc.LOG_EXCEPTIONS.push('index');
+DewFunc.LOG_IGNORE.push('index');
 
 function doSomeThingImportant() {
 	// ...code
