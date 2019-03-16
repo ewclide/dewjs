@@ -22,10 +22,11 @@ I would also like to note that some solutions that may have analogues were devel
 
 ### Install
 
-For using this library on the site just link CDN hosted script into your page:
+For using this library on the site just substitute VERSION_NAME by last release version  
+and link CDN hosted script into your page.  
 
 ```html
-<script src="https://cdn.jsdelivr.net/gh/ewclide/dewjs@2.0.0/dist/dew.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/ewclide/dewjs@VERSION_NAME/dist/dew.min.js"></script>
 ```
 Also you can get a local copy using git or simply **[download][1]**.
 The script located in dist folder.
