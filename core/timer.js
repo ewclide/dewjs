@@ -1,4 +1,4 @@
-import CallBacker from './callbacker';
+import Callbacker from './callbacker';
 
 const _timerList = new Set();
 
@@ -15,11 +15,11 @@ export default class Timer
 
 		// callbacks
 		const { onUpdate, onPlay, onPause, onStart, onFinish } = settings;
-		this._onUpdate = new CallBacker(onUpdate);
-		this._onPlay = new CallBacker(onPlay);
-		this._onPause = new CallBacker(onPause);
-		this._onStart = new CallBacker(onStart);
-		this._onFinish = new CallBacker(onFinish);
+		this._onUpdate = new Callbacker(onUpdate);
+		this._onPlay = new Callbacker(onPlay);
+		this._onPause = new Callbacker(onPause);
+		this._onStart = new Callbacker(onStart);
+		this._onFinish = new Callbacker(onFinish);
 
 		// specials
 		this._prevTime = 0;

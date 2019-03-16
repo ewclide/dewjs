@@ -50,7 +50,7 @@ printErr(err);
 ( ***value*** : *Any*, ***type*** : *String* ) => *Boolean* | *String*
 
 Checks type of the value. Returns result of checking as Boolean.
-Function, wich called with one argument will returns type of the passed value as string. If you pass array of types, then it checks value with each type in the array and returns true if value is one of this types.
+Function, which called with one argument will returns type of the passed value as string. If you pass array of types, then it checks value with each type in the array and returns true if value is one of this types.
 *HTMLTools* - is a special type of objects produced through library html object.
 
 - **value* - value itself.
@@ -76,7 +76,7 @@ if (isType(other, ['string', 'number']) {
 
 Parses and converts a string to type. Uses when result come as string and his necessary convert to the correct type. Supports types - *number, boolean, json, array*. If it can't converts a value, then it trims spaces and returns a string
 
-- **value* - a string, wich must converted
+- **value* - a string, which must converted
 
 ```js
 strParse('[1, 2, 3]'); // [1,2,3]
@@ -88,7 +88,7 @@ strParse('[1, 2, 3]'); // [1,2,3]
 
 Removes all not number chars from the string and returns integer number.
 
-- **value* - a string, wich contains int number.
+- **value* - a string, which contains int number.
 
 ```js
 intParse('as125%7d'); // 1257
@@ -100,7 +100,7 @@ intParse('as125%7d'); // 1257
 
 Removes all not number chars from the string and returns float number. Recognizes points and commas for separating real and fractional parts. If it founds two points (commas), then it removed all chars after second separator.
 
-- **value* - a string, wich contains float number.
+- **value* - a string, which contains float number.
 
 ```js
 floatParse('as12,5%7d'); // 12.57
@@ -112,7 +112,7 @@ floatParse('as12,5%7d'); // 12.57
 
 Recognizes json object in the string. More permissive then JSON.parse method. Not sensitive to quots.
 
-- **value* - a string, wich contains json object.
+- **value* - a string, which contains json object.
 
 ```js
 jsonParse(`{ a: text, b: 'text2', "c": 123 }`);
@@ -144,8 +144,8 @@ const inst = construct(Test, [1,2,3]);
 Allows to publish specified fields and methods and encapsulate others. Returns new class.
 
 - **class* - a class.
-- **methods* - methods list, wich you want to publish.
-- *fields* - fields list, wich you want to publish.
+- **methods* - methods list, which you want to publish.
+- *fields* - fields list, which you want to publish.
 
 ```js
 class Test {
@@ -184,7 +184,7 @@ Function also detects *Boolean* values in attrubtes.
 
 - **settings* - object with user settings.
 - **defaults* - default values.
-- *element* - DOM element, wich contains attrubites.
+- *element* - DOM element, which contains attrubites.
 - *attributes* - list of attributes, which corresponds to the settings.
 
 ```html
@@ -292,7 +292,7 @@ randf(3, 10, 2); // 4.12
 Returns string of random chars.
 
 - *length* [15] - length of result string.
-- *types* [all] - List of char types, wich will be used. Available types - *all, lower, upper, numbers, specials*;
+- *types* [all] - List of char types, which will be used. Available types - *all, lower, upper, numbers, specials*;
 
 ```js
 randKey(10, ['upper', 'lower']); // "mkFqWeTGdp"
@@ -302,9 +302,9 @@ randKey(10, ['upper', 'lower']); // "mkFqWeTGdp"
 ### idGetter
 ( ***prefix*** : *String* ) => *Function*
 
-Returns function, wich returns unique value in own space (Just increment value)
+Returns function, which returns unique value in own space (Just increment value)
 
-- *prefix* - a string, wich will be added before value.
+- *prefix* - a string, which will be added before value.
 
 ```js
 const getName = idGetter('unique_');
@@ -355,13 +355,27 @@ camelCaseMerge('hello', 'world', 'have', 'fun'); // "helloWorldHaveFun"
 ```
 
 ##
+### camelCaseToLine
+(***string*** : *String*, ***up*** : *Boolean*) => *String*
+
+Converts string to underline spelling. Also if you specify second argument as true,  
+then string will be converted to upper-case.
+
+- **string* - a string for convertation
+- *up* [false] - converts string to uppercase.
+
+```js
+camelCaseToLine('camelCaseToLine', true); // "CAMEL_CASE_TO_LINE"
+```
+
+##
 ### trim
 (***string*** : *String*, ***all*** : *Boolean*) => *String*
 
 Is a wrapper of native function. Deletes spaces from both ends of a string. If you pass second argument as true, then all repeated spaces on the string will be replaced by once space.
 
 - **string* - a sring itself.
-- *all* - a flag, wich allows to replace all spaces by one.
+- *all* - a flag, which allows to replace all spaces by one.
 
 ```js
 trim(' hello world,   have fun! '); // "hello world, have fun!"
@@ -561,7 +575,7 @@ clampBySteps(-1, [0, 2, 4]); // 0
 ### sleep
 (***time*** : *Number*) => *Promise*
 
-Returns promise, wich will be resolved after specified time. If you not pass a time, that function return resolved promise.
+Returns promise, which will be resolved after specified time. If you not pass a time, that function return resolved promise.
 
 - *time* - a time in milliseconds.
 
@@ -580,7 +594,7 @@ logAsync(['hello', 'world']);
 ### limitCalls
 (***function*** : *Function*, ***count*** : *Number*) => *Function*
 
-Returns wrapper of a function, wich can be called a certain number of times.
+Returns wrapper of a function, which can be called a certain number of times.
 
 - **function* - a function.
 - *count* [1] - permissible number of calling.

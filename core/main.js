@@ -6,7 +6,7 @@ import http from './http';
 import url from './url';
 import html from './html';
 import bind from './bind';
-import CallBacker from './callbacker';
+import Callbacker from './callbacker';
 import Eventer from './eventer';
 import Template from './template';
 import Timer from './timer';
@@ -17,7 +17,7 @@ const DEW = {
 	funcs,
 	array,
 	object,
-	CallBacker,
+	Callbacker,
 	Eventer,
 	Template,
 	Async,

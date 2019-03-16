@@ -1,5 +1,5 @@
 import Timer from "./timer";
-import CallBacker from './callbacker';
+import Callbacker from './callbacker';
 
 const EASING = {
     linear     : (t) => t,
@@ -37,8 +37,8 @@ export default class Lerp
         // callbacks
         const { action = () => {}, onStart, onFinish } = settings;
         this._action = action;
-        this._onStart  = new CallBacker(onStart);
-        this._onFinish = new CallBacker(onFinish);
+        this._onStart  = new Callbacker(onStart);
+        this._onFinish = new Callbacker(onFinish);
 
         // spacials
         this._delta = 1;

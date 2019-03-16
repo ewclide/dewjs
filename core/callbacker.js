@@ -1,64 +1,64 @@
-import {printErr} from "./functions";
+import { printErr } from "./functions";
 
-export default class CallBacker
-{
-	constructor(handler) {
+export default class Callbacker {
+	constructor(...handlers) {
 		this._handlers = new Map();
 
-		if (typeof handler == "function") {
-			this.push(handler);
+		if (handlers.length) {
+			handlers.forEach((h) => this.push(h));
 		}
 	}
 
-	get isCallBacker() {
+	get isCallbacker() {
 		return true;
 	}
 
-	get length() {
+	get size() {
 		return this._handlers.size;
 	}
 
-	async(...args) {
-		// this._handlers.forEach((handler) => {
-		// 	handler(args)
-		// 	args = Array.isArray(args) ? handler(...args) : handler(args);
-		// });
-
-		return args.length > 1 ? args : args[0];
-	}
-
 	call(...args) {
-		this._handlers.forEach( handler => handler(...args));
-		return args.length > 1 ? args : args[0];
+		const all = [];
+
+		this._handlers.forEach((handler) => {
+			const res = handler(...args);
+			all.push(res);
+		});
+
+		return all;
 	}
 
 	sequence(...args) {
-		this._handlers.forEach( handler => {
-			args = Array.isArray(args) ? handler(...args) : handler(args);
+		let data = args;
+
+		this._handlers.forEach((handler) => {
+			data = Array.isArray(data) ? handler(...data) : handler(data);
 		});
 
-		return args;
+		const { length } = data;
+		return !length || length > 1 ? data : data[0];
 	}
 
 	filter(filter, ...args) {
 		let index = 0;
+		let data = args;
 
 		for (const handler of this._handlers) {
-			const product = Array.isArray(args)
-				? handler[1](...args) : handler[1](args);
+			const product = Array.isArray(data)
+				? handler[1](...data) : handler[1](data);
 
 			const skip = Array.isArray(product)
 				? filter(index, ...product) : filter(index, product);
 
 			if (skip) {
-				args = product;
+				data = product;
 				index++;
 			} else {
 				break;
 			}
 		}
 
-		return args;
+		return data;
 	}
 
 	single(key, ...args) {
@@ -67,12 +67,13 @@ export default class CallBacker
 		if (handler) {
 			return handler(...args);
 		} else {
-			printErr(`CallBacker error: undefined handler with key "${key}"`);
+			printErr(`Callbacker error: undefined handler with key "${key}"`);
+			return false;
 		}
 	}
 
 	push(handler) {
-		if (typeof handler == "function") {
+		if (typeof handler == 'function') {
 			const name = handler.name || handler;
 			this._handlers.set(name, handler);
 			this._lastKey = name;
@@ -95,8 +96,6 @@ export default class CallBacker
 
 	shift() {
 		const first = this._handlers.keys().next().value;
-		if (first) {
-			this._handlers.delete(first);
-		}
+		if (first) this._handlers.delete(first);
 	}
 }

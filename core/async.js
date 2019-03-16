@@ -1,4 +1,4 @@
-import CallBacker from './callbacker';
+import Callbacker from './callbacker';
 
 export default class Async
 {
@@ -125,7 +125,7 @@ export default class Async
 
     refresh(handler) {
 		if (!this.__asyncRefresh) {
-            this.__asyncRefresh  = new CallBacker();
+            this.__asyncRefresh  = new Callbacker();
         }
 
 		this.__asyncRefresh.push(handler);
@@ -145,7 +145,7 @@ export default class Async
 
     progress(handler) {
 		if (!this.__asyncProgress) {
-            this.__asyncProgress = new CallBacker();
+            this.__asyncProgress = new Callbacker();
         }
 
 		this.__asyncProgress.push(handler);

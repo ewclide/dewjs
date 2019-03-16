@@ -1,7 +1,7 @@
 import { printErr, idGetter } from './functions';
 import JSONConverter from './json-converter';
 import CSSTransformer from './css-transformer';
-import CallBacker from './callbacker';
+import Callbacker from './callbacker';
 
 export const getIdOfElement = idGetter('__elem__');
 export const eventList = new Map();
@@ -795,7 +795,7 @@ export class HTMLTools
         if (events.has(type)) {
             events.get(type).push(handler);
         } else {
-            events.set(type, new CallBacker(handler));
+            events.set(type, new Callbacker(handler));
         }
 
         this.setAttr('on' + type, `$event.fire('${this._id}','${type}',event)`);

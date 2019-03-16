@@ -325,6 +325,11 @@ export function camelCaseMerge(...list) {
 	}, '');
 }
 
+export function camelCaseToLine(str, up = false) {
+	const res = str.replace(/[A-Z]/g, s => '_' + s.toLowerCase());
+	return up ? res.toUpperCase() : res;
+}
+
 export function trim(str, all) {
 	return all ? str.trim().replace(/\s+/g, ' ') : str.trim();
 }
