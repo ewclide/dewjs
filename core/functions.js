@@ -54,14 +54,20 @@ export function printErr(data, source = true) {
 	return false;
 }
 
+export const LOG_EXCEPTIONS = [];
+
 function _getSourceLog() {
 	let stack = (new Error()).stack;
 
 	if (stack) stack = stack.split('\n');
 	else return '';
 
+	let scripts = LOG_EXCEPTIONS.join('|');
+	if (scripts) scripts += '|';
+	const reg = new RegExp(`(${scripts}dew)(\.min|\.dev)?\.js|anonymous`, 'g');
+
 	for (let i = 0; i < stack.length; i++) {
-		if (stack[i].search(/dew\.(min|dev)\.js|anonymous/g) == -1) {
+		if (stack[i].search(reg) == -1) {
 			const src = stack[i].match(/https?:[^\)]+/g);
 			if (src && src[0]) return src[0];
 		}
