@@ -1,4 +1,4 @@
-import Callbacker from "./callbacker";
+import Callbacker from './callbacker';
 
 export default class Eventer {
 	constructor() {

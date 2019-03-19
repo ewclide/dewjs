@@ -19,33 +19,6 @@ if (browser === BROWSERS.CHROME) {
 ```
 
 ##
-### printErr
-( ***error*** : *Array*, ***source*** : *Boolean* ) => *false*
-
-Allows to print errors in the console.
-
-- **error* - can be string or array. If you want to print errors stack, then pass array with title property.
-- *source* [true] - If true, then it prints the file where was called this function.
-
-```js
-const err = [];
-err.title = 'You cant do it!';
-
-err.push('first error');
-err.push('second error');
-
-printErr(err);
-
-/*
-  Error: You cant do it!
-  --> first error
-  --> second error
-  -----
-  Source: http://localhost:3000/core/index.js:81:11
-*/
-```
-
-##
 ### isType
 ( ***value*** : *Any*, ***type*** : *String* ) => *Boolean* | *String*
 
@@ -358,7 +331,7 @@ camelCaseMerge('hello', 'world', 'have', 'fun'); // "helloWorldHaveFun"
 ### camelCaseToLine
 (***string*** : *String*, ***up*** : *Boolean*) => *String*
 
-Converts string to underline spelling. Also if you specify second argument as true,  
+Converts string to underline spelling. Also if you specify second argument as true,
 then string will be converted to upper-case.
 
 - **string* - a string for convertation
@@ -629,6 +602,33 @@ entry(12, 5, 10); // false
 ```
 
 ##
+### printErr
+( ***error*** : *Array*, ***source*** : *Boolean* ) => *false*
+
+Allows to print errors in the console.
+
+- **error* - can be string or array. If you want to print errors stack, then pass array with title property.
+- *source* [true] - If true, then it prints the file where was called this function.
+
+```js
+const err = [];
+err.title = 'You cant do it!';
+
+err.push('first error');
+err.push('second error');
+
+printErr(err);
+
+/*
+  Error: You cant do it!
+  --> first error
+  --> second error
+  -----
+  Source: http://localhost:3000/core/index.js:81:11
+*/
+```
+
+##
 ### log
 (***arg1, arg2, ...***) => *Void*
 
@@ -676,7 +676,7 @@ log.timeEnd('speed test');
 ##
 ### LOG_IGNORE : *Array*
 
-It is represents list of script names, which will not prints as source in console with using library *"log"* or *"printErr"* functions.  
+It is represents list of script names, which will not prints as source in console with using library *"log"* or *"printErr"* functions.
 Also it can to recognize "min" or "dev" postfix after script name.
 
 ```js
