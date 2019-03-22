@@ -50,17 +50,16 @@ export default class Timer
 		}
 
 		const tick = this._getTickMethod();
-		this[tick] = this[tick].bind(this);
-		this._tickMethod = tick;
+		this._tickMethod = tick.bind(this);
 
 		_timerList.add(this);
 	}
 
 	_getTickMethod() {
 		if (this._step) {
-			return this._count ? '_tickLimitedStep' : '_tickInfinityStep';
+			return this._count ? this._tickLimitedStep : this._tickInfinityStep;
 		} else {
-			return this._duration ? '_tickLimited' : '_tickInfinity';
+			return this._duration ? this._tickLimited : this._tickInfinity;
 		}
 	}
 
@@ -128,18 +127,15 @@ export default class Timer
 
 	_play() {
 		this._paused = false;
+		this._prevTime = performance.now();
 
-		const now = performance.now();
-		const tick = this[this._tickMethod];
-
-		this._prevTime = now;
 		if (!this._elapsedTime) {
 			this._onStart.call();
 		} else {
 			this._onPlay.call();
 		}
 
-		requestAnimationFrame(() => tick(this._prevTime));
+		requestAnimationFrame(() => this._tickMethod(this._prevTime));
 	}
 
 	pause() {
