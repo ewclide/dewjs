@@ -1,7 +1,6 @@
 import Callbacker from './callbacker';
 
-export default class Async
-{
+export default class Async {
     constructor() {
         this.__asyncStatus = 0;
         this.__asyncList = [];
@@ -81,16 +80,16 @@ export default class Async
         }
     }
 
-    wait(list, progress) {
+    wait(asyncList, progress) {
         const promises = [];
 
-        this.__asyncList = Array.isArray(list) ? list : [list];
+        this.__asyncList = Array.isArray(asyncList) ? asyncList : [asyncList];
         this.__asyncList.forEach((async) => {
-            const prom = async.isAsync ? async.promise : async;
-            promises.push(prom);
+            const promise = async.isAsync ? async.promise : async;
+            promises.push(promise);
 
             if (progress) {
-                async.onProgress(() => {
+                async.progress(() => {
                     this.progress(this.__calcReady());
                 });
             }

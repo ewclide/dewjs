@@ -47,7 +47,6 @@ export default class Lerp
         this._timer = new Timer({
             onUpdate: (dt, elapsed) => this._update(elapsed)
         });
-        console.log(this)
     }
 
     setAction(handler) {

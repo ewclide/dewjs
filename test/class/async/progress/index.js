@@ -1,5 +1,4 @@
-class Loader extends DEW.Async
-{
+class Loader extends DEW.Async {
     constructor(list) {
         super();
 
@@ -36,13 +35,13 @@ class Loader extends DEW.Async
     load(list) {
         this.wait(list, true)
         .then(() => log('loaded!'))
-        .catch((e) => DEW.printErr(e));
+        .catch((e) => DEW.funcs.printErr(e));
     }
 }
 
 let loader = new Loader([
-    '/test/assets/big.jpg',
-    '/test/assets/big.jpg',
+    '/test/assets/img.png',
+    '/test/assets/img.png',
     // '/test/assets/empty.jpg'
 ]);
 

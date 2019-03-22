@@ -2,8 +2,7 @@ import Callbacker from './callbacker';
 
 const _timerList = new Set();
 
-export default class Timer
-{
+export default class Timer {
 	constructor(settings = {}) {
 		// common
 		const { count = 0, duration = 0, delay = 0, step = 0, flow = 1 } = settings;
@@ -49,9 +48,7 @@ export default class Timer
 			this._step = this._duration / this._count;
 		}
 
-		const tick = this._getTickMethod();
-		this._tickMethod = tick.bind(this);
-
+		this._tickMethod = this._getTickMethod();
 		_timerList.add(this);
 	}
 
@@ -186,7 +183,7 @@ export default class Timer
 		_timerList.clear();
 	}
 
-	_tickInfinity(time) {
+	_tickInfinity = (time) => {
 		const deltaTime = (time - this._prevTime) * this._timeRate;
 
 		this._prevTime = time;
@@ -198,7 +195,7 @@ export default class Timer
 		}
 	}
 
-	_tickInfinityStep(time) {
+	_tickInfinityStep = (time) => {
 		const deltaTime = (time - this._prevTime) * this._timeRate;
 
 		this._prevTime = time;
@@ -211,7 +208,7 @@ export default class Timer
 		}
 	}
 
-	_tickLimited(time) {
+	_tickLimited = (time) => {
 		const deltaTime = (time - this._prevTime) * this._timeRate;
 
 		this._prevTime = time;
@@ -227,7 +224,7 @@ export default class Timer
 		}
 	}
 
-	_tickLimitedStep(time) {
+	_tickLimitedStep = (time) => {
 		const deltaTime = (time - this._prevTime) * this._timeRate;
 
 		this._prevTime = time;
