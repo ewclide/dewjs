@@ -90,7 +90,7 @@ export default class Async {
 
             if (progress) {
                 async.progress(() => {
-                    this.progress(this.__calcReady());
+                    this.shift(this.__calcReady());
                 });
             }
         });
