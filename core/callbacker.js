@@ -1,4 +1,4 @@
-import { printErr } from "./functions";
+import { printErr } from './functions';
 
 export default class Callbacker {
 	constructor(...handlers) {

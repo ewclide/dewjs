@@ -6,6 +6,7 @@ import http from './http';
 import url from './url';
 import html from './html';
 import bind from './bind';
+import ProgressReducer from './progress-reducer';
 import Callbacker from './callbacker';
 import Eventer from './eventer';
 import Template from './template';
@@ -17,6 +18,7 @@ const DEW = {
 	funcs,
 	array,
 	object,
+	ProgressReducer,
 	Callbacker,
 	Eventer,
 	Template,
