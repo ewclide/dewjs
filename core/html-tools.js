@@ -1,13 +1,13 @@
-import { printErr, idGetter } from './functions';
+import { printErr, idGetter, aggregateCalls } from './functions';
+import { removeValue } from './array';
 import JSONConverter from './json-converter';
 import CSSTransformer from './css-transformer';
 import Callbacker from './callbacker';
 
-export const getIdOfElement = idGetter('__elem__');
+export const genElementId = idGetter('__elem__');
 export const eventList = new Map();
 
-export class HTMLTools
-{
+export class HTMLTools {
     constructor(source) {
         if (source) {
             this.elements = source instanceof NodeList || Array.isArray(source)
@@ -18,7 +18,7 @@ export class HTMLTools
 
         this._srcLength = this.elements.length;
         this._ready = false;
-        this._id = getIdOfElement();
+        this._id = genElementId();
 
         this.query = '';
     }
@@ -82,51 +82,164 @@ export class HTMLTools
         })
     }
 
-    mutation(fn, options, replace) {
+    onResize(handler, childFactor = false) {
+        if (typeof handler !== 'function') return;
 
+        this._cacheOfSize = this._cacheSize();
+
+        const reaction = aggregateCalls(() => {
+            const size = [0, 0];
+
+            if (this.elements.length === 1) {
+                const changes = this._checkoutSize(this.elements[0], size);
+                if (changes) handler(...changes);
+                return;
+            }
+            
+            for (let i = 0; i < this.elements.length; i++) {
+                const changes = this._checkoutSize(this.elements[i], size);
+                if (changes) {
+                    handler(...changes);
+                    return;
+                } 
+            }
+        });
+
+        const options = {
+            attributes: true,
+            characterData: true,
+            childList: childFactor,
+            subtree: childFactor
+        };
+
+        this.mutate(reaction, options);
+        window.addEventListener('resize', reaction);
+
+        if (!this._resizeReaction) {
+            this._resizeReaction = new Set();
+        }
+
+        this._resizeReaction.add(reaction);
+
+        return this;
+    }
+
+    clearOnResize() {
+        if (!this._resizeReaction) return;
+
+        this._resizeReaction.forEach((reaction) => {
+            this.removeMutation(reaction);
+            window.removeEventListener('resize', reaction);
+        });
+
+        return this;
+    }
+
+    _checkoutSize(element, size) {
+        const { offsetHeight, offsetWidth } = element;
+        const { width, height } = this._cacheOfSize.get(element);
+
+        if (width === offsetWidth && height === offsetHeight) {
+            return false;
+        } else {
+            size[0] = offsetWidth;
+            size[1] = offsetHeight;
+            return size;
+        }
+    }
+
+    _cacheSize() {
+        const cache = new Map();
+
+        for (let i = 0; i < this.elements.length; i++) {
+            const element = this.elements[i];
+            cache.set(element, {
+                width: element.offsetWidth,
+                height: element.offsetHeight
+            })
+        }
+
+        return cache;
+    }
+
+    _getSize(element) {
+        const target = element || this.elements[0];
+        return {
+            width: target.offsetWidth,
+            height: target.offsetHeight
+        }
+    }
+
+    mutate(handler, options = { attributes: true }, replace) {
         if (!('MutationObserver' in window)) {
             printErr('Your browser not support observ mutation');
             return;
         }
 
-        if (replace) this.mutationClear();
+        if (replace) this.clearMutations();
+        if (!this._mutations) this._mutations = [];
 
-        this._mutations = [];
+        const optKeys = Object.keys(options);
+        if (!optKeys.length) options.attributes = true;
+
+        const aggregator = aggregateCalls(handler);
 
         for (let i = 0; i < this.elements.length; i++) {
             const element = this.elements[i];
-            const observer = new MutationObserver((data) => fn(data[0]));
+            const observer = new MutationObserver(rec => aggregator(rec[0]));
             observer.observe(element, options);
 
             this._mutations.push({
                 options,
                 observer,
-                element
+                element,
+                handler
             });
         }
 
         return this;
     }
 
-    mutationStart() {
+    mutateEnable() {
         this._mutations.forEach((mutation) => {
             const { observer, element, options } = mutation;
             observer.observe(element, options);
         });
+
+        return this;
     }
 
-    mutationEnd() {
-        this._mutations.forEach((mutation) => {
-            mutation.observer.disconnect();
-        });
-    }
-
-    mutationClear() {
+    mutateDisable() {
         this._mutations.forEach((mutation) => {
             mutation.observer.disconnect();
         });
 
-        this._mutations = null;
+        return this;
+    }
+
+    removeMutation(handler) {
+        const values = [];
+
+        this._mutations.forEach((mutation) => {
+            if (mutation.handler === handler) {
+                mutation.observer.disconnect();
+                values.push(mutation);
+            }
+        });
+
+        removeValue(this._mutations, values);
+
+        return this;
+    }
+
+    clearMutations() {
+        this._mutations.forEach((mutation) => {
+            mutation.observer.disconnect();
+        });
+
+        this._mutations.length = 0;
+
+        return this;
     }
 
     visible(maxDepth = 3) {
@@ -457,22 +570,23 @@ export class HTMLTools
         return this;
     }
 
-    size(width, height) {
-        if (width === undefined && height === undefined) {
-            const { offsetWidth, offsetHeight } = this.elements[0];
-            return {
-                width: offsetWidth,
-                height: offsetHeight
-            }
+    size() {
+        const { offsetWidth, offsetHeight } = this.elements[0];
+        return {
+            width: offsetWidth,
+            height: offsetHeight
         }
+    }
 
+    resize(width, height) {
         let w = width; h = height;
         if (typeof width == 'number') w += 'px';
         if (typeof height == 'number') h += 'px';
 
         for (let i = 0; i < this.elements.length; i++) {
-            this.elements[i].style.width = w;
-            this.elements[i].style.height = h;
+            const elemStyle = this.elements[i].style;
+            elemStyle.width = w;
+            elemStyle.height = h;
         }
     }
 

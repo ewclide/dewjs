@@ -612,6 +612,29 @@ func(3); // nothing
 func.resetCalls();
 func(3); // you called with: 3;
 ```
+##
+### aggregateCalls
+(***handler*** : *Function*) => *Function*
+
+Returns function wich allows to unite synchronous function calls by one call. The handler receive an array wich contains agruments of all calls. Also note that the handler called asynchronously.
+
+- *handler* - target function
+
+```js
+const agregator = aggregateCalls((args) => {
+    // some importtant code...
+    console.log(args);
+});
+
+aggregator('one');
+aggregator('two');
+aggregator('three');
+
+/**
+ * in console:
+ * ["one", "two", "three"]
+*/
+```
 
 ##
 ### entry

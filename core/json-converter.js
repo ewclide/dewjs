@@ -1,8 +1,7 @@
-import { eventList, HTMLTools, getIdOfElement } from './html-tools';
+import { eventList, HTMLTools, genElementId } from './html-tools';
 import Callbacker from './callbacker';
 
-export default class JSONConverter
-{
+export default class JSONConverter {
 	constructor(json) {
         this.htl = null;
         this.nodes = {};
@@ -47,7 +46,7 @@ export default class JSONConverter
                     break;
 
                 case 'events' :
-                    const id = getIdOfElement();
+                    const id = genElementId();
                     const events = new Map();
                     eventList.set(id, events);
 

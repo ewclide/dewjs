@@ -450,6 +450,28 @@ export function limitCalls(fn, count = 1) {
 	return res;
 }
 
+export function aggregateCalls(handler) {
+	if (handler.isAggregator) return handler;
+
+	const argsList = [];
+	let timer = null;
+
+	const aggregator = (...args) => {
+		clearTimeout(timer);
+
+		argsList.push(args.length > 1 ? args : args[0]);
+	
+		timer = setTimeout(() => {
+			handler(argsList.slice());
+			argsList.length = 0;
+		});
+	};
+
+	aggregator.isAggregator = true;
+
+	return aggregator;
+}
+
 export function sleep(time) {
 	if (!time) return Promise.resolve();
 	return new Promise((resolve) => setTimeout(resolve, time));
