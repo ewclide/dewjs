@@ -450,7 +450,7 @@ export function limitCalls(fn, count = 1) {
 	return res;
 }
 
-export function aggregateCalls(handler) {
+export function aggregateCalls(handler, timeInterval = 0) {
 	if (handler.isAggregator) return handler;
 
 	const argsList = [];
@@ -464,7 +464,7 @@ export function aggregateCalls(handler) {
 		timer = setTimeout(() => {
 			handler(argsList.slice());
 			argsList.length = 0;
-		});
+		}, timeInterval);
 	};
 
 	aggregator.isAggregator = true;

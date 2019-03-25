@@ -587,11 +587,12 @@ func(3); // you called with: 3;
 ```
 ##
 ### aggregateCalls
-(***handler*** : *Function*) => *Function*
+(***handler*** : *Function*, ***timeInterval*** : *Number*) => *Function*
 
-Returns function wich allows to unite synchronous function calls by one call. The handler receive an array wich contains agruments of all calls. Also note that the handler called asynchronously.
+Returns function wich allows to unite synchronous function calls by one call. The handler receive an array wich contains agruments of all calls. Also note that the handler called asynchronously. For grouping asynchronous function calls you can specify second argument which means time of catching.
 
 - *handler* - target function
+- *timeInterval* - time for catching function calls
 
 ```js
 const agregator = aggregateCalls((args) => {
