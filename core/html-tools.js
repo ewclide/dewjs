@@ -85,23 +85,23 @@ export class HTMLTools {
     onResize(handler, childFactor = false) {
         if (typeof handler !== 'function') return;
 
-        this._cacheOfSize = this._cacheSize();
+        const cache = this._cacheSize();
 
         const reaction = aggregateCalls(() => {
-            const size = [0, 0];
+            const changeList = [];
 
-            if (this.elements.length === 1) {
-                const changes = this._checkoutSize(this.elements[0], size);
-                if (changes) handler(...changes);
-                return;
-            }
-            
             for (let i = 0; i < this.elements.length; i++) {
-                const changes = this._checkoutSize(this.elements[i], size);
+                const element = this.elements[i];
+                const changes = this._checkoutSize(element, cache);
+
                 if (changes) {
-                    handler(...changes);
-                    return;
-                } 
+                    changeList.push({ element, ...changes });
+                    cache.set(element, changes);
+                }
+            }
+
+            if (changeList.length) {
+                handler(changeList.length > 1 ? changeList : changeList[0]);
             }
         });
 
@@ -115,19 +115,19 @@ export class HTMLTools {
         this.mutate(reaction, options);
         window.addEventListener('resize', reaction);
 
-        if (!this._resizeReaction) {
-            this._resizeReaction = new Set();
+        if (!this._resizeReactions) {
+            this._resizeReactions = new Set();
         }
 
-        this._resizeReaction.add(reaction);
+        this._resizeReactions.add(reaction);
 
         return this;
     }
 
     clearOnResize() {
-        if (!this._resizeReaction) return;
+        if (!this._resizeReactions) return;
 
-        this._resizeReaction.forEach((reaction) => {
+        this._resizeReactions.forEach((reaction) => {
             this.removeMutation(reaction);
             window.removeEventListener('resize', reaction);
         });
@@ -135,17 +135,20 @@ export class HTMLTools {
         return this;
     }
 
-    _checkoutSize(element, size) {
-        const { offsetHeight, offsetWidth } = element;
-        const { width, height } = this._cacheOfSize.get(element);
+    _checkoutSize(element, cache) {
+        if (!cache.has(element)) return;
 
-        if (width === offsetWidth && height === offsetHeight) {
-            return false;
-        } else {
-            size[0] = offsetWidth;
-            size[1] = offsetHeight;
-            return size;
+        const { offsetHeight, offsetWidth } = element;
+        const { width, height } = cache.get(element);
+
+        if (width !== offsetWidth || height !== offsetHeight) {
+            return {
+                width: offsetWidth,
+                height: offsetHeight
+            }
         }
+
+        return false;
     }
 
     _cacheSize() {
@@ -561,7 +564,7 @@ export class HTMLTools {
         }
 
         let val = value;
-        if (typeof value == 'number') val += 'px';  
+        if (typeof value == 'number') val += 'px';
 
         for (let i = 0; i < this.elements.length; i++) {
             this.elements[i].style.height = val;
