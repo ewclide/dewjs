@@ -320,18 +320,18 @@ export class HTMLTools {
         return htl;
     }
 
-    before(htl) {
-        this._insert(htl, 'beforebegin');
+    before(...htl) {
+        this._insert(htl.length > 1 ? htl : htl[0], 'beforebegin');
         return this;
     }
 
-    after(htl) {
-        this._insert(htl, 'afterend');
+    after(...htl) {
+        this._insert(htl.length > 1 ? htl : htl[0], 'afterend');
         return this;
     }
 
-    append(htl) {
-        this._insert(htl, 'beforeend');
+    append(...htl) {
+        this._insert(htl.length > 1 ? htl : htl[0], 'beforeend');
         return this;
     }
 
@@ -340,8 +340,8 @@ export class HTMLTools {
         return this;
     }
 
-    prepend(htl) {
-        this._insert(htl, 'afterbegin');
+    prepend(...htl) {
+        this._insert(htl.length > 1 ? htl : htl[0], 'afterbegin');
         return this;
     }
 
