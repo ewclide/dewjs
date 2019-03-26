@@ -23,9 +23,8 @@ export class HTMLTools {
         this.query = '';
     }
 
-    native() {
-        return this.elements.length == 1
-            ? this.elements[0] : Array.from(this.elements);
+    get isHTMLTools() {
+        return true;
     }
 
     get length() {
@@ -36,11 +35,11 @@ export class HTMLTools {
         return this.elements[0].tagName.toLowerCase();
     }
 
-    get isHTMLTools() {
-        return true;
+    get sindex() {
+        return this.elements[0].selectedIndex;
     }
 
-    ready() {
+    get ready() {
         return new Promise((resolve, reject) => {
 
             const elems = this.select('img, link, script, iframe');
@@ -80,6 +79,11 @@ export class HTMLTools {
                 }
             });
         })
+    }
+
+    native() {
+        return this.elements.length == 1
+            ? this.elements[0] : Array.from(this.elements);
     }
 
     onResize(handler, childFactor = false) {
@@ -499,7 +503,7 @@ export class HTMLTools {
         return this;
     }
 
-    active(enable) {
+    active(enable = false) {
         enable ? this.addClass('active') : this.removeClass('active');
         return this;
     }
@@ -527,10 +531,6 @@ export class HTMLTools {
         }
 
         return this;
-    }
-
-    get index() {
-        return this.elements[0].selectedIndex;
     }
 
     choose(index) {
@@ -573,7 +573,7 @@ export class HTMLTools {
         return this;
     }
 
-    size() {
+    get size() {
         const { offsetWidth, offsetHeight } = this.elements[0];
         return {
             width: offsetWidth,

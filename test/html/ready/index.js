@@ -5,6 +5,6 @@ const jq = $html
 
 $html.ready.then(() => log('dom loaded!'));
 
-$html.select('.big-images').ready()
+$html.select('.big-images').ready
 .then(() => log('Images ready!'))
 .catch((e) => log(e));

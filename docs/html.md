@@ -12,15 +12,14 @@ import { html } from 'dewjs';
 - ***isHTMLTools***
 - ***length***
 - ***tag***
+- ***sindex***
+- ***size***
+- ***ready***
 
 ##
 ### Methods
 ### native
 () => *Element | [...Elements]*
-
-##
-### ready
-() => *Promise*
 
 ##
 ### onResize
@@ -133,3 +132,115 @@ import { html } from 'dewjs';
 - *position* [end] before, after, begin, end
 - *child* [0]
 - *reverse* [false]
+
+moveTo(target, position, child, reverse)
+
+createFromJSON(json)
+
+createJSON(htl)
+
+tplAppend(tpl)
+
+addClass(className)
+
+removeClass(className)
+
+html(str, clear)
+
+text(str)
+
+value(data)
+
+active(flag)
+
+checked(flag)
+
+toogle()
+
+choose(index)
+
+width(value)
+
+height(value)
+
+resize(width, height)
+
+offsetParent()
+
+offsetWindow
+
+offsetScroll
+
+offsetPage
+
+wrap
+
+hide
+
+show(displayProp)
+
+parent
+
+transform
+
+matrix2d
+
+matrix3d
+
+scale
+
+scaleX
+
+scaleY
+
+skew
+
+rotate
+
+translate
+
+origin
+
+getAttr
+
+setAttr
+
+unsetAttr ()
+
+style (name, value)
+
+styles (prefix, data)
+
+addEvent
+
+fireEvent
+
+removeEvent
+
+each
+
+clone
+
+join
+
+clear
+
+remove
+
+delete
+
+
+
+extend
+
+script
+
+create
+
+convert
+
+parseXML
+
+createStyleSheet
+
+body
