@@ -1,6 +1,6 @@
 {
   "name": "dewjs",
-  "version": "2.7.0",
+  "version": "2.7.1",
   "description": "Experimental JavaScript library for UI programming",
   "author": "ewclide",
   "license": "MIT",
@@ -11,6 +11,7 @@
   "repository": "ewclide/dewjs",
   "main": "index.js",
   "files": [
+    "src",
     "index.js",
     "funcs.js",
     "object.js",

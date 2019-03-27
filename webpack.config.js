@@ -1,5 +1,16 @@
 const path = require('path');
 
+const rules = [{
+	test: /\.js$/,
+	exclude: /node_modules/,
+	use: {
+		loader: 'babel-loader',
+		options: {
+			presets: ['es2015', 'stage-0']
+		}
+	}
+}];
+
 const npmlib = {
 	entry: {
         'index.min': './core/lib-main',
@@ -12,7 +23,8 @@ const npmlib = {
         filename: '[name].js',
 		library: 'DEW',
 		libraryTarget: 'commonjs2'
-	}
+	},
+	module: { rules }
 };
 
 const script = {
@@ -22,18 +34,7 @@ const script = {
 		filename: 'dew.min.js',
 		publicPath: '/dist/'
 	},
-	module: {
-		rules: [{
-			test: /\.js$/,
-			exclude: /node_modules/,
-			use: {
-				loader: 'babel-loader',
-				query: {
-					presets: ['es2015', 'stage-0'],
-				}
-			}
-		}]
-	},
+	module: { rules },
 	devServer: {
 		port: 3000,
 		inline: true,
