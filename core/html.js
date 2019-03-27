@@ -24,14 +24,6 @@ html.extend = function(name, method) {
     return this;
 }
 
-html.ready = new Promise((resolve) => {
-    if (html._ready) {
-        resolve();
-    } else {
-        document.addEventListener('DOMContentLoaded', resolve);
-    }
-});
-
 html.script = function(source) {
     return new Promise((resolve, reject) => {
 
@@ -129,6 +121,17 @@ Object.defineProperty(html, 'body', {
 
         return this._body;
     }
+});
+
+Object.defineProperty(html, 'ready', {
+    configurable: false,
+    get: () => new Promise((resolve) => {
+        if (html._ready) {
+            resolve();
+        } else {
+            document.addEventListener('DOMContentLoaded', resolve);
+        }
+    })
 });
 
 document.addEventListener('DOMContentLoaded', () => html._ready = true );
