@@ -29,11 +29,6 @@ export default class Timer {
 		this._timeRate = flow / 1000;
 		this._tickMethod = null;
 
-		this._tickLimitedStep = this._tickLimitedStep.bind(this); 
-		this._tickInfinityStep = this._tickInfinityStep.bind(this);
-		this._tickLimited = this._tickLimited.bind(this);
-		this._tickInfinity = this._tickInfinity.bind(this);
-
 		this._init();
 	}
 
@@ -188,7 +183,7 @@ export default class Timer {
 		_timerList.clear();
 	}
 
-	_tickInfinity(time) {
+	_tickInfinity = (time) => {
 		const deltaTime = (time - this._prevTime) * this._timeRate;
 
 		this._prevTime = time;
@@ -200,7 +195,7 @@ export default class Timer {
 		}
 	}
 
-	_tickInfinityStep(time) {
+	_tickInfinityStep = (time) => {
 		const deltaTime = (time - this._prevTime) * this._timeRate;
 
 		this._prevTime = time;
@@ -213,7 +208,7 @@ export default class Timer {
 		}
 	}
 
-	_tickLimited(time) {
+	_tickLimited = (time) => {
 		const deltaTime = (time - this._prevTime) * this._timeRate;
 
 		this._prevTime = time;
@@ -229,7 +224,7 @@ export default class Timer {
 		}
 	}
 
-	_tickLimitedStep(time) {
+	_tickLimitedStep = (time) => {
 		const deltaTime = (time - this._prevTime) * this._timeRate;
 
 		this._prevTime = time;

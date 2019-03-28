@@ -166,6 +166,10 @@ export function search(root, key, value, settings = {}) {
     return _searchInObject(root, key, value, children, all, depth);
 }
 
+export function dispose(inst) {
+    Object.keys(inst).forEach(prop => inst[prop] = null);
+}
+
 export function define(obj, fields, options = {}) {
     const { enumer, config, write, get, set, value } = options;
 	let desc = {

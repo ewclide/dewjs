@@ -1,15 +1,22 @@
 const path = require('path');
 
-const rules = [{
+const rules = [];
+
+rules.push({
 	test: /\.js$/,
 	exclude: /node_modules/,
 	use: {
 		loader: 'babel-loader',
 		options: {
-			presets: ['es2015', 'stage-0']
+			presets: ['@babel/preset-env'],
+			plugins: [
+				['@babel/plugin-transform-runtime', { regenerator: true }],
+				['@babel/plugin-proposal-class-properties', { loose: true }],
+				'@babel/plugin-proposal-export-default-from'
+			]
 		}
 	}
-}];
+});
 
 const npmlib = {
 	entry: {
