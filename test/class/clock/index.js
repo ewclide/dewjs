@@ -20,7 +20,7 @@ const clock = new Clock({
 
 // setTimeout(() => clock.sleep(1000), 1100);
 
-const duration = 5;
+const duration = 140;
 const p = html.create('p');
 p.styles({
     fontSize: '50px',
