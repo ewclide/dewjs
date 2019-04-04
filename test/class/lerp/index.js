@@ -1,8 +1,11 @@
-var lerp = new DEW.Lerp({
-    timing: 'InOutQuad'
+const { html } = DEW;
+const { Lerp, EASING } = DEW.lerp;
+
+const lerp = new Lerp({
+    timing: EASING.InOutQuad
 });
 
-var box = $html.create('div').styles({
+const box = html.create('div').styles({
     position: "absolute",
     top: '50px',
     left: '50px',
@@ -10,7 +13,7 @@ var box = $html.create('div').styles({
     height: '50px',
     background: 'red',
     borderRadius: '50%'
-}).appendTo($html.body)
+}).appendTo(html.body)
 
 // const clones = [];
 
@@ -26,8 +29,8 @@ var box = $html.create('div').styles({
 
 async function animate(box) {
     lerp.setAction((offset) => box.translate(offset));
-    await lerp.run(0, 500, 1, 'linear');
-    await lerp.run(500, 250, 0.5, 'InOutQuad');
+    await lerp.run(0, 500, 1, EASING.linear);
+    await lerp.run(500, 250, 0.5, EASING.InOutQuad);
     await lerp.sleep(1);
     await lerp.run(250, 700, 1.5);
 }

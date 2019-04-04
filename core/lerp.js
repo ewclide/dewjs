@@ -1,7 +1,7 @@
-import Timer from "./timer";
+import { Clock } from './clock';
 import Callbacker from './callbacker';
 
-const EASING = {
+export const EASING = {
     linear     : (t) => t,
     InQuad     : (t) => t*t,
     OutQuad    : (t) => t*(2-t),
@@ -17,15 +17,9 @@ const EASING = {
     InOutQuint : (t) => t < 0.5 ? 16*t*t*t*t*t : 1+16*(--t)*t*t*t*t
 }
 
-export default class Lerp
-{
+export class Lerp {
     constructor(settings = {}) {
-        // common
-        let { timing, duration = 500 } = settings;
-
-        if (typeof timing == 'string' && timing in EASING) {
-            timing = EASING[timing];
-        }
+        const { timing = EASING.linear, duration = 500 } = settings;
 
         this._timing = timing || EASING.linear;
         this._duration = duration;
@@ -44,7 +38,7 @@ export default class Lerp
         this._delta = 1;
         this._completed = true;
         this._stepResolver = () => {};
-        this._timer = new Timer({
+        this._clock = new Clock({
             onUpdate: (dt, elapsed) => this._update(elapsed)
         });
     }
@@ -63,7 +57,7 @@ export default class Lerp
 
     setState(from, to, duration, timing) {
         if (typeof from != 'number' && typeof to != 'number') {
-            console.warn('setState must to recieve required arguments - from, to');
+            console.warn('Lerp.setState function must recieve required arguments "from", "to"');
             return;
         }
 
@@ -77,9 +71,7 @@ export default class Lerp
             this._duration = duration;
         }
 
-        if (typeof timing == 'string' && timing in EASING) {
-            this._timing = EASING[timing];
-        } else if (typeof timing == 'function') {
+        if (typeof timing == 'function') {
             this._timing = timing;
         }
 
@@ -106,7 +98,7 @@ export default class Lerp
     }
 
     sleep(time) {
-        return this._timer.sleep(time);
+        return this._clock.sleep(time);
     }
 
     play() {
@@ -115,13 +107,13 @@ export default class Lerp
             this._completed = false;
         }
 
-        this._timer.play();
+        this._clock.play();
 
         return new Promise((res) => this._stepResolver = res);
     }
 
     pause() {
-        this._timer.pause();
+        this._clock.pause();
     }
 
     finish() {
@@ -129,7 +121,7 @@ export default class Lerp
         this._progress = 0;
         this._completed = true;
 
-        this._timer.finish();
+        this._clock.finish();
         this._onFinish.call();
         this._stepResolver();
     }

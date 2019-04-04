@@ -355,7 +355,13 @@ export class HTMLTools {
     }
 
     _insert(htl, position) {
+        if (!htl) return;
+
         if (htl.isHTMLTools) {
+            if (!this.length || !htl.length) {
+                printErr(`Can't insert elements`);
+                return;
+            }
 
             if (htl._jsonConv) {
                 this._insertJSON(htl, 'beforeend');

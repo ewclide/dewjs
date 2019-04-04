@@ -1,6 +1,6 @@
 {
   "name": "dewjs",
-  "version": "2.7.2",
+  "version": "2.8.0",
   "description": "Experimental JavaScript library for UI programming",
   "author": "ewclide",
   "license": "MIT",
@@ -16,6 +16,8 @@
     "funcs.js",
     "object.js",
     "array.js",
+    "clock.js",
+    "lerp.js",
     "LICENSE",
     "README.md"
   ],
