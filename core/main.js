@@ -2,6 +2,8 @@ import './polyfill';
 import * as funcs from './functions';
 import * as array from'./array';
 import * as object from './object';
+import * as clock from './clock';
+import * as lerp from './lerp';
 import http from './http';
 import url from './url';
 import html from './html';
@@ -10,21 +12,19 @@ import ProgressReducer from './progress-reducer';
 import Callbacker from './callbacker';
 import Eventer from './eventer';
 import Template from './template';
-import Timer from './timer';
 import Async from './async';
-import Lerp from './lerp';
 
 const DEW = {
 	funcs,
 	array,
 	object,
+	clock,
+	lerp,
 	ProgressReducer,
 	Callbacker,
 	Eventer,
 	Template,
 	Async,
-	Timer,
-	Lerp,
 	bind,
 	http,
 	url,

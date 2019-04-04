@@ -1,22 +1,27 @@
-const timer = new DEW.Timer({
+const { html } = DEW;
+const { Clock, Time } = DEW.clock;
+
+const clock = new Clock({
     // count: 5,
     duration: 2,
-    flow: 0.5,
+    timeScale: 0.5,
     // step: 100,
     onUpdate: (dt, elapsed) => {
         console.log(dt, elapsed);
     }
 });
 
-// timer.play();
+// clock.play();
 
 // setTimeout(() => {
-//     timer.sleep(1);
-//     console.log('sleep')
+//     clock.sleep(1);
+//     console.log('sleep');
 // }, 1000);
-// setTimeout(() => timer.sleep(1000), 1100);
 
-const p = $html.create('p');
+// setTimeout(() => clock.sleep(1000), 1100);
+
+const duration = 140;
+const p = html.create('p');
 p.styles({
     fontSize: '50px',
     fontFamily: 'Consolas',
@@ -24,13 +29,13 @@ p.styles({
     margin: 0,
     padding: '15px'
 })
-$html.body.append(p);
+.appendTo(html.body);
 
-const ptime = new DEW.Timer({
-    duration: 140,
+const pClock = new Clock({
+    duration,
     step: 1,
     onUpdate: (dt, elapsed) => {
-        t = DEW.Timer.parse(140 - elapsed);
+        t = Time.parse(duration - elapsed);
         p.text(`${t[0]}:${t[1]}:${t[2]}`);
     },
     onFinish: () => {
@@ -38,4 +43,4 @@ const ptime = new DEW.Timer({
     }
 });
 
-ptime.play();
+pClock.play();

@@ -48,7 +48,9 @@ html.create = function(tag, attrs, styles) {
         htls.setAttr(attrs);
     }
 
-    if (styles) htls.style(styles);
+    if (styles) {
+        htls.styles(styles);
+    }
 
     return htls;
 }

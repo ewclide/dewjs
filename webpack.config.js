@@ -20,10 +20,12 @@ rules.push({
 
 const npmlib = {
 	entry: {
-        'index.min': './core/lib-main',
-        'funcs.min': './core/functions',
-        'array.min': './core/array',
-		'object.min': './core/object'
+        'index.min' : './core/lib-main',
+        'funcs.min' : './core/functions',
+        'array.min' : './core/array',
+		'object.min': './core/object',
+		'clock.min' : './core/clock',
+		'lerp.min'  : './core/lerp'
     },
 	output: {
 		path: path.resolve(__dirname, './lib/src'),
