@@ -227,9 +227,9 @@ export function publish(Input, methods, fields) {
 }
 
 export function getElementData(settings, defaults, element, attributes) {
-	const result = {}
+	const result = {};
 
-    for (let name in defaults) {
+    for (const name in defaults) {
         if (settings[name] === undefined) {
             let attr = 'data-' + (attributes[name] || camelCaseToDash(name)), num;
 
@@ -256,37 +256,64 @@ export function getElementData(settings, defaults, element, attributes) {
     return result;
 }
 
-export function fetchSettings(settings, defaults, types = {}, rates = {}) {
-	const result = {}
+export function fetchSettings(settings, restrictions = {}) {
+    const { defaults, required, filter = 0, types = 0, rates = 0 } = restrictions;
+	const propList = Object.assign({}, required, defaults);
+	const result = {};
 
-	for (let i in defaults) {
-		const value = settings[i];
-		const type = types[i];
-		const rate = rates[i];
-		const defValue = defaults[i];
+    for (const propName in propList) {
+		const haveProp = settings[propName] !== undefined;
+		
+        if (required && propName in required && !haveProp) {
+            printErr(`Settings must contain "${propName}" property`);
+            return;
+        }
 
-		let canWrite = true;
+        const propValue = haveProp ? settings[propName] : propList[propName];
 
-		if (value === undefined) {
-			canWrite = false;
-		} else {
-			if (type) canWrite = isType(value, type);
-			if (rate) canWrite = rate.indexOf(value) >= 0;
-		}
+        if (propValue === null) {
+            result[propName] = propValue;
+            continue;
+        }
 
-		result[i] = canWrite ? value : defValue;
-	}
+        const propFilter = filter[propName];
+
+        if (typeof propFilter == 'function' && !propFilter(propValue)) {
+            printErr(`Property "${propName}" is invalid`);
+            return;
+        }
+
+		const propType = types[propName];
+
+        if (propType !== undefined) {
+			const isInstanceOf = propType.prototype ? propValue instanceof propType : false;
+
+			if (!(typeof propValue == propType || isInstanceOf)) {
+				printErr(`Property "${propName}" must be of type "${propType.name || propType}"`);
+            	return;
+			}
+        }
+
+        const propRates = rates[propName];
+
+        if (Array.isArray(propRates) && !propRates.includes(propValue)) {
+            printErr(`Invalid value "${propValue}" of property "${propName}"`);
+            return;
+        }
+
+        result[propName] = propValue;
+    }
 
 	return result;
 }
 
-export function randi(min = 0, max = 9999999) {
-	return Math.floor(Math.random() * (max - min)) + min;
+export function randi(min = 0, max = 9) {
+	return Math.floor(min + Math.random() * (max + 1 - min));
 }
 
-export function randf(min = 0, max = 1, size) {
+export function randf(min = 0, max = 1, accuracy) {
     const num = Math.random() * (max - min) + min;
-    return size ? parseFloat(num.toFixed(size)) : num;
+    return accuracy ? parseFloat(num.toFixed(accuracy)) : num;
 }
 
 export function randKey(length = 15, types = ['all']) {
@@ -350,11 +377,25 @@ export function capitalize(str, each) {
 }
 
 export function zeroPad(num, size) {
-    let result = num + '';
+	let result = num + '';
+	
     while (result.length < size) {
         result = '0' + result;
-    }
+	}
+	
     return result;
+}
+
+export function formatNumber(value, space = ' ') {
+    return String(Math.floor(value)).split('').reverse()
+        .reduce((a, c, i, { length }) => {
+            const n = i + 1;
+            return (n > 1 && n < length && !(n % 3) ? space : '') + c + a;
+        }, '');
+}
+
+export function accuracy(num) {
+    return num.toString().split('.')[1].length;
 }
 
 export function vmin(value) {
@@ -479,6 +520,42 @@ export function sleep(time) {
 
 export function entry(val, from, to) {
     return val >= from && val <= to;
+}
+
+export function getProbability(prob) {
+	return Math.random() <= prob;
+}
+ 
+export function getProbFromMap(probs) {
+    const prob = Math.random();
+    let prev = 0;
+ 
+    for (const [key, value] of probs) {
+        const cur = prev + value;
+
+        if (prob >= prev && prob <= cur) {
+            return key;
+        }
+ 
+        prev += value;
+    }
+}
+
+export function makeIterable(context, handler) {
+    if (typeof context !== 'object' && typeof handler !== 'function') {
+        printErr(`makeIterable must recieve context ${context} of object and handler ${handler} as function`);
+        return;
+    }
+
+    const product = { value: null, done: false };
+    const iterator = {
+        next() {
+            handler(product, context);
+            return product;
+        }
+    };
+
+    context[Symbol.iterator] = () => iterator;
 }
 
 export function log() {
