@@ -1,114 +1,118 @@
 import { idGetter, log } from './functions';
 
-const $metaData = Symbol('meta_data');
+const $key = Symbol('key');
+const $defaultKey = Symbol('default_key');
+const metaDataStorage = new Map();
 const getConstValue = idGetter();
 
-function setMetaData(storage, constName, metaData) {
-    // const metaStorage = this._store.get(nameSpace);
+function _setMetaData(nameSpace, constName, metaData = {}) {
+    const storage = metaDataStorage.get(nameSpace);
+    const value = getConstValue();
     const desc = {
         enumerable: true,
         writable: false,
         configurable: false
     };
 
-    let value;
-
-    if (typeof metaData === 'object') {
-        value = getConstValue();
-        metaData.constName = constName;
-        storage.set(value, metaData);
-    } else {
-        value = metaData;
-        storage.set(value, { constName });
-    }
+    metaData.constName = constName;
+    storage.set(value, metaData);
 
     Object.defineProperty(nameSpace, constName, { ...desc, value });
 }
 
-function createConst(constList) {
-    
+function has(nameSpace, constValue) {
+    const storage = metaDataStorage.get(nameSpace);
+
+    if (storage) {
+        return storage.has(constValue);
+    }
+
+    const found = Object.entries(nameSpace).find(([k, v]) => v === constValue);
+    return Boolean(found);
 }
 
-export default class ConstManager {
-    constructor() {
-        this._storageMap = new Map();
-        this._getConstValue = idGetter();
+function create(constList, key_ = $defaultKey) {
+    let key = key_;
+
+    if (key_ && typeof key_ != 'symbol') {
+        log.warn(`key "${key_}" must be a Symbol. Now constant meta-data not private`);
+        key = $defaultKey;
     }
 
-    has(nameSpace, constValue) {
-        const storage = this._storageMap.get(nameSpace);
-        const metaData = storage ? storage.get(nameSpace) : null;
+    const nameSpace = { [$key]: key };
+    const storage = new Map();
 
-        if (metaData) {
-            return metaData.has(constValue);
-        }
-
-        const found = Object.entries(nameSpace).find(([k, v]) => v === constValue);
-        return Boolean(found);
+    if (Array.isArray(constList)) {
+        constList.forEach(constName => _setMetaData(nameSpace, constName));
     }
 
-    create(constList) {
-        const nameSpace = {};
-        const storage = new Map();
+    else if (typeof constList === 'object') {
+        const entries = Object.entries(constList);
 
-        if (Array.isArray(constList)) {
-            constList.forEach(constName => setMetaData(nameSpace, constName));
+        for (const [constName, metaData] of entries) {
+            _setMetaData(nameSpace, constName, metaData);
         }
-
-        else if (typeof constList === 'object') {
-            const entries = Object.entries(constList);
-
-            for (const [constName, metaData] of entries) {
-                setMetaData(nameSpace, constName, metaData);
-            }
-        }
-
-        this._storageMap.set(nameSpace, storage);
-
-        return nameSpace;
     }
 
-    getData(nameSpace, value) {
-        const warnText = `Constant with value "${value}" have not meta data`;
-        const metaData = nameSpace[$metaData];
+    metaDataStorage.set(nameSpace, storage);
 
-        if (!metaData) {
-            log.warn(warnText);
-            return;
-        }
+    return nameSpace;
+}
 
-        if (!metaData.has(value)) {
-            log.warn(warnText);
-            return;
-        }
-
-        return metaData.get(value);
+function getData(nameSpace, value, key = $defaultKey) {
+    if (nameSpace[$key] !== key) {
+        log.error(`Can't get access to meta-data of const with value "${value}" from namespace "${nameSpace}"`);
+        return;
     }
 
-    static getName(nameSpace, constValue) {
-        const emptyConstError = `Can't get constant name by value "${constValue}" from nameSpace ${nameSpace}`;
-        const metaData = nameSpace[$metaData];
+    const warnText = `Constant with value "${value}" have not meta-data`;
+    const storage = metaDataStorage.get(nameSpace);
 
-        if (metaData) {
-            if (!metaData.has(constValue)) {
-                log.error(emptyConstError);
-                return;
-            }
+    if (!storage) {
+        log.warn(warnText);
+        return;
+    }
 
-            return metaData.get(constValue).constName;
-        }
+    if (!storage.has(value)) {
+        log.warn(warnText);
+        return;
+    }
 
-        const found = Object.entries(nameSpace).find(([k, v]) => v === constValue);
+    return storage.get(value);
+}
 
-        if (!found) {
+function getName(nameSpace, constValue) {
+    const emptyConstError = `Can't get constant name by value "${constValue}" from namespace "${nameSpace}"`;
+    const storage = metaDataStorage.get(nameSpace);
+
+    if (storage) {
+        if (!storage.has(constValue)) {
             log.error(emptyConstError);
             return;
         }
 
-        return found[0];
+        return storage.get(constValue).constName;
     }
 
-    erase() {
+    const found = Object.entries(nameSpace).find(([k, v]) => v === constValue);
 
+    if (!found) {
+        log.error(emptyConstError);
+        return;
     }
+
+    return found[0];
+}
+
+function erase(nameSpace) {
+    log.warn(`Meta-data of namespace "${nameSpace}" was erased`);
+    metaDataStorage.delete(nameSpace);
+}
+
+export default {
+    has,
+    create,
+    getData,
+    getName,
+    erase
 }

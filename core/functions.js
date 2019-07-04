@@ -93,7 +93,7 @@ log.error = function(errorList, source = true) {
 }
 
 log.warn = function(text, source = true) {
-	let warnText = 'Warning: ' + text;
+	let warnText = 'Warning: ' + [...text].join(' ');
 
 	if (source) {
 		warnText += ` (src: ${_getSourceLog()})`;
