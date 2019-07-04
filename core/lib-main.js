@@ -1,4 +1,5 @@
 ﻿import ProgressReducer from '../core/progress-reducer';
+import ConstManager from '../core/const';
 import Callback from '../core/callback';
 import Eventer from '../core/eventer';
 import Template from '../core/template';
@@ -10,6 +11,7 @@ import html from '../core/html';
 
 const exp = {
 	ProgressReducer,
+	ConstManager,
 	Callback,
 	Eventer,
 	Template,

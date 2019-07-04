@@ -9,6 +9,7 @@ import url from './url';
 import html from './html';
 import bind from './bind';
 import ProgressReducer from './progress-reducer';
+import ConstManager from './const';
 import Callback from './callback';
 import Eventer from './eventer';
 import Template from './template';
@@ -21,6 +22,7 @@ const DEW = {
 	clock,
 	lerp,
 	ProgressReducer,
+	ConstManager,
 	Callback,
 	Eventer,
 	Template,

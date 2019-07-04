@@ -1,15 +1,43 @@
 import { idGetter, log } from './functions';
 
 const $metaData = Symbol('meta_data');
+const getConstValue = idGetter();
 
-export default class ConstantGenerator {
+function setMetaData(storage, constName, metaData) {
+    // const metaStorage = this._store.get(nameSpace);
+    const desc = {
+        enumerable: true,
+        writable: false,
+        configurable: false
+    };
+
+    let value;
+
+    if (typeof metaData === 'object') {
+        value = getConstValue();
+        metaData.constName = constName;
+        storage.set(value, metaData);
+    } else {
+        value = metaData;
+        storage.set(value, { constName });
+    }
+
+    Object.defineProperty(nameSpace, constName, { ...desc, value });
+}
+
+function createConst(constList) {
+    
+}
+
+export default class ConstManager {
     constructor() {
-        this._metaDataStore = new Map();
+        this._storageMap = new Map();
         this._getConstValue = idGetter();
     }
 
     has(nameSpace, constValue) {
-        const metaData = nameSpace[$metaData];
+        const storage = this._storageMap.get(nameSpace);
+        const metaData = storage ? storage.get(nameSpace) : null;
 
         if (metaData) {
             return metaData.has(constValue);
@@ -20,21 +48,22 @@ export default class ConstantGenerator {
     }
 
     create(constList) {
-        const nameSpace = {
-            [this._$metaData]: new Map()
-        };
+        const nameSpace = {};
+        const storage = new Map();
 
         if (Array.isArray(constList)) {
-            constList.forEach(constName => thsi._setMetaData(nameSpace, constName));
+            constList.forEach(constName => setMetaData(nameSpace, constName));
         }
 
         else if (typeof constList === 'object') {
             const entries = Object.entries(constList);
 
             for (const [constName, metaData] of entries) {
-                this._setMetaData(nameSpace, constName, metaData);
+                setMetaData(nameSpace, constName, metaData);
             }
         }
+
+        this._storageMap.set(nameSpace, storage);
 
         return nameSpace;
     }
@@ -56,7 +85,7 @@ export default class ConstantGenerator {
         return metaData.get(value);
     }
 
-    getName(nameSpace, constValue) {
+    static getName(nameSpace, constValue) {
         const emptyConstError = `Can't get constant name by value "${constValue}" from nameSpace ${nameSpace}`;
         const metaData = nameSpace[$metaData];
 
@@ -79,29 +108,7 @@ export default class ConstantGenerator {
         return found[0];
     }
 
-    static has() {}
-    static create() {}
-    static getData() {}
-    static getName() {}
+    erase() {
 
-    _setMetaData(nameSpace, constName, metaData, store) {
-        const desc = {
-            enumerable: true,
-            writable: false,
-            configurable: false
-        };
-
-        let value;
-
-        if (typeof metaData === 'object') {
-            value = getConstValue();
-            metaData.constName = constName;
-            nameSpace[this._$metaData].set(value, metaData);
-        } else {
-            value = metaData;
-            nameSpace[this._$metaData].set(value, { constName });
-        }
-
-        Object.defineProperty(nameSpace, constName, { ...desc, value });
     }
 }
