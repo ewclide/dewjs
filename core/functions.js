@@ -263,7 +263,7 @@ export function fetchSettings(settings, restrictions = {}) {
 
     for (const propName in propList) {
 		const haveProp = settings[propName] !== undefined;
-		
+
         if (required && propName in required && !haveProp) {
             printErr(`Settings must contain "${propName}" property`);
             return;
@@ -378,11 +378,11 @@ export function capitalize(str, each) {
 
 export function zeroPad(num, size) {
 	let result = num + '';
-	
+
     while (result.length < size) {
         result = '0' + result;
 	}
-	
+
     return result;
 }
 
@@ -456,25 +456,25 @@ export function roundBetween(value, begin, end) {
     const mid = begin + (end - begin) / 2;
     return value > mid ? end : begin;
 }
- 
+
 export function clampBySteps(value, steps) {
     if (steps.length < 2) return value;
 
     const last = steps[steps.length - 1];
 	const first = steps[0];
 	let prev = steps[0];
- 
+
     for (let i = 1; i < steps.length; i++) {
         const step = steps[i];
         if (step < prev) continue;
- 
+
         if (value >= prev && value <= step) {
             return roundBetween(value, prev, step);
         }
- 
+
         prev = steps[i];
     }
- 
+
     return roundBetween(value, first, last);
 }
 
@@ -501,7 +501,7 @@ export function aggregateCalls(handler, timeInterval = 0) {
 		clearTimeout(timer);
 
 		argsList.push(args.length > 1 ? args : args[0]);
-	
+
 		timer = setTimeout(() => {
 			handler(argsList.slice());
 			argsList.length = 0;
@@ -525,18 +525,18 @@ export function entry(val, from, to) {
 export function getProbability(prob) {
 	return Math.random() <= prob;
 }
- 
+
 export function getProbFromMap(probs) {
     const prob = Math.random();
     let prev = 0;
- 
+
     for (const [key, value] of probs) {
         const cur = prev + value;
 
         if (prob >= prev && prob <= cur) {
             return key;
         }
- 
+
         prev += value;
     }
 }
@@ -556,6 +556,31 @@ export function makeIterable(context, handler) {
     };
 
     context[Symbol.iterator] = () => iterator;
+}
+
+export function getPropByPath(obj, path) {
+    if (!Array.isArray(path)) return;
+
+    return path.reduce((a, c) => a[c], obj);
+}
+
+export function setPropByPath(obj, srcPath, val) {
+    if (!Array.isArray(srcPath)) {
+		printErr(`setPropByPath - path ${srcPath} must be an array`);
+		return;
+	}
+
+    const path = srcPath.slice();
+    const propName = path.pop();
+
+    const target = path.reduce((a, c) => a[c], obj);
+    if (!target || !target[propName]) return;
+
+    if (typeof val === 'function') {
+        target[propName] = val(target[propName]);
+    } else {
+        target[propName] = val;
+    }
 }
 
 export function log() {
