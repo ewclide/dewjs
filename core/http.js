@@ -1,4 +1,4 @@
-import {printErr} from './functions';
+import { log } from './functions';
 import {innerAssign} from './object';
 import url from './url';
 import Async from './async';
@@ -34,7 +34,7 @@ class HTTP {
 
 		request.onerror = function() {
 			if (errors) {
-				printErr(`(${this.status}) ${this.statusText} "${path}"`);
+				log.error(`(${this.status}) ${this.statusText} "${path}"`);
 			}
 			async.reject(this.statusText);
 		}
@@ -62,7 +62,7 @@ class HTTP {
 
 		result.to = (path, settings) => {
 			if (!path) {
-				printErr('http.post must have some path!');
+				log.error('http.post must have some path!');
 				return;
 			}
 
@@ -79,7 +79,7 @@ class HTTP {
 
 			request.onerror = function() {
 				async.reject(this.statusText);
-				printErr(`(${this.status}) ${this.statusText} "${path}"`);
+				log.error(`(${this.status}) ${this.statusText} "${path}"`);
 			}
 
 			if (settings.progress) {

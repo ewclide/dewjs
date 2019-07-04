@@ -1,4 +1,4 @@
-import { printErr } from './functions';
+import { log } from './functions';
 
 export default class Callback {
 	constructor(...handlers) {
@@ -67,7 +67,7 @@ export default class Callback {
 		if (handler) {
 			return handler(...args);
 		} else {
-			printErr(`Callback error: undefined handler with key "${key}"`);
+			log.error(`Callback error: undefined handler with key "${key}"`);
 			return false;
 		}
 	}

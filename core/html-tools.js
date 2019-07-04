@@ -1,4 +1,4 @@
-import { printErr, idGetter, aggregateCalls } from './functions';
+import { log, idGetter, aggregateCalls } from './functions';
 import { removeValue } from './array';
 import JSONConverter from './json-converter';
 import CSSTransformer from './css-transformer';
@@ -179,7 +179,7 @@ export class HTMLTools {
 
     mutate(handler, options = { attributes: true }, replace) {
         if (!('MutationObserver' in window)) {
-            printErr('Your browser not support observ mutation');
+            log.error('Your browser not support observ mutation');
             return;
         }
 
@@ -359,7 +359,7 @@ export class HTMLTools {
 
         if (htl.isHTMLTools) {
             if (!this.length || !htl.length) {
-                printErr(`Can't insert elements`);
+                log.error(`Can't insert elements`);
                 return;
             }
 
@@ -953,7 +953,7 @@ export class HTMLTools {
         } else if (source instanceof Element) {
             elemList = [source];
         } else {
-            printErr(`Can't attach element ${source}`);
+            log.error(`Can't attach element ${source}`);
             return this;
         }
 

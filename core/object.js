@@ -1,4 +1,4 @@
-import {printErr} from './functions';
+import { log } from './functions';
 import ObjectIniter from './object-initer';
 
 function _createClone(object, full) {
@@ -102,7 +102,7 @@ export function fullAssign(target, source, copy) {
 
 export function init(target, values, settings, common = { errors : true }) {
     if (!values || !settings) {
-        printErr('DEW object.init error - missing required arguments (values or settings)');
+        log.error('DEW object.init error - missing required arguments (values or settings)');
         return false;
     }
 
@@ -117,7 +117,7 @@ export function init(target, values, settings, common = { errors : true }) {
         }
     }
 
-    return initer.errors.length ? (common.errors && printErr(initer.errors), false) : true;
+    return initer.errors.length ? (common.errors && log.error(initer.errors), false) : true;
 }
 
 function _searchInObject(root, key, value, chld, all, depth) {
@@ -153,7 +153,7 @@ function _searchInObject(root, key, value, chld, all, depth) {
 
 export function search(root, key, value, settings = {}) {
     if (key === undefined || value === undefined) {
-        printErr(`Object.search error: settings must have "key" and "value" props!`);
+        log.error(`Object.search error: settings must have "key" and "value" props!`);
         return;
     }
 

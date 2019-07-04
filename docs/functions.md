@@ -626,33 +626,6 @@ entry(12, 5, 10); // false
 ```
 
 ##
-### printErr
-( ***error*** : *Array*, ***source*** : *Boolean* ) => *false*
-
-Allows to print errors in the console.
-
-- **error* - can be string or array. If you want to print errors stack, then pass array with title property.
-- *source* [true] - If true, then it prints the file where was called this function.
-
-```js
-const err = [];
-err.title = 'You cant do it!';
-
-err.push('first error');
-err.push('second error');
-
-printErr(err);
-
-/*
-  Error: You cant do it!
-  --> first error
-  --> second error
-  -----
-  Source: http://localhost:3000/core/index.js:81:11
-*/
-```
-
-##
 ### log
 (***arg1, arg2, ...***) => *Void*
 
@@ -698,9 +671,47 @@ log.timeEnd('speed test');
 ```
 
 ##
+### log.error
+( ***error*** : *Array*, ***source*** : *Boolean* ) => *false*
+
+Allows to print errors in the console.
+
+- **error* - can be string or array. If you want to print errors stack, then pass array with title property.
+- *source* [true] - If true, then it prints the file where was called this function.
+
+```js
+const err = [];
+err.title = 'You cant do it!';
+
+err.push('first error');
+err.push('second error');
+
+log.error(err);
+
+/*
+  Error: You cant do it!
+  --> first error
+  --> second error
+  -----
+  src: http://localhost:3000/core/index.js:81:11
+*/
+```
+
+##
+### log.warn
+(***name*** : *String*, ***source*** : *Boolean*) => *Void*
+
+Wrapper of native console.warn function.
+
+```js
+log.warn('Attention!');
+// Warning: Attention! (src: http://localhost:3000/core/index.js:81:11)
+```
+
+##
 ### LOG_IGNORE : *Array*
 
-It is represents list of script names, which will not prints as source in console with using library *"log"* or *"printErr"* functions.
+It is represents list of script names, which will not prints as source in console with using library *"log"* or *"log.error"* functions.
 Also it can to recognize "min" or "dev" postfix after script name.
 
 ```js

@@ -1,4 +1,4 @@
-import {printErr}  from './functions';
+import { log }  from './functions';
 
 export default class Template
 {
@@ -23,10 +23,10 @@ export default class Template
                 this._htl.html(this._render(data))
 
             } else {
-                printErr('DEW template must be append to DOM before drawing');
+                log.error('DEW template must be append to DOM before drawing');
             }
         } catch (e) {
-            printErr(`DEW template error - ${e.message}`);
+            log.error(`DEW template error - ${e.message}`);
         }
     }
 
@@ -36,7 +36,7 @@ export default class Template
 
         if (Array.isArray(args)) {
             args.forEach( arg => func += arg + '=data.' + arg + ',' );
-        } 
+        }
 
         func += "__output__='';";
 
@@ -52,7 +52,7 @@ export default class Template
             this._render = new Function('data', func);
 
         } catch (e) {
-            printErr(`DEW template error - ${e.message}`);
+            log.error(`DEW template error - ${e.message}`);
             this._render = () => {};
         }
     }

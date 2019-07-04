@@ -1,5 +1,5 @@
 import {HTMLTools, eventList}  from './html-tools';
-import {printErr} from './functions';
+import { log } from './functions';
 import StyleSheet from './stylesheet';
 
 const proto = HTMLTools.prototype;
@@ -8,7 +8,7 @@ const html = new HTMLTools(document);
 const $event = {
     fire: (id, type, e) => {
         if (!eventList.has(id)) {
-            printErr(`Can't dispatch event on element with id "${id}"`);
+            log.error(`Can't dispatch event on element with id "${id}"`);
             return;
         }
 
@@ -93,7 +93,7 @@ html.parseXML = function(data) {
         errors = 'parseXML not supported by this browser!';
     }
 
-    return errors ? printErr(errors) : parse(data);
+    return errors ? log.error(errors) : parse(data);
 }
 
 html.createStyleSheet = function() {
@@ -116,7 +116,7 @@ Object.defineProperty(html, 'body', {
     configurable: false,
     get: function() {
         if (!document.body) {
-            printErr('body element is currently unavailable!');
+            log.error('body element is currently unavailable!');
         } else if (!this._body.length) {
             this._body.join(document.body);
         }

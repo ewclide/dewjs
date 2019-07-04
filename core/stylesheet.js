@@ -1,5 +1,5 @@
 import CSSTransformer from './css-transformer';
-import { printErr, camelCaseToDash, idGetter } from './functions';
+import { log, camelCaseToDash, idGetter } from './functions';
 
 export default class StyleSheet
 {
@@ -46,11 +46,11 @@ export default class StyleSheet
 
 	_add(rule, styles) {
 		if (typeof rule !== 'string') {
-			printErr(`rule "${rule}" argument must be a string`);
+			log.error(`rule "${rule}" argument must be a string`);
 			return;
 
 		} else if (typeof styles !== 'object') {
-			printErr(`styles "${styles}" argument must be an object`);
+			log.error(`styles "${styles}" argument must be an object`);
 			return;
 		}
 
@@ -64,7 +64,7 @@ export default class StyleSheet
 
 	keyFrames(name, keyFrames) {
 		if (!Array.isArray(keyFrames) || keyFrames.length < 2) {
-			printErr('keyframes must be an array with more than 1 elements');
+			log.error('keyframes must be an array with more than 1 elements');
 			return;
 		}
 
@@ -85,7 +85,7 @@ export default class StyleSheet
 
 	media(request, arrStyles) {
 		if (typeof request !== 'object') {
-			printErr('media request must be an object');
+			log.error('media request must be an object');
 			return;
 		}
 

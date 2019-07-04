@@ -1,3 +1,4 @@
+import { log } from './functions';
 import Callback from './callback';
 
 export default class Eventer {
@@ -54,7 +55,7 @@ export default class Eventer {
 		if (event.isCallback) {
 			if (!locked) event.call(data);
 		} else {
-			console.warn(`eventer error - event '${type}' is not defined`);
+			log.warn(`eventer error - event '${type}' is not defined`);
 		}
 	}
 }

@@ -1,3 +1,4 @@
+import { log } from './functions';
 import Callback from './callback';
 
 export default class Async {
@@ -68,7 +69,7 @@ export default class Async {
             if (this.__asyncProgress) this.progress(1);
             this.__nativeResolve(e);
         } else {
-            console.warn("Can't use resolve after use wait!");
+            log.warn("Can't use resolve after use wait!");
         }
     }
 
@@ -76,7 +77,7 @@ export default class Async {
         if (this.__asyncPermit) {
             this.__nativeReject(e);
         } else {
-            console.warn("Can't use reject after use wait!");
+            log.warn("Can't use reject after use wait!");
         }
     }
 
@@ -156,7 +157,7 @@ export default class Async {
         if (this.__asyncReady == 1) return;
 
         if (typeof loaded != 'number' && typeof total != 'number') {
-            console.warn('Shift method must to receive numeric arguments');
+            log.warn('Shift method must to receive numeric arguments');
             return;
         }
 

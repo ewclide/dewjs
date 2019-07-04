@@ -1,4 +1,4 @@
-import {printErr, idGetter} from './functions';
+import { log, idGetter} from './functions';
 import {define} from './object';
 
 const getId = idGetter();
@@ -83,7 +83,7 @@ const bind = {
 
 	sided(current, target, modifier, trigger) {
 		if (!Array.isArray(current) && !Array.isArray(target)) {
-			printErr('DEW bind error - first two arguments must be an array!');
+			log.error('DEW bind error - first two arguments must be an array!');
 			return;
 		}
 
@@ -97,7 +97,7 @@ const bind = {
 
 	cross(current, target) {
 		if (!Array.isArray(current) && !Array.isArray(target)) {
-			printErr('DEW bind error - first two arguments must be an array!');
+			log.error('DEW bind error - first two arguments must be an array!');
 			return;
 		}
 

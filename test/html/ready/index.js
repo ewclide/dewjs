@@ -1,7 +1,7 @@
 const jq = $html
 .script('https://code.jquery.com/jquery-3.2.1.min.js')
 .then((e) => log('jquery loaded!'))
-.catch((e) => DEW.funcs.printErr(e));
+.catch((e) => DEW.funcs.log.error(e));
 
 $html.ready.then(() => log('dom loaded!'));
 

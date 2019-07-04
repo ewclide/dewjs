@@ -1,3 +1,4 @@
+import { log } from './functions';
 import { Clock } from './clock';
 import Callback from './callback';
 
@@ -57,7 +58,7 @@ export class Lerp {
 
     setState(from, to, duration = 1, timing = EASING.linear) {
         if (typeof from != 'number' && typeof to != 'number') {
-            console.warn(`Lerp.setState invalid arguments "${from}" and "${to}"`);
+            log.warn(`Lerp.setState invalid arguments "${from}" and "${to}"`);
             return;
         }
 

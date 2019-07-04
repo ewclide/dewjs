@@ -35,7 +35,7 @@ class Loader extends DEW.Async {
     load(list) {
         this.wait(list, true)
         .then(() => log('loaded!'))
-        .catch((e) => DEW.funcs.printErr(e));
+        .catch((e) => DEW.funcs.log.error(e));
     }
 }
 

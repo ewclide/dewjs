@@ -1,4 +1,4 @@
-import {printErr} from './functions';
+import { log } from './functions';
 
 const CSSTransformer = {
 	apply(element, actions, settings = {}) {
@@ -151,7 +151,7 @@ const CSSTransformer = {
 				elements[i].style.transform = transform + ` matrix3d(${matrix.join(',')})`;
 			}
 		} else {
-			printErr(`matrix must be an array with length "${size}"`);
+			log.error(`matrix must be an array with length "${size}"`);
 		}
 	}
 }

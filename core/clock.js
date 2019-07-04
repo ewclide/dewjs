@@ -1,3 +1,4 @@
+import { log } from './functions';
 import Callback from './callback';
 
 const _timerList = new Set();
@@ -164,7 +165,7 @@ export class Clock {
 
 	sleep(time) {
 		if (this._asleep) {
-			console.warn("Can't sleep the clock - it's sleeping now!");
+			log.warn("Can't sleep the clock - it's sleeping now!");
 			return;
 		}
 

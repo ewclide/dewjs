@@ -17,5 +17,5 @@ main.wait([one, two, three])
 .then(() => log("main resolved!"))
 .catch((e) => {
     log("main rejected!");
-    DEW.printErr(e);
+    log.error(e);
 });

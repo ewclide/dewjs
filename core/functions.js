@@ -28,32 +28,6 @@ function _getBrowser() {
 
 export const browser = _getBrowser();
 
-export function printErr(data, source = true) {
-	let error = 'Error: ';
-
-	if (source) source = _getSourceLog();
-
-	if (Array.isArray(data) && data.length) {
-		error += data.title || 'Error list';
-		error += '\n';
-
-		data.forEach((message) => error += `  --> ${message}\n` );
-
-        if (source) error += `  -----\n  Source: ${source}`;
-	}
-
-	else if (typeof data == 'string') {
-		error += data;
-		if (source) error += ` (${source})`;
-	}
-
-	else return false;
-
-	console.error(error);
-
-	return false;
-}
-
 export const LOG_IGNORE = [];
 
 function _getSourceLog() {
@@ -76,6 +50,58 @@ function _getSourceLog() {
 	return '';
 }
 
+export function log() {
+	const args = Array.from(arguments);
+	const source = _getSourceLog();
+
+    if (source) {
+		args.push(` (src: ${source})`);
+	}
+
+	console.log.apply(null, args);
+}
+
+log.json = (json, spaces = 4) => log(JSON.stringify(json, null, spaces));
+log.time = (name) => console.time(name);
+log.timeEnd = (name) => console.timeEnd(name);
+
+log.error = function(errorList, source = true) {
+	let error = 'Error: ';
+	let src = '';
+
+	if (source) src = _getSourceLog();
+
+	if (Array.isArray(errorList) && errorList.length) {
+		error += errorList.title || 'Error list';
+		error += '\n';
+
+		errorList.forEach((message) => error += `  --> ${message}\n` );
+
+        if (source) error += `  -----\n  src: ${src}`;
+	}
+
+	else if (typeof errorList == 'string') {
+		error += errorList;
+		if (source) error += ` (src: ${src})`;
+	}
+
+	else return false;
+
+	console.error(error);
+
+	return false;
+}
+
+log.warn = function(text, source = true) {
+	let warnText = 'Warning: ' + text;
+
+	if (source) {
+		warnText += ` (src: ${_getSourceLog()})`;
+	}
+
+	console.warn(warnText);
+}
+
 export function isType(value, type) {
 	if (Array.isArray(type)) {
 		return type.some((t) => isType(value, t));
@@ -90,7 +116,7 @@ export function isType(value, type) {
 			case 'function' : return typeof value == 'function';
 			case 'DOM'      : return value instanceof Element;
 			case 'HTMLTools': return value.isHTMLTools ? true : false;
-			default : printErr(`the type "${type}" is unknown!`); return false;
+			default : log.error(`the type "${type}" is unknown!`); return false;
 		}
 
 	} else {
@@ -119,7 +145,7 @@ export function strParse(value) {
 		return trim(value);
 
 	} else {
-		printErr('strParse error - type of argument must be "string"');
+		log.error('strParse error - type of argument must be "string"');
 	}
 }
 
@@ -265,7 +291,7 @@ export function fetchSettings(settings, restrictions = {}) {
 		const haveProp = settings[propName] !== undefined;
 
         if (required && propName in required && !haveProp) {
-            printErr(`Settings must contain "${propName}" property`);
+            log.error(`Settings must contain "${propName}" property`);
             return;
         }
 
@@ -279,7 +305,7 @@ export function fetchSettings(settings, restrictions = {}) {
         const propFilter = filter[propName];
 
         if (typeof propFilter == 'function' && !propFilter(propValue)) {
-            printErr(`Property "${propName}" is invalid`);
+            log.error(`Property "${propName}" is invalid`);
             return;
         }
 
@@ -289,7 +315,7 @@ export function fetchSettings(settings, restrictions = {}) {
 			const isInstanceOf = propType.prototype ? propValue instanceof propType : false;
 
 			if (!(typeof propValue == propType || isInstanceOf)) {
-				printErr(`Property "${propName}" must be of type "${propType.name || propType}"`);
+				log.error(`Property "${propName}" must be of type "${propType.name || propType}"`);
             	return;
 			}
         }
@@ -297,7 +323,7 @@ export function fetchSettings(settings, restrictions = {}) {
         const propRates = rates[propName];
 
         if (Array.isArray(propRates) && !propRates.includes(propValue)) {
-            printErr(`Invalid value "${propValue}" of property "${propName}"`);
+            log.error(`Invalid value "${propValue}" of property "${propName}"`);
             return;
         }
 
@@ -543,7 +569,7 @@ export function getProbFromMap(probs) {
 
 export function makeIterable(context, handler) {
     if (typeof context !== 'object' && typeof handler !== 'function') {
-        printErr(`makeIterable must recieve context ${context} of object and handler ${handler} as function`);
+        log.error(`makeIterable must recieve context ${context} of object and handler ${handler} as function`);
         return;
     }
 
@@ -566,7 +592,7 @@ export function getPropByPath(obj, path) {
 
 export function setPropByPath(obj, srcPath, val) {
     if (!Array.isArray(srcPath)) {
-		printErr(`setPropByPath - path ${srcPath} must be an array`);
+		log.error(`setPropByPath - path ${srcPath} must be an array`);
 		return;
 	}
 
@@ -582,18 +608,3 @@ export function setPropByPath(obj, srcPath, val) {
         target[propName] = val;
     }
 }
-
-export function log() {
-	const args = Array.from(arguments);
-	const source = _getSourceLog();
-
-    if (source) {
-		args.push(`\n-----\nSource: ${source}`);
-	}
-
-	console.log.apply(null, args);
-}
-
-log.json = (json, spaces = 4) => log(JSON.stringify(json, null, spaces));
-log.time = (name) => console.time(name);
-log.timeEnd = (name) => console.timeEnd(name);
