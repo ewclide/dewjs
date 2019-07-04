@@ -2,6 +2,8 @@
 
 ![license](img/license.svg)
 
+![logo](img/logo.svg)
+
 *Dew* is experimental javaScript library for UI programming.
 
 The project was conceived as a replacement for jquery, as well as a combination of solutions and ideas accumulated over two years.
