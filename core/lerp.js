@@ -1,5 +1,5 @@
 import { Clock } from './clock';
-import Callbacker from './callbacker';
+import Callback from './callback';
 
 export const EASING = {
     linear     : (t) => t,
@@ -31,8 +31,8 @@ export class Lerp {
         // callbacks
         const { action = () => {}, onStart, onFinish } = settings;
         this._action = action;
-        this._onStart  = new Callbacker(onStart);
-        this._onFinish = new Callbacker(onFinish);
+        this._onStart  = new Callback(onStart);
+        this._onFinish = new Callback(onFinish);
 
         // spacials
         this._delta = 1;
@@ -55,9 +55,9 @@ export class Lerp {
         this._onFinish.push(handler);
     }
 
-    setState(from, to, duration, timing) {
+    setState(from, to, duration = 1, timing = EASING.linear) {
         if (typeof from != 'number' && typeof to != 'number') {
-            console.warn('Lerp.setState function must recieve required arguments "from", "to"');
+            console.warn(`Lerp.setState invalid arguments "${from}" and "${to}"`);
             return;
         }
 

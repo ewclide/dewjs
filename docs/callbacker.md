@@ -1,4 +1,4 @@
-# Callbacker
+# Callback
 
 ### constructor
 (***handler*** : *Function*)
@@ -8,12 +8,12 @@ Description...
 ### Usage
 
 ```js
-import { Callbacker } from 'dewjs';
+import { Callback } from 'dewjs';
 ```
 
 ## fields
 
-- **isCallbacker** : *Boolean (true)* -
+- **isCallback** : *Boolean (true)* -
 - **length** : *Number* -
 
 ## Methods

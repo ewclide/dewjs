@@ -2,7 +2,7 @@ import { printErr, idGetter, aggregateCalls } from './functions';
 import { removeValue } from './array';
 import JSONConverter from './json-converter';
 import CSSTransformer from './css-transformer';
-import Callbacker from './callbacker';
+import Callback from './callback';
 
 export const genElementId = idGetter('__elem__');
 export const eventList = new Map();
@@ -918,7 +918,7 @@ export class HTMLTools {
         if (events.has(type)) {
             events.get(type).push(handler);
         } else {
-            events.set(type, new Callbacker(handler));
+            events.set(type, new Callback(handler));
         }
 
         this.setAttr('on' + type, `$event.fire('${this._id}','${type}',event)`);

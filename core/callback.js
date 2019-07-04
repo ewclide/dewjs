@@ -1,6 +1,6 @@
 import { printErr } from './functions';
 
-export default class Callbacker {
+export default class Callback {
 	constructor(...handlers) {
 		this._handlers = new Map();
 
@@ -9,7 +9,7 @@ export default class Callbacker {
 		}
 	}
 
-	get isCallbacker() {
+	get isCallback() {
 		return true;
 	}
 
@@ -67,7 +67,7 @@ export default class Callbacker {
 		if (handler) {
 			return handler(...args);
 		} else {
-			printErr(`Callbacker error: undefined handler with key "${key}"`);
+			printErr(`Callback error: undefined handler with key "${key}"`);
 			return false;
 		}
 	}

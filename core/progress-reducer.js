@@ -1,11 +1,11 @@
-import Callbacker from './callbacker';
+import Callback from './callback';
 
 export default class ProgressReducer {
     constructor() {
         this._reducers = new Map();
         this._ready = false;
-        this._onUpdate = new Callbacker();
-        this._onFinish = new Callbacker();
+        this._onUpdate = new Callback();
+        this._onFinish = new Callback();
     }
 
     get ready() {

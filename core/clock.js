@@ -1,4 +1,4 @@
-import Callbacker from './callbacker';
+import Callback from './callback';
 
 const _timerList = new Set();
 
@@ -78,11 +78,11 @@ export class Clock {
 		this._timeScale = timeScale;
 
 		const { onUpdate, onPlay, onPause, onStart, onFinish } = settings;
-		this._onUpdate = new Callbacker(onUpdate);
-		this._onPlay = new Callbacker(onPlay);
-		this._onPause = new Callbacker(onPause);
-		this._onStart = new Callbacker(onStart);
-		this._onFinish = new Callbacker(onFinish);
+		this._onUpdate = new Callback(onUpdate);
+		this._onPlay = new Callback(onPlay);
+		this._onPause = new Callback(onPause);
+		this._onStart = new Callback(onStart);
+		this._onFinish = new Callback(onFinish);
 
 		this._time = null;
 		this._iteration = 0;

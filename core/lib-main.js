@@ -1,5 +1,5 @@
 ﻿import ProgressReducer from '../core/progress-reducer';
-import Callbacker from '../core/callbacker';
+import Callback from '../core/callback';
 import Eventer from '../core/eventer';
 import Template from '../core/template';
 import Async from '../core/async';
@@ -10,7 +10,7 @@ import html from '../core/html';
 
 const exp = {
 	ProgressReducer,
-	Callbacker,
+	Callback,
 	Eventer,
 	Template,
 	Async,

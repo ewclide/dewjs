@@ -1,4 +1,4 @@
-import Callbacker from './callbacker';
+import Callback from './callback';
 
 export default class Eventer {
 	constructor() {
@@ -12,7 +12,7 @@ export default class Eventer {
 		if (event) {
 			event.push(handler);
 		} else {
-			this._events[type] = new Callbacker(handler);
+			this._events[type] = new Callback(handler);
 		}
 	}
 
@@ -51,7 +51,7 @@ export default class Eventer {
 		const event = this._events[type];
 		const locked = this._locks[type];
 
-		if (event.isCallbacker) {
+		if (event.isCallback) {
 			if (!locked) event.call(data);
 		} else {
 			console.warn(`eventer error - event '${type}' is not defined`);

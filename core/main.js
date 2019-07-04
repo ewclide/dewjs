@@ -9,7 +9,7 @@ import url from './url';
 import html from './html';
 import bind from './bind';
 import ProgressReducer from './progress-reducer';
-import Callbacker from './callbacker';
+import Callback from './callback';
 import Eventer from './eventer';
 import Template from './template';
 import Async from './async';
@@ -21,7 +21,7 @@ const DEW = {
 	clock,
 	lerp,
 	ProgressReducer,
-	Callbacker,
+	Callback,
 	Eventer,
 	Template,
 	Async,

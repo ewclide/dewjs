@@ -1,5 +1,5 @@
 import { eventList, HTMLTools, genElementId } from './html-tools';
-import Callbacker from './callbacker';
+import Callback from './callback';
 
 export default class JSONConverter {
 	constructor(json) {
@@ -51,7 +51,7 @@ export default class JSONConverter {
                     eventList.set(id, events);
 
                     for (let type in json.events) {
-                        const handler = new Callbacker((e) => {
+                        const handler = new Callback((e) => {
                             json.events[type](e, this.nodes[json.key], this.htl);
                         });
 
