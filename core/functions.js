@@ -50,21 +50,6 @@ function _getSourceLog() {
 	return '';
 }
 
-function _mergeMessage(message) {
-	return !Array.isArray(message) ? message : message.reduce((acc, cur) => {
-		const index = acc.length - 1;
-		const prev = acc[index];
-
-		if (prev && typeof prev != 'object' && typeof cur != 'object') {
-			acc[index] = prev + ' ' + cur;
-		} else {
-			acc.push(cur);
-		}
-
-		return acc;
-	}, []);
-}
-
 export function log() {
 	const args = Array.from(arguments);
 	const source = _getSourceLog();
@@ -99,14 +84,14 @@ log.error = function(...message) {
 	const src = _getSourceLog();
 	const text = ['Error:', ...message, src ? `\n(src: ${src})` : ''];
 
-	console.error.apply(null, _mergeMessage(text));
+	console.error.apply(null, text);
 }
 
 log.warn = function(...message) {
 	const src = _getSourceLog();
 	const text = ['Warning:', ...message, src ? `\n(src: ${src})` : ''];
 
-	console.warn.apply(null, _mergeMessage(text));
+	console.warn.apply(null, text);
 }
 
 export function isType(value, type) {
