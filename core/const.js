@@ -1,13 +1,13 @@
 import { idGetter, log } from './functions';
 
-const $key = Symbol('key');
+const $accessKey = Symbol('access_key');
 const $defaultKey = Symbol('default_key');
 const $constName = Symbol('const_name');
 
 const metaDataStorage = new Map();
 const getConstValue = idGetter();
 
-function _setMetaData(nameSpace, constName, data = {}) {
+function _setMetaData(nameSpace, constName, data) {
     const storage = metaDataStorage.get(nameSpace);
     const value = getConstValue();
     const desc = {
@@ -32,15 +32,15 @@ function has(nameSpace, constValue) {
     return Boolean(found);
 }
 
-function create(constList, key_ = $defaultKey) {
-    let key = key_;
+function create(constList, key = $defaultKey) {
+    let accessKey = key;
 
-    if (key_ && typeof key_ != 'symbol') {
-        log.warn(`key "${key_}" must be a Symbol. Now constant meta-data not private`);
-        key = $defaultKey;
+    if (key && typeof key != 'symbol') {
+        log.warn(`key "${key}" must be a Symbol. Now constant meta-data not private`);
+        accessKey = $defaultKey;
     }
 
-    const nameSpace = { [$key]: key };
+    const nameSpace = { [$accessKey]: accessKey };
     const storage = new Map();
 
     metaDataStorage.set(nameSpace, storage);
@@ -61,8 +61,10 @@ function create(constList, key_ = $defaultKey) {
 }
 
 function getData(nameSpace, value, key = $defaultKey) {
-    if (nameSpace[$key] !== key) {
-        log.error([`Can't get access to meta-data of const with value "${value}" from namespace`, nameSpace]);
+    const accessKey = nameSpace[$accessKey];
+
+    if (accessKey && accessKey !== key) {
+        log.error(`Can't get access to meta-data of const with value "${value}" from namespace`, nameSpace);
         return;
     }
 
@@ -74,21 +76,23 @@ function getData(nameSpace, value, key = $defaultKey) {
         return;
     }
 
-    if (!storage.has(value)) {
+    const { data } = storage.get(value);
+
+    if (!data) {
         log.warn(warnText);
         return;
     }
 
-    return storage.get(value).data;
+    return data;
 }
 
 function getName(nameSpace, constValue) {
-    const emptyConstError = `Can't get constant name by value "${constValue}" from namespace "${nameSpace}"`;
+    const emptyConstError = [`Can't get constant name by value "${constValue}" from namespace`, nameSpace];
     const storage = metaDataStorage.get(nameSpace);
 
     if (storage) {
         if (!storage.has(constValue)) {
-            log.error(emptyConstError);
+            log.error(...emptyConstError);
             return;
         }
 
@@ -98,7 +102,7 @@ function getName(nameSpace, constValue) {
     const found = Object.entries(nameSpace).find(([k, v]) => v === constValue);
 
     if (!found) {
-        log.error(emptyConstError);
+        log.error(...emptyConstError);
         return;
     }
 
@@ -106,10 +110,10 @@ function getName(nameSpace, constValue) {
 }
 
 function erase(nameSpace) {
-    delete nameSpace[$key];
+    delete nameSpace[$accessKey];
     metaDataStorage.delete(nameSpace);
 
-    log.warn(['Meta-data of namespace', nameSpace, 'was erased']);
+    log.warn('Meta-data of namespace', nameSpace, 'was erased');
 }
 
 export default {
