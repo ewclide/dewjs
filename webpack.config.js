@@ -20,12 +20,12 @@ rules.push({
 
 const npmlib = {
 	entry: {
-        'index.min' : './core/lib-main',
-        'funcs.min' : './core/functions',
-        'array.min' : './core/array',
-		'object.min': './core/object',
-		'clock.min' : './core/clock',
-		'lerp.min'  : './core/lerp'
+        'index.min' : './bundles/lib/main',
+        'funcs.min' : './bundles/lib/funcs',
+        'array.min' : './bundles/lib/array',
+		'object.min': './bundles/lib/object',
+		'clock.min' : './bundles/lib/clock',
+		'lerp.min'  : './bundles/lib/lerp'
     },
 	output: {
 		path: path.resolve(__dirname, './lib/src'),
@@ -37,7 +37,7 @@ const npmlib = {
 };
 
 const script = {
-	entry: './core/main',
+	entry: './bundles/script/main',
 	output: {
 		path: path.resolve(__dirname, './dist'),
 		filename: 'dew.min.js',

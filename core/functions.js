@@ -50,6 +50,21 @@ function _getSourceLog() {
 	return '';
 }
 
+function _prepareMessage(message) {
+	return !Array.isArray(message) ? message : message.reduce((acc, cur) => {
+		const index = acc.length - 1;
+		const prev = acc[index];
+
+		if (prev && typeof prev != 'object' && typeof cur != 'object') {
+			acc[index] = prev + ' ' + cur;
+		} else {
+			acc.push(cur);
+		}
+
+		return acc;
+	}, []);
+}
+
 export function log() {
 	const args = Array.from(arguments);
 	const source = _getSourceLog();
@@ -66,26 +81,28 @@ log.time = (name) => console.time(name);
 log.timeEnd = (name) => console.timeEnd(name);
 
 log.error = function(errorList, source = true) {
+	const { title } = errorList;
+
 	let error = 'Error: ';
 	let src = '';
 
 	if (source) src = _getSourceLog();
 
-	if (Array.isArray(errorList) && errorList.length) {
-		error += errorList.title || 'Error list';
+	if (Array.isArray(errorList) && title) {
+		if (!errorList.length) return;
+
+		error += errorList.title;
 		error += '\n';
 
 		errorList.forEach((message) => error += `  --> ${message}\n` );
 
         if (source) error += `  -----\n  src: ${src}`;
+	} else {
+		// error += errorList;
+		error = [error].concat(errorList);
+		if (source) error.push(`(src: ${src})`);
+		error = _prepareMessage(error);
 	}
-
-	else if (typeof errorList == 'string') {
-		error += errorList;
-		if (source) error += ` (src: ${src})`;
-	}
-
-	else return false;
 
 	console.error(error);
 
@@ -93,13 +110,13 @@ log.error = function(errorList, source = true) {
 }
 
 log.warn = function(text, source = true) {
-	let warnText = 'Warning: ' + [...text].join(' ');
+	const message = ['Warning:', ...[].concat(text)];
 
 	if (source) {
-		warnText += ` (src: ${_getSourceLog()})`;
+		message.push(`(src: ${_getSourceLog()})`);
 	}
 
-	console.warn(warnText);
+	console.warn.apply(null, _prepareMessage(message));
 }
 
 export function isType(value, type) {

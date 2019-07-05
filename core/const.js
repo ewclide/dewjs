@@ -2,10 +2,12 @@ import { idGetter, log } from './functions';
 
 const $key = Symbol('key');
 const $defaultKey = Symbol('default_key');
+const $constName = Symbol('const_name');
+
 const metaDataStorage = new Map();
 const getConstValue = idGetter();
 
-function _setMetaData(nameSpace, constName, metaData = {}) {
+function _setMetaData(nameSpace, constName, data = {}) {
     const storage = metaDataStorage.get(nameSpace);
     const value = getConstValue();
     const desc = {
@@ -14,8 +16,7 @@ function _setMetaData(nameSpace, constName, metaData = {}) {
         configurable: false
     };
 
-    metaData.constName = constName;
-    storage.set(value, metaData);
+    storage.set(value, { data, [$constName]: constName });
 
     Object.defineProperty(nameSpace, constName, { ...desc, value });
 }
@@ -42,6 +43,8 @@ function create(constList, key_ = $defaultKey) {
     const nameSpace = { [$key]: key };
     const storage = new Map();
 
+    metaDataStorage.set(nameSpace, storage);
+
     if (Array.isArray(constList)) {
         constList.forEach(constName => _setMetaData(nameSpace, constName));
     }
@@ -54,14 +57,12 @@ function create(constList, key_ = $defaultKey) {
         }
     }
 
-    metaDataStorage.set(nameSpace, storage);
-
     return nameSpace;
 }
 
 function getData(nameSpace, value, key = $defaultKey) {
     if (nameSpace[$key] !== key) {
-        log.error(`Can't get access to meta-data of const with value "${value}" from namespace "${nameSpace}"`);
+        log.error([`Can't get access to meta-data of const with value "${value}" from namespace`, nameSpace]);
         return;
     }
 
@@ -78,7 +79,7 @@ function getData(nameSpace, value, key = $defaultKey) {
         return;
     }
 
-    return storage.get(value);
+    return storage.get(value).data;
 }
 
 function getName(nameSpace, constValue) {
@@ -91,7 +92,7 @@ function getName(nameSpace, constValue) {
             return;
         }
 
-        return storage.get(constValue).constName;
+        return storage.get(constValue)[$constName];
     }
 
     const found = Object.entries(nameSpace).find(([k, v]) => v === constValue);
@@ -105,8 +106,10 @@ function getName(nameSpace, constValue) {
 }
 
 function erase(nameSpace) {
-    log.warn(`Meta-data of namespace "${nameSpace}" was erased`);
+    delete nameSpace[$key];
     metaDataStorage.delete(nameSpace);
+
+    log.warn(['Meta-data of namespace', nameSpace, 'was erased']);
 }
 
 export default {
