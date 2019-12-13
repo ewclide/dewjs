@@ -1,8 +1,7 @@
-import CSSTransformer from './css-transformer';
+import CSSTransformer from './singleton/css-transformer';
 import { log, camelCaseToDash, idGetter } from './functions';
 
-export default class StyleSheet
-{
+export default class StyleSheet {
 	constructor() {
 		this.element = this._createElement();
 	}
@@ -170,8 +169,7 @@ export default class StyleSheet
 	}
 }
 
-class Media
-{
+class Media {
 	constructor(parent, index) {
 		this._media = parent.cssRules[index];
 		this._rules = this._media.cssRules;
@@ -209,8 +207,7 @@ class Media
 const getNameKF = idGetter('__kf__');
 const getNameAnim = idGetter('__anim__');
 
-class Animation
-{
+class Animation {
 	constructor(parent, name) {
 		this._parent = parent;
 		this._offsetTime = 0;

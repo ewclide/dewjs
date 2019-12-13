@@ -1,7 +1,6 @@
 import { log }  from './functions';
 
-export default class Template
-{
+export default class Template {
     constructor(str, name) {
         this._htl = null;
         this._render = () => {};
