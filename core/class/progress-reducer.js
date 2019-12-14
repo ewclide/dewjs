@@ -52,12 +52,12 @@ export default class ProgressReducer {
         const red = this._reduce();
         const [ loaded, total ] = red;
 
+        this._onUpdate.call(loaded, total);
+
         if (loaded === total) {
             this._ready = true;
             this._onFinish.call();
         }
-
-        this._onUpdate.call(loaded, total);
     }
 
     _reduce() {
