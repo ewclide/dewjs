@@ -1,13 +1,28 @@
 {
-  "private": true,
-  "workspaces": [
-    "lib/*"
-  ],
+  "name": "dewjs",
+  "version": "3.0.0",
+  "description": "Experimental JavaScript library for UI programming",
+  "author": "ewclide",
+  "license": "MIT",
+  "homepage": "https://dew.ewclide.com/",
   "scripts": {
     "dev": "webpack-dev-server --mode development",
     "build": "webpack --mode production",
     "test-lib": "webpack --config ./test/npm/wp.config.js --mode production"
   },
+  "bugs": {
+    "url": "https://github.com/ewclide/dewjs/issues"
+  },
+  "repository": "ewclide/dewjs",
+  "main": "index.js",
+  "files": [
+    "core",
+    "LICENSE",
+    "README.md"
+  ],
+  "keywords": [
+    "dewjs"
+  ],
   "devDependencies": {
     "@babel/core": "^7.4.0",
     "@babel/plugin-proposal-class-properties": "^7.4.0",
