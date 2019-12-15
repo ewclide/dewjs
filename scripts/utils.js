@@ -18,26 +18,27 @@ function normalizeOptions(path_, options_) {
     return { path, options };
 }
 
-function prepareFileList(folder, list) {
-    return Array.from(list).map(item => {
+function prepareFileList(folder, list, onlyFiles = false) {
+    const result = Array.from(list).map(item => {
             const path = nodePath.resolve(folder, item);
             return { ...nodePath.parse(path), path };
-        })
-        .filter(item => isFile(item.path));
+        });
+
+    return onlyFiles ? result.filter(item => isFile(item.path)) : result;
 }
 
-function getFiles(folder_, options_) {
-    const { path: folder, options } = normalizeOptions(folder_, options_);
+function getFolderContent(folder_, options_) {
+    const { path: folder, options, onlyFiles } = normalizeOptions(folder_, options_);
 
     if (options.sync) {
         const files = fs.readdirSync(folder, options);
-        return prepareFileList(folder, files);
+        return prepareFileList(folder, files, onlyFiles);
     }
 
     return new Promise((resolve, reject) => {
         fs.readdir(folder, options, (error, files) => {
             if (error) reject(error);
-            resolve(prepareFileList(folder, files));
+            resolve(prepareFileList(folder, files, onlyFiles));
         });
     });
 }
@@ -86,7 +87,7 @@ module.exports = {
     dashToCamelCase,
     capitalize,
     relative,
-    getFiles,
+    getFolderContent,
     readFile,
     writeFile
 };

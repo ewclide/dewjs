@@ -1,11 +1,11 @@
 const log = require('node-con-color');
-const { getFiles, writeFile, dashToCamelCase, capitalize } = require('./utils');
+const { getFolderContent, writeFile, dashToCamelCase, capitalize } = require('./utils');
 
 function gather(folder, options = {}) {
     log(`gather files #12{"${folder}"} at #12{"${folder}/index.js"}`);
 
     const { excp = [], caps = false } = options;
-    const flist = getFiles(folder, { sync: true });
+    const flist = getFolderContent(folder, { sync: true });
     const exports = [];
 
     let data = '';
