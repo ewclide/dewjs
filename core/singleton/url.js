@@ -128,5 +128,4 @@ class Url {
 	}
 }
 
-const url = new Url();
-export default url;
+export default new Url();

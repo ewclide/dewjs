@@ -1,15 +1,15 @@
-# DEW.js
+# Dew.js
 
 ![license](img/license.svg)
 
 ![logo](img/logo.svg)
 
-*Dew* is experimental javaScript library for UI programming.
-
-The project was conceived as a replacement for jquery, as well as a combination of solutions and ideas accumulated over two years.
+This is experimental javaScript library.  
+The project is a combination of solutions and ideas accumulated over few years.
 I would also like to note that some solutions that may have analogues were developed by chance :) but have the right to exist.
 
 ### **[Documentation][3]**
+in development stage...
 
 ### Features
 
@@ -20,18 +20,12 @@ I would also like to note that some solutions that may have analogues were devel
 - *Binding* - organize objects interaction throught binding
 - *Access* - hide or publish fields and methods of classes
 - *Templating* - create views throught templates
-- Many others good solutions ;)
+- Many other good things ;)
 
 ### Install
 
-For using this library on the site just substitute VERSION_NAME by last release version  
-and link CDN hosted script into your page.  
-
-```html
-<script src="https://cdn.jsdelivr.net/gh/ewclide/dewjs@VERSION_NAME/dist/dew.min.js"></script>
-```
-Also you can get a local copy using git or simply **[download][1]**.
-The script located in dist folder.
+For using this library on the site just get a local copy using git or press to **[download][1]**.  
+And link script, which located in dist folder, into your page.
 
 	$ git clone https://github.com/ewclide/dewjs.git
 
@@ -41,32 +35,20 @@ For creating your projects use npm
 
 ### Usage
 
-As npm package:
-
 ```js
-import {html} from 'dewjs';
+import { html } from 'dewjs';
 
-const hello = html.create('h1').text('Hello world!');
+(async () => {
+	await html.ready;
 
-html.ready.then(() => html.body.append(hello));
-```
-
-As library on the page:
-```html
-<script src="../dew.min.js"></script>
-<script>$html = DEW.html</script>
-<script src="../user-script.js"></script>
-```
-```js
-// user-script
-const hello = $html.create('h1').text('Hello world!');
-
-$html.ready.then(() => $html.body.append(hello));
+	const hello = html.create('h1').text('Hello world!');
+	html.body.append(hello);
+})()
 ```
 
 ##
-*Thank's for using*  
-@ Developed by ***Max Ustinov*** - *[ewclide][4]*
+*Thanks for using*  
+@ Developed by **Max Ustinov** - **[ewclide][4]**
 
 [1]: https://github.com/ewclide/dewjs/archive/master.zip  "download"
 [2]: https://dew.ewclide.com/support  "support"

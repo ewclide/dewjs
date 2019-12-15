@@ -1,4 +1,4 @@
-import { log }  from './functions';
+import log from '../function/log';
 
 export default class Template {
     constructor(str, name) {
