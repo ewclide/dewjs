@@ -1,0 +1,9 @@
+export { bind } from './core/singleton/bind';
+export { const } from './core/singleton/const';
+export { cssTransformer } from './core/singleton/css-transformer';
+export { htmlTools } from './core/singleton/html-tools';
+export { html } from './core/singleton/html';
+export { http } from './core/singleton/http';
+export { index } from './core/singleton/index';
+export { platform } from './core/singleton/platform';
+export { url } from './core/singleton/url';

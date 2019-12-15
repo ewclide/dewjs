@@ -6,8 +6,9 @@
   "license": "MIT",
   "homepage": "https://dew.ewclide.com/",
   "scripts": {
-    "dev": "webpack-dev-server --mode development",
-    "build": "webpack --mode production",
+    "dev": "npm run gather webpack-dev-server --mode development",
+    "build": "npm run gather webpack --mode production",
+    "gather": "node scripts/gather.js",
     "test-lib": "webpack --config ./test/npm/wp.config.js --mode production"
   },
   "bugs": {
@@ -31,6 +32,11 @@
     "@babel/preset-env": "^7.4.2",
     "@babel/runtime": "^7.4.2",
     "babel-loader": "^8.0.5",
+    "eslint": "^6.7.2",
+    "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-loader": "^3.0.3",
+    "eslint-plugin-import": "^2.19.1",
+    "node-con-color": "^1.0.1",
     "uglifyjs-webpack-plugin": "^1.2.7",
     "webpack": "^4.29.6",
     "webpack-cli": "^3.3.0",

@@ -1,0 +1,9 @@
+export { clone } from './core/object/clone';
+export { define } from './core/object/define';
+export { dispose } from './core/object/dispose';
+export { equal } from './core/object/equal';
+export { fullAssign } from './core/object/full-assign';
+export { index } from './core/object/index';
+export { innerAssign } from './core/object/inner-assign';
+export { outerAssign } from './core/object/outer-assign';
+export { search } from './core/object/search';

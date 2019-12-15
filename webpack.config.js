@@ -1,8 +1,6 @@
 const path = require('path');
 
-const rules = [];
-
-rules.push({
+const rules = [{
 	test: /\.js$/,
 	exclude: /node_modules/,
 	use: {
@@ -16,28 +14,10 @@ rules.push({
 			]
 		}
 	}
-});
+}];
 
-const npmlib = {
-	entry: {
-        'index.min' : './bundles/lib/main',
-        'funcs.min' : './bundles/lib/funcs',
-        'array.min' : './bundles/lib/array',
-		'object.min': './bundles/lib/object',
-		'clock.min' : './bundles/lib/clock',
-		'lerp.min'  : './bundles/lib/lerp'
-    },
-	output: {
-		path: path.resolve(__dirname, './lib/src'),
-        filename: '[name].js',
-		library: 'DEW',
-		libraryTarget: 'commonjs2'
-	},
-	module: { rules }
-};
-
-const script = {
-	entry: './bundles/script/main',
+module.exports = {
+	entry: './core',
 	output: {
 		path: path.resolve(__dirname, './dist'),
 		filename: 'dew.min.js',
@@ -53,8 +33,4 @@ const script = {
 			errors: true
 		}
 	}
-};
-
-const prod = process.argv.includes('production');
-
-module.exports = prod ? [ npmlib, script ] : script;
+}

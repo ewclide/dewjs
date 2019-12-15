@@ -1,0 +1,11 @@
+export { compare } from './core/array/compare';
+export { contain } from './core/array/contain';
+export { difference } from './core/array/difference';
+export { equal } from './core/array/equal';
+export { index } from './core/array/index';
+export { natSort } from './core/array/nat-sort';
+export { removeByIndex } from './core/array/remove-by-index';
+export { removeValue } from './core/array/remove-value';
+export { search } from './core/array/search';
+export { subtract } from './core/array/subtract';
+export { unique } from './core/array/unique';
