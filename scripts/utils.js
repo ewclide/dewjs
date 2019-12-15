@@ -78,8 +78,13 @@ function dashToCamelCase(str, expt = []) {
         : str.replace(/-/g, '')
 }
 
+function capitalize(str) {
+	return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
 module.exports = {
     dashToCamelCase,
+    capitalize,
     relative,
     getFiles,
     readFile,

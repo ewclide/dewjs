@@ -1,5 +1,6 @@
-import { log, idGetter} from './functions';
-import {define} from './object';
+import log from '../function/log';
+import idGetter from '../function/id-getter';
+import define from '../object/define';
 
 const getId = idGetter();
 const _nodeList = new Map();

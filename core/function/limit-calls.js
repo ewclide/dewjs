@@ -1,4 +1,4 @@
-export function limitCalls(fn, count = 1) {
+export default function limitCalls(fn, count = 1) {
 	let used = 0;
 	const res = (...arg) => {
 		if (used < count) {

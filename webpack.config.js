@@ -17,7 +17,7 @@ const rules = [{
 }];
 
 module.exports = {
-	entry: './core',
+	entry: './core/index.js',
 	output: {
 		path: path.resolve(__dirname, './dist'),
 		filename: 'dew.min.js',

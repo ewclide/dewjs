@@ -1,8 +1,10 @@
-import { log, idGetter, aggregateCalls } from './functions';
-import { removeValue } from './array';
-import JSONConverter from './json-converter';
-import CSSTransformer from './css-transformer';
-import Callback from './callback';
+import log from '../../function/log';
+import idGetter from '../../function/id-getter';
+import aggregateCalls from '../../function/aggregate-calls';
+import JsonConverter from '../../class/json-converter';
+import removeValue from '../../array/remove-value';
+import cssTransformer from '../css-transformer';
+import Callback from '../../class/callback';
 
 export const genElementId = idGetter('__elem__');
 export const eventList = new Map();
@@ -430,7 +432,7 @@ export class HTMLTools {
     }
 
     createFromJSON(json) {
-        const jsonConv = new JSONConverter(json);
+        const jsonConv = new JsonConverter(json);
         const { htl, nodes } = jsonConv;
 
         htl.node = nodes;
@@ -443,10 +445,10 @@ export class HTMLTools {
         const elements = htl ? htl.elements : this.elements
 
         if (elements.length > 1) {
-            return elements.map((elem) => JSONConverter.createJSON(elem));
+            return elements.map((elem) => JsonConverter.createJSON(elem));
         }
 
-        return JSONConverter.createJSON(elements[0]);
+        return JsonConverter.createJSON(elements[0]);
     }
 
     tplAppend(tpl) {
@@ -706,52 +708,52 @@ export class HTMLTools {
     }
 
     transform(actions, settings) {
-        CSSTransformer.apply(this, actions, settings);
+        cssTransformer.apply(this, actions, settings);
         return this;
     }
 
     matrix2d(matrix, save) {
-        CSSTransformer.matrix2d(this.elements, actions, save);
+        cssTransformer.matrix2d(this.elements, actions, save);
         return this;
     }
 
     matrix3d(matrix, save) {
-        CSSTransformer.matrix3d(this.elements, matrix, save);
+        cssTransformer.matrix3d(this.elements, matrix, save);
         return this;
     }
 
     scale(value, save) {
-        CSSTransformer.scale(this.elements, value, save);
+        cssTransformer.scale(this.elements, value, save);
         return this;
 	}
 
 	scaleX(value, save) {
-        CSSTransformer.scaleX(this.elements, value, save);
+        cssTransformer.scaleX(this.elements, value, save);
         return this;
 	}
 
 	scaleY(value, save) {
-        CSSTransformer.scaleY(this.elements, value, save);
+        cssTransformer.scaleY(this.elements, value, save);
         return this;
 	}
 
 	skew(value, save, units) {
-        CSSTransformer.skew(this.elements, value, save, units);
+        cssTransformer.skew(this.elements, value, save, units);
         return this;
 	}
 
 	rotate(value, save, units) {
-        CSSTransformer.rotate(this.elements, value, save, units);
+        cssTransformer.rotate(this.elements, value, save, units);
         return this;
 	}
 
 	translate(value, save, units) {
-        CSSTransformer.translate(this.elements, value, save, units);
+        cssTransformer.translate(this.elements, value, save, units);
         return this;
     }
 
     origin(value, units) {
-        CSSTransformer.origin(this, value, units);
+        cssTransformer.origin(this, value, units);
         return this;
     }
 

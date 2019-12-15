@@ -1,8 +1,7 @@
-import { log } from './functions';
+import log from '../function/log';
 
 const CSSTransformer = {
 	apply(element, actions, settings = {}) {
-
 		const { origin, backface, style, perspective, units = {} } = settings;
 		let transform = '';
 

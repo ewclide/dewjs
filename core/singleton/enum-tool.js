@@ -1,4 +1,5 @@
-import { idGetter, log } from './functions';
+import log from '../function/log';
+import idGetter from '../function/id-getter';
 
 const $accessKey = Symbol('access_key');
 const $defaultKey = Symbol('default_key');

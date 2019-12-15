@@ -6,8 +6,8 @@
   "license": "MIT",
   "homepage": "https://dew.ewclide.com/",
   "scripts": {
-    "dev": "npm run gather webpack-dev-server --mode development",
-    "build": "npm run gather webpack --mode production",
+    "dev": "npm run gather && webpack-dev-server --mode development",
+    "build": "npm run gather && webpack --mode production",
     "gather": "node scripts/gather.js",
     "test-lib": "webpack --config ./test/npm/wp.config.js --mode production"
   },

@@ -1,4 +1,4 @@
-import { log } from './functions';
+import log from '../function/log';
 import Callback from './callback';
 
 const _timerList = new Set();
@@ -69,7 +69,7 @@ export class Time {
 	}
 }
 
-export class Clock {
+export default class Clock {
 	constructor(settings = {}) {
 		const { count = 0, duration = 0, delay = 0, step = 0, timeScale = 1 } = settings;
 		this._count = count;

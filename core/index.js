@@ -1,8 +1,8 @@
-import * as functions from './function';
-import * as object from './object';
-import * as array from './array';
-import * as classes from './class';
-import * as singleton from './singleton';
+import functions from './function';
+import object from './object';
+import array from './array';
+import classes from './class';
+import singleton from './singleton';
 
 const Dew = {
 	functions,

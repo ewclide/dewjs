@@ -1,9 +1,15 @@
-export { bind } from './core/singleton/bind';
-export { const } from './core/singleton/const';
-export { cssTransformer } from './core/singleton/css-transformer';
-export { htmlTools } from './core/singleton/html-tools';
-export { html } from './core/singleton/html';
-export { http } from './core/singleton/http';
-export { index } from './core/singleton/index';
-export { platform } from './core/singleton/platform';
-export { url } from './core/singleton/url';
+import bind from './bind';
+import cssTransformer from './css-transformer';
+import enumTool from './enum-tool';
+import http from './http';
+import platform from './platform';
+import url from './url';
+
+export default {
+   bind,
+   cssTransformer,
+   enumTool,
+   http,
+   platform,
+   url
+}

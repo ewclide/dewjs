@@ -1,11 +1,23 @@
-export { compare } from './core/array/compare';
-export { contain } from './core/array/contain';
-export { difference } from './core/array/difference';
-export { equal } from './core/array/equal';
-export { index } from './core/array/index';
-export { natSort } from './core/array/nat-sort';
-export { removeByIndex } from './core/array/remove-by-index';
-export { removeValue } from './core/array/remove-value';
-export { search } from './core/array/search';
-export { subtract } from './core/array/subtract';
-export { unique } from './core/array/unique';
+import compare from './compare';
+import contain from './contain';
+import difference from './difference';
+import equal from './equal';
+import natSort from './nat-sort';
+import removeByIndex from './remove-by-index';
+import removeValue from './remove-value';
+import search from './search';
+import subtract from './subtract';
+import unique from './unique';
+
+export default {
+   compare,
+   contain,
+   difference,
+   equal,
+   natSort,
+   removeByIndex,
+   removeValue,
+   search,
+   subtract,
+   unique
+}

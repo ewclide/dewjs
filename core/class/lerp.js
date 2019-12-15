@@ -1,5 +1,5 @@
-import { log } from './functions';
-import { Clock } from './clock';
+import log from '../function/log';
+import Clock from './clock';
 import Callback from './callback';
 
 export const EASING = {
@@ -18,7 +18,7 @@ export const EASING = {
     InOutQuint : (t) => t < 0.5 ? 16*t*t*t*t*t : 1+16*(--t)*t*t*t*t
 }
 
-export class Lerp {
+export default class Lerp {
     constructor(settings = {}) {
         const { timing = EASING.linear, duration = 500 } = settings;
 

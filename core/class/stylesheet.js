@@ -1,5 +1,7 @@
-import CSSTransformer from './singleton/css-transformer';
-import { log, camelCaseToDash, idGetter } from './functions';
+import CSSTransformer from '../singleton/css-transformer';
+import log from '../function/log';
+import camelCaseToDash from '../function/camel-case-to-dash';
+import idGetter from '../function/id-getter';
 
 export default class StyleSheet {
 	constructor() {

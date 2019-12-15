@@ -1,22 +1,37 @@
 const log = require('node-con-color');
-const { getFiles, writeFile, dashToCamelCase } = require('./utils');
+const { getFiles, writeFile, dashToCamelCase, capitalize } = require('./utils');
 
-const prefix = '#6{prebuild:} ';
-function gather(folder) {
-    log(prefix + `start gather files #12{"${folder}"} at #12{"${folder}/index.js"}`);
+function gather(folder, options = {}) {
+    log(`gather files #12{"${folder}"} at #12{"${folder}/index.js"}`);
+
+    const { excp = [], caps = false } = options;
     const flist = getFiles(folder, { sync: true });
+    const exports = [];
 
     let data = '';
-    const exceptions = ['rand-i', 'rand-f'];
+    let exportName;
+
     for (const { name } of flist) {
-        data += `export { ${dashToCamelCase(name, exceptions)} } from '${folder}/${name}';\n`;
+        if (name === 'index') continue;
+
+        exportName = dashToCamelCase(name, excp);
+        if (caps) exportName = capitalize(exportName);
+
+        data += `import ${exportName} from './${name}';\n`;
+        exports.push(exportName);
     }
+
+    data += `\nexport default {\n   ${exports.join(',\n   ')}\n}`;
 
     writeFile(`${folder}/index.js`, data);
 }
 
-gather('./core/function');
+log('#6{prebuild gathering} started:\n');
+
+gather('./core/function', { excp: ['rand-i', 'rand-f'] });
 gather('./core/object');
 gather('./core/array');
-gather('./core/class');
+gather('./core/class', { caps: true });
 gather('./core/singleton');
+
+log('\n#6{prebuild gathering} completed!\n');
