@@ -1,74 +1,97 @@
+function trimStr(str, all) {
+	// return str.replace(/^\n|\n$/gm, '');
+	return all ? str.replace(/\n\s*/gm, '') : str.trim();
+}
+
+function trimLineBreaks(str) {
+    return str.replace(/^\n+|\n+$/gm, '');
+}
+
 const methods = {
     echo(value) {
         return value;
     },
-    join(list, sp) {
-        return list.join(sp);
+    join(list, tpl, sp = ',') {
+        return list.map(tpl).join(sp);
     }
 }
 
 const template = {
-    _wrapMethod(...inputs) {
-        const [, method, space] = inputs;
-        return `\${this.${method}}${space}`;
+    _prepareSyntax(str) {
+        return str.replace(/^\n/, '')
+            .replace(/\n{0,1}@([^\{]*)\{([^\}]+)\}/gm, (...args) => {
+                const [, expr, body] = args;
+                return expr ? `<~${expr}{~><~${body}~><~}~>` : `<~${body}~>`
+            })
+            .replace(/%([^;%]+)(;)/g, '\${$1}')
     },
-    _prepareStrToken(str) {
-        return str
-            .replace(/%(\w+)(\s)/gm, '\${$1}$2')
-            .replace(/@(\w+\([^)]+\))(\s)/gm, this._wrapMethod);
+    _prepareCodeToken(token) {
+        return token[0] === '&' || token[0] === '!'
+            ? this._prepareStringToken(token.slice(1), token[0] === '!')
+            : trimStr(token);
     },
-    _prepareToken(str) {
-        return str
-            .replace(/%(\w+)(\s)/gm, '\${$1}$2')
-            .replace(/@(\w+\([^)]+\))(\s)/gm, this._wrapMethod);
+    _prepareStringToken(token, trim = false) {
+        return '__output__+=`' + (trim ? trimStr(token) : token) + '`;';
     },
     create(str, args) {
-        const tokens = str.replace(/\<&/gm, '<&#').split(/\<&|&\>/gm);
-        let body = 'let ';
+        const prep = this._prepareSyntax(str);
+        console.log(prep)
+        const tokens = prep
+            .replace(/\<~/gm, '<~#')
+            .split(/\<~|~\>/gm);
 
+        let body = 'const {';
         if (Array.isArray(args)) {
-            args.forEach( arg => body += arg + '=data.' + arg + ',' );
+            body += `${args.join(', ')}}=data;\n`;
         }
 
-        body += `__output__='';`;
+        body += `const {${Object.keys(methods)}}=this;\n`;
+        body += `let __output__='';\n`;
 
-        tokens.forEach( token => {
-            body += token[0] == '#'
-            ? token.slice(1).replace(/:=/g, '__output__+=') + ';\n'
-            : '__output__+=`' + this._prepareStrToken(token) + '`;';
+        tokens.forEach((token) => {
+            if (!token) return;
+            body += token[0] === '#'
+                ? this._prepareCodeToken(token.slice(1))
+                : this._prepareStringToken(token)
         });
 
         body += ' return __output__';
         console.log(body)
 
-        let render = () => {};
+        let template = () => {};
         try {
-            const rend = new Function('data', body);
-            render = function(tpl) {
-                return rend.apply(methods, [tpl]);
-            }
+            const render = new Function('data', body);
+            template = tpl => render.apply(methods, [tpl]);
         } catch (e) {
             throw new Error(`template error - ${e.message}`);
         }
 
-        return render;
+        return template;
     }
 }
 
 const tpl = `
-### <&:=name&>
+%name;
 
-<& :=[1,2,3].join(', ') &>
+@if (async) {
+    console.log('is async')
+}
 
-### %name
-@echo('asd')
-@join(args, ', ')
+@if (async) {&
+    *async* %name;
+    *async* %name;
+}
 
-<&:=desc&>
+@for (let arg of args) {& ***%arg.name;*** : *%arg.type;* }
+
+%join(args, ', ', (e) => ' **%e.name;** : *%e.type;* ');
 `;
 
-const render = template.create(tpl, ['name', 'args', 'desc', 'returns', 'example'])
+// @join(&'***%data.name*** : *%data.type*')(args, ', ')
+
+const render = template.create(tpl, ['name', 'args', 'desc', 'returns', 'example', 'async'])
 const result = render({
+    async: true,
     name: 'someFunction',
     args: [
         {  name: 'value', type: 'String' },
