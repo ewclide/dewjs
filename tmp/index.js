@@ -22,19 +22,20 @@ const template = {
         let depth = 0;
         return str
             .replace(/^\n/, '')
-            .replace(/(\(|\))/gm, (br) => { // prepare brackets
+            .replace(/#'([^']+)'/gm, 'echo(\`$1\`)') // prepare tpls
+            .replace(/(\(|\))/gm, (br) => { // prepare brackets (indicate)
                 if (br === ')') depth--;
                 let ibr = depth + br;
                 if (br === '(') depth++;
                 return ibr;
             })
-            .replace(/\n{0,1}@([^\{]*)\{([^\}]+)\}/gm, (...args) => {
+            .replace(/\n{0,1}@([^\{]*)\{([^\}]+)\}/gm, (...args) => { // prepare exp
                 const [, expr, body] = args;
-                return expr ? `<~${expr}{~><~${body}~><~}~>` : `<~${body}~>`
+                return expr ? `<~${expr}{${body}}~>` : `<~${body}~>`
             })
-            .replace(/%((\w|\.)+)\b/g, '\${$1}')
-            .replace(/@((\w|\.)+)(?<nb>\d+)(\()(.*)\k<nb>\)/g, '\${$1($5)}')
-            .replace(/\d+(\(|\))/gm, '$1');
+            .replace(/%((\w|\.)+)\b/g, '\${$1}') // prepare echo
+            .replace(/@((\w|\.)+)(?<nb>\d+)(\()(.*)\k<nb>\)/g, '<~$1($5)~>') // prepare funcs
+            .replace(/\d+(\(|\))/gm, '$1'); // remove bracket indeces
     },
     _prepareCodeToken(token) {
         return token[0] === '&' || token[0] === '!'
@@ -62,7 +63,7 @@ const template = {
         tokens.forEach((token) => {
             if (!token) return;
             body += token[0] === '#'
-                ? this._prepareCodeToken(token.slice(1))
+                ? trimStr(token.slice(1))
                 : this._prepareStringToken(token)
         });
 
@@ -100,14 +101,14 @@ const tpl = `
     console.log('is async')
 }
 
-@if (async) {&
+@if (async) {#'
     *async* %name;
     *async* %name;
-}
+'}
 
-@for (let arg of args) {& ***%arg.name*** : *%arg.type* }
+@for (let arg of args) {#' ***%arg.name*** : *%arg.type* '}
 
-( @join(args, (e) => \`**%e.name** : *%e.type*\`) )
+( @join(args, (e) => #'**%e.name** : *%e.type*') ) => @if(async){#'Promise(%returns[0])'} @else{#'%returns[0]'}
 `;
 
 const render = template.create(tpl, ['name', 'args', 'desc', 'returns', 'example', 'async'])
