@@ -11,19 +11,30 @@ const methods = {
     echo(value) {
         return value;
     },
-    join(list, tpl, sp = ',') {
+    join(list, tpl, sp = ', ') {
+        console.log(sp)
         return list.map(tpl).join(sp);
     }
 }
 
 const template = {
     _prepareSyntax(str) {
-        return str.replace(/^\n/, '')
+        let depth = 0;
+        return str
+            .replace(/^\n/, '')
+            .replace(/(\(|\))/gm, (br) => { // prepare brackets
+                if (br === ')') depth--;
+                let ibr = depth + br;
+                if (br === '(') depth++;
+                return ibr;
+            })
             .replace(/\n{0,1}@([^\{]*)\{([^\}]+)\}/gm, (...args) => {
                 const [, expr, body] = args;
                 return expr ? `<~${expr}{~><~${body}~><~}~>` : `<~${body}~>`
             })
-            .replace(/%([^;%]+)(;)/g, '\${$1}')
+            .replace(/%((\w|\.)+)\b/g, '\${$1}')
+            .replace(/@((\w|\.)+)(?<nb>\d+)(\()(.*)\k<nb>\)/g, '\${$1($5)}')
+            .replace(/\d+(\(|\))/gm, '$1');
     },
     _prepareCodeToken(token) {
         return token[0] === '&' || token[0] === '!'
@@ -70,8 +81,20 @@ const template = {
     }
 }
 
+let depth = 0;
+'asdad ( (()) () ) () asdad'.replace(/(\(|\))/gm, (br) => {
+    if (br === ')') depth--;
+    let res = depth + br + ' ';
+    if (br === '(') depth++;
+    return res;
+});
+
+'asdad %asd.qwe qweqe'.replace(/%((\w|\.)+)\b/g, '{$1}')
+'asdad 1( zxc () 1) qweqe'.match(/(?<nb>\d+)(\()(.*?)\k<nb>\)/g,);
+
+
 const tpl = `
-%name;
+%name
 
 @if (async) {
     console.log('is async')
@@ -82,12 +105,10 @@ const tpl = `
     *async* %name;
 }
 
-@for (let arg of args) {& ***%arg.name;*** : *%arg.type;* }
+@for (let arg of args) {& ***%arg.name*** : *%arg.type* }
 
-%join(args, ', ', (e) => ' **%e.name;** : *%e.type;* ');
+( @join(args, (e) => \`**%e.name** : *%e.type*\`) )
 `;
-
-// @join(&'***%data.name*** : *%data.type*')(args, ', ')
 
 const render = template.create(tpl, ['name', 'args', 'desc', 'returns', 'example', 'async'])
 const result = render({
