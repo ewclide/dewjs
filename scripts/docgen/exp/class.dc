@@ -1,0 +1,40 @@
+@class>
+
+#name ClassName
+
+#description
+some desc some desc some desc some desc some desc some desc some desc
+some desc some desc some desc some desc some desc some desc some desc some desc some desc
+some desc some desc some desc some desc
+
+#constructor
+value <String> ! - some desc some desc some desc so
+options <Object> ? 2 - some desc some desc some desc so
+
+#properties
+value <String> ! - some desc some desc some desc so
+options <Object> ? 2 - some desc some desc some desc so
+
+#methods
+
+@method>
+    #name play
+
+    #arguments
+    value <String> ! - some desc some desc some desc so
+    options <Object> ? 2 - some desc some desc some desc so
+
+    #description
+    some desc some desc some desc some desc some desc some desc some desc
+
+    #return <Boolean> - desc of returns
+@method<
+
+#example-js
+// array of types
+const other = 'hello';
+if (isType(other, ['string', 'number']) {
+    // ...code
+}
+
+@class<

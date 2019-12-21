@@ -7,6 +7,37 @@ function trimLineBreaks(str) {
     return str.replace(/^\n+|\n+$/gm, '');
 }
 
+function indexBrackets(str, brackets = ['()', '{}', '[]']) {
+    const bracketData = new Map();
+    const regList = [];
+
+    for (const bracket of brackets) {
+        const [open, close] = bracket.split('');
+        const data = { open, close, depth: 0 };
+
+        bracketData.set(open, data);
+        bracketData.set(close, data);
+        regList.push('\\' + open, '\\' + close);
+    }
+
+    const regexp = new RegExp(`(${regList.join('|')})`, 'gm');
+    let result = '';
+
+    return str.replace(regexp, (type) => {
+        const bracket = bracketData.get(type);
+
+        if (type === bracket.close) bracket.depth--;
+        result = bracket.depth + type;
+        if (type === bracket.open) bracket.depth++;
+
+        return result;
+    });
+}
+
+function removeBracketIndeces(str) {
+    return str.replace(/\d+(\(|\)|\{|\})/gm, '$1')
+}
+
 const methods = {
     echo(value) {
         return value;
@@ -43,7 +74,7 @@ const template = {
             : trimStr(token);
     },
     _prepareStringToken(token, trim = false) {
-        return '__output__+=`' + (trim ? trimStr(token) : token) + '`;';
+        return '\n__output__+=`' + (trim ? trimStr(token) : token) + '`;';
     },
     create(str, args) {
         const prep = this._prepareSyntax(str);
@@ -62,9 +93,9 @@ const template = {
 
         tokens.forEach((token) => {
             if (!token) return;
-            body += token[0] === '#'
-                ? trimStr(token.slice(1))
-                : this._prepareStringToken(token)
+            body += token[0] == "#"
+                ? token.slice(1).replace(/:=/g, '__output__+=') + ';\n'
+                : "__output__+=`" + token + "`;";
         });
 
         body += ' return __output__';
@@ -108,7 +139,7 @@ const tpl = `
 
 @for (let arg of args) {#' ***%arg.name*** : *%arg.type* '}
 
-( @join(args, (e) => #'**%e.name** : *%e.type*') ) => @if(async){#'Promise(%returns[0])'} @else{#'%returns[0]'}
+( @join(args, (e) => {#'**%e.name** : *%e.type*'}) ) => @if(async){#'Promise(%returns[0])'} @else{#'%returns[0]'}
 `;
 
 const render = template.create(tpl, ['name', 'args', 'desc', 'returns', 'example', 'async'])

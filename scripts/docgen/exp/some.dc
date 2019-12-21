@@ -4,8 +4,8 @@
 
 #description
 some desc some desc some desc some desc some desc some desc some desc
-some desc some desc some desc some desc some desc some desc some desc some desc some desc 
-some desc some desc some desc some desc 
+some desc some desc some desc some desc some desc some desc some desc some desc some desc
+some desc some desc some desc some desc
 
 #arguments
 value <String> ! - some desc some desc some desc so
@@ -13,8 +13,7 @@ options <Object> ? 2 - some desc some desc some desc so
 
 #return <String>
 
-#example: js
-
+#example-js
 // array of types
 const other = 'hello';
 if (isType(other, ['string', 'number']) {
@@ -22,8 +21,3 @@ if (isType(other, ['string', 'number']) {
 }
 
 @function<
-
-
-
-
-
