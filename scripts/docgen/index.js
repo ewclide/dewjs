@@ -128,6 +128,10 @@ let depth = 0;
 const tpl = `
 %name
 
+@if (a):
+
+@;
+
 @if (async) {
     console.log('is async')
 }

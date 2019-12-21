@@ -8,7 +8,7 @@ some desc some desc some desc some desc some desc some desc some desc some desc 
 some desc some desc some desc some desc
 
 #arguments
-value <String> ! - some desc some desc some desc so
+value <String|Number> ! - some desc some desc some desc so
 options <Object> ? 2 - some desc some desc some desc so
 
 #return <String>
