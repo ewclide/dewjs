@@ -9,7 +9,7 @@ function trimLineBreaks(str) {
 
 function indexBrackets(str, brackets = ['()', '{}', '[]']) {
     const bracketData = new Map();
-    const regList = [];
+    const regbody = [];
 
     for (const bracket of brackets) {
         const [open, close] = bracket.split('');
@@ -17,10 +17,10 @@ function indexBrackets(str, brackets = ['()', '{}', '[]']) {
 
         bracketData.set(open, data);
         bracketData.set(close, data);
-        regList.push('\\' + open, '\\' + close);
+        regbody.push('\\' + open, '\\' + close);
     }
 
-    const regexp = new RegExp(`(${regList.join('|')})`, 'gm');
+    const regexp = new RegExp(`(${regbody.join('|')})`, 'gm');
     let result = '';
 
     return str.replace(regexp, (type) => {
@@ -38,99 +38,86 @@ function removeBracketIndeces(str) {
     return str.replace(/\d+(\(|\)|\{|\})/gm, '$1')
 }
 
+function prepareTemplates(str) {
+    return str.replace(/#'([^']+)'/gm, 'echo(\`$1\`)');
+}
+
+function prepareExpressions(str) {
+    return str.replace(/\n{0,1}@([^\{]*)\{([^\}]+)\}/gm,
+        (...args) => {
+            const [, expr, body] = args;
+            return expr ? `<~${expr}{${body}}~>` : `<~${body}~>`
+        })
+}
+
+function prepareOutputs(str) {
+    return str.replace(/%((\w|\.)+)\b/g, '\${$1}');
+}
+
+function prepareFunctions(str) {
+    return str.replace(/@((\w|\.)+)(?<nb>\d+)(\()(.*)\k<nb>\)/g, '<~$1($5)~>');
+}
+
+function prepareSyntax(input) {
+    let tpl = input.replace(/^\n/, '');
+
+    tpl = prepareTemplates(tpl);
+    tpl = indexBrackets(tpl);
+    tpl = prepareExpressions(tpl);
+    tpl = prepareOutputs(tpl);
+    tpl = prepareFunctions(tpl);
+    tpl = removeBracketIndeces(tpl);
+
+    return tpl;
+}
+
 const methods = {
     echo(value) {
         return value;
     },
     join(list, tpl, sp = ', ') {
-        console.log(sp)
         return list.map(tpl).join(sp);
     }
 }
 
-const template = {
-    _prepareSyntax(str) {
-        let depth = 0;
-        return str
-            .replace(/^\n/, '')
-            .replace(/#'([^']+)'/gm, 'echo(\`$1\`)') // prepare tpls
-            .replace(/(\(|\))/gm, (br) => { // prepare brackets (indicate)
-                if (br === ')') depth--;
-                let ibr = depth + br;
-                if (br === '(') depth++;
-                return ibr;
-            })
-            .replace(/\n{0,1}@([^\{]*)\{([^\}]+)\}/gm, (...args) => { // prepare exp
-                const [, expr, body] = args;
-                return expr ? `<~${expr}{${body}}~>` : `<~${body}~>`
-            })
-            .replace(/%((\w|\.)+)\b/g, '\${$1}') // prepare echo
-            .replace(/@((\w|\.)+)(?<nb>\d+)(\()(.*)\k<nb>\)/g, '<~$1($5)~>') // prepare funcs
-            .replace(/\d+(\(|\))/gm, '$1'); // remove bracket indeces
-    },
-    _prepareCodeToken(token) {
-        return token[0] === '&' || token[0] === '!'
-            ? this._prepareStringToken(token.slice(1), token[0] === '!')
-            : trimStr(token);
-    },
-    _prepareStringToken(token, trim = false) {
-        return '\n__output__+=`' + (trim ? trimStr(token) : token) + '`;';
-    },
-    create(str, args) {
-        const prep = this._prepareSyntax(str);
-        console.log(prep)
-        const tokens = prep
-            .replace(/\<~/gm, '<~#')
-            .split(/\<~|~\>/gm);
+function create(str, args) {
+    const prep = prepareSyntax(str);
+    console.log(prep)
+    const tokens = prep
+        .replace(/\<~/gm, '<~#')
+        .split(/\<~|~\>/gm);
 
-        let body = 'const {';
-        if (Array.isArray(args)) {
-            body += `${args.join(', ')}}=data;\n`;
-        }
-
-        body += `const {${Object.keys(methods)}}=this;\n`;
-        body += `let __output__='';\n`;
-
-        tokens.forEach((token) => {
-            if (!token) return;
-            body += token[0] == "#"
-                ? token.slice(1).replace(/:=/g, '__output__+=') + ';\n'
-                : "__output__+=`" + token + "`;";
-        });
-
-        body += ' return __output__';
-        console.log(body)
-
-        let template = () => {};
-        try {
-            const render = new Function('data', body);
-            template = tpl => render.apply(methods, [tpl]);
-        } catch (e) {
-            throw new Error(`template error - ${e.message}`);
-        }
-
-        return template;
+    let body = 'const {';
+    if (Array.isArray(args)) {
+        body += `${args.join(', ')}}=data;\n`;
     }
+
+    body += `const {${Object.keys(methods)}}=this;\n`;
+    body += `let __output__='';\n`;
+
+    tokens.forEach((token) => {
+        if (!token) return;
+        body += token[0] == "#"
+            ? token.slice(1).replace(/:=/g, '__output__+=') + ';\n'
+            : "__output__+=`" + token + "`;";
+    });
+
+    body += ' return __output__';
+    console.log(body)
+
+    let template = () => {};
+    try {
+        const render = new Function('data', body);
+        template = tpl => render.apply(methods, [tpl]);
+    } catch (e) {
+        throw new Error(`template error - ${e.message}`);
+    }
+
+    return template;
 }
-
-let depth = 0;
-'asdad ( (()) () ) () asdad'.replace(/(\(|\))/gm, (br) => {
-    if (br === ')') depth--;
-    let res = depth + br + ' ';
-    if (br === '(') depth++;
-    return res;
-});
-
-'asdad %asd.qwe qweqe'.replace(/%((\w|\.)+)\b/g, '{$1}')
-'asdad 1( zxc () 1) qweqe'.match(/(?<nb>\d+)(\()(.*?)\k<nb>\)/g,);
-
 
 const tpl = `
 %name
-
-@if (a):
-
-@;
 
 @if (async) {
     console.log('is async')
@@ -143,10 +130,10 @@ const tpl = `
 
 @for (let arg of args) {#' ***%arg.name*** : *%arg.type* '}
 
-( @join(args, (e) => {#'**%e.name** : *%e.type*'}) ) => @if(async){#'Promise(%returns[0])'} @else{#'%returns[0]'}
+( @join(args, arg => #'**%arg.name** : *%arg.type*') ) => @if(async){#'Promise(%returns[0])'} @else{#'%returns[0]'}
 `;
 
-const render = template.create(tpl, ['name', 'args', 'desc', 'returns', 'example', 'async'])
+const render = create(tpl, ['name', 'args', 'desc', 'returns', 'example', 'async'])
 const result = render({
     async: true,
     name: 'someFunction',

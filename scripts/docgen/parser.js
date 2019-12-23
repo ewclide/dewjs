@@ -24,7 +24,20 @@ if (isType(other, ['string', 'number']) {
 @function<`;
 
 function getChunks(str) {
-    return /@function>([^@]+)@function</gm.exec(str).slice(1);
+    const chunkType = ['function', 'class', 'method'];
+    const result = [];
+
+    for (const type of chunkType) {
+        let chunks = new RegExp(`@${type}>([^@]+)@${type}<`, 'gm').exec(str);
+        if (!chunks) continue;
+
+        chunks = chunks.slice(1);
+        for (const body of chunks) {
+            result.push({ type, body });
+        }
+    }
+
+    return result;
 }
 
 function splitTokens(chunk) {
@@ -42,10 +55,10 @@ function splitTokens(chunk) {
 
 function parseValue(value) {
     if (+value) return +value;
-    if (value == 'true' || value == 'TRUE') return true;
-    if (value == 'false' || value == 'FALSE') return false;
+    if (value === 'true' || value === 'TRUE') return true;
+    if (value === 'false' || value === 'FALSE') return false;
 
-    return true;
+    return value;
 }
 
 function getArguments(str) {
@@ -110,8 +123,8 @@ function getTokens(chunk) {
     return tokens;
 }
 
-function gatherTokens(tokens) {
-    const json = {};
+function gatherTokens(type, tokens) {
+    const json = { type };
     for (const { name, value } of tokens) {
         json[name] = value;
     }
@@ -122,9 +135,9 @@ function parse(str) {
     const chunks = getChunks(str);
     const result = [];
 
-    for (const chunk of chunks) {
-        const tokens = getTokens(chunk);
-        result.push(gatherTokens(tokens));
+    for (const { type, body } of chunks) {
+        const tokens = getTokens(body);
+        result.push(gatherTokens(type, tokens));
     }
 
     return result;
