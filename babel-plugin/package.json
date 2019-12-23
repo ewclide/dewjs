@@ -1,0 +1,22 @@
+{
+  "name": "babel-plugin-dewjs",
+  "version": "1.0.0",
+  "description": "dewjs imports",
+  "main": "index.js",
+  "keywords": [
+    "babel-plugin",
+    "dewjs"
+  ],
+  "author": "ewclide",
+  "license": "MIT",
+  "scripts": {
+    "test-prep": "npm link && cd test && npm link babel-plugin-dewjs",
+    "test": "npx babel ./test/src.js -o ./test/res.js"
+  },
+  "dependencies": {
+    "@babel/core": "^7.2.2"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.7.7"
+  }
+}
