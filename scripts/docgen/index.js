@@ -99,7 +99,7 @@ function create(str, args) {
         if (!token) return;
         body += token[0] == "#"
             ? token.slice(1).replace(/:=/g, '__output__+=') + ';\n'
-            : "__output__+=`" + token + "`;";
+            : `echo(\`${token}\`)`;
     });
 
     body += ' return __output__';
@@ -119,18 +119,22 @@ function create(str, args) {
 const tpl = `
 %name
 
+%{async ? name : name + 2}
+
 @if (async) {
     console.log('is async')
 }
 
-@if (async) {#'
+@if (async) {#
     *async* %name;
     *async* %name;
-'}
+}
 
-@for (let arg of args) {#' ***%arg.name*** : *%arg.type* '}
+@for (let arg of args) {#
+    ***%arg.name*** : *%arg.type*
+}
 
-( @join(args, arg => #'**%arg.name** : *%arg.type*') ) => @if(async){#'Promise(%returns[0])'} @else{#'%returns[0]'}
+( %join(args, arg => #'**%arg.name** : *%arg.type*') ) => %{ async ?$ Promise(%returns[0]) : %returns[0] }
 `;
 
 const render = create(tpl, ['name', 'args', 'desc', 'returns', 'example', 'async'])
