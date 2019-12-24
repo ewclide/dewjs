@@ -39,33 +39,34 @@ function removeBracketIndeces(str) {
 }
 
 function prepareTemplates(str) {
-    return str.replace(/#'([^']+)'/gm, 'echo(\`$1\`)');
+    return str
+        .replace(/(?<nb>\d+)\{(\:|\.)((?:\n|.)*?)\k<nb>\}/gm,
+            (...args) => `echo(\`${args[3]}\`,${args[2] === '.'});`);
 }
 
 function prepareExpressions(str) {
-    return str.replace(/\n{0,1}@([^\{]*)\{([^\}]+)\}/gm,
+    return str.replace(/\n{0,1}@(.*?)(?<nb>\d+)\{([^\}]+)\k<nb>\}/gm,
         (...args) => {
-            const [, expr, body] = args;
+            const [, expr, br, body] = args;
             return expr ? `<~${expr}{${body}}~>` : `<~${body}~>`
         })
 }
 
 function prepareOutputs(str) {
-    return str.replace(/%((\w|\.)+)\b/g, '\${$1}');
-}
-
-function prepareFunctions(str) {
-    return str.replace(/@((\w|\.)+)(?<nb>\d+)(\()(.*)\k<nb>\)/g, '<~$1($5)~>');
+    return str
+        .replace(/%((?:\w|\.)+)(?<nb>\d+)\((.*?)\k<nb>\)/g, '\${$1($3)}')
+        .replace(/%(?<nb>\d+)\{(.*?)\k<nb>\}/g, '\${$2}')
+        .replace(/%((?:\w|\.)+)((?<nb>\d+)\[(\d+)\k<nb>\])+?/g, (...a) => console.log(a),'\${$1$2}')
+        .replace(/%((?:\w|\.)+)\b/g, '\${$1}')
 }
 
 function prepareSyntax(input) {
     let tpl = input.replace(/^\n/, '');
 
-    tpl = prepareTemplates(tpl);
-    tpl = indexBrackets(tpl);
-    tpl = prepareExpressions(tpl);
-    tpl = prepareOutputs(tpl);
-    tpl = prepareFunctions(tpl);
+    tpl = indexBrackets(tpl); //console.log(tpl)
+    tpl = prepareTemplates(tpl); //console.log(tpl)
+    tpl = prepareOutputs(tpl); //console.log(tpl)
+    tpl = prepareExpressions(tpl); console.log(tpl)
     tpl = removeBracketIndeces(tpl);
 
     return tpl;
@@ -82,7 +83,6 @@ const methods = {
 
 function create(str, args) {
     const prep = prepareSyntax(str);
-    console.log(prep)
     const tokens = prep
         .replace(/\<~/gm, '<~#')
         .split(/\<~|~\>/gm);
@@ -118,23 +118,25 @@ function create(str, args) {
 
 const tpl = `
 %name
+%returns[0][1]
 
 %{async ? name : name + 2}
 
 @if (async) {
     console.log('is async')
+    {.sync}
 }
 
-@if (async) {#
+@if (async) {:
     *async* %name;
     *async* %name;
 }
 
-@for (let arg of args) {#
+@for (let arg of args) {.
     ***%arg.name*** : *%arg.type*
 }
 
-( %join(args, arg => #'**%arg.name** : *%arg.type*') ) => %{ async ?$ Promise(%returns[0]) : %returns[0] }
+( %join(args, arg => {. **%arg.name** : *%arg.type* }) ) => %{ async ?. Promise(%returns[0]) : %returns[0] }
 `;
 
 const render = create(tpl, ['name', 'args', 'desc', 'returns', 'example', 'async'])
