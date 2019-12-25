@@ -35,7 +35,10 @@ function indexBrackets(str, brackets = ['()', '{}', '[]']) {
 }
 
 function removeBracketIndeces(str) {
-    return str.replace(/\d+(\(|\)|\{|\}|\[|\])/gm, '$1')
+    return str
+        .replace(/(?<i>\d+)\(((?:\n|.)+?)\k<i>\)/gm, '($2)')
+        .replace(/(?<i>\d+)\[((?:\n|.)+?)\k<i>\]/gm, '[$2]')
+        .replace(/(?<i>\d+)\{((?:\n|.)+?)\k<i>\}/gm, '{$2}')
 }
 
 function prepareTemplates(str) {
@@ -44,7 +47,7 @@ function prepareTemplates(str) {
             (...a) => {
                 const trim = a[3] === '.';
                 const expr = a[2].trim();
-                return `<~if (${expr}) echo(\`${a[4]}\`,${trim}) else echo(\`${a[5]}\`,${trim});~>`;
+                return `<~if (${expr}) echo(\`${a[4]}\`,${trim}); else echo(\`${a[5]}\`,${trim});~>`;
             })
         .replace(/(?<nb>\d+)\{(\:|\.)((?:\n|.)*?)\k<nb>\}/gm,
             (...a) => `${a[1]}{echo(\`${a[3]}\`,${a[2] === '.'});${a[1]}}`);
@@ -59,7 +62,7 @@ function prepareOutputs(str) {
 }
 
 function prepareExpressions(str) {
-    return str.replace(/\n{0,1}@(.*?)(?<nb>\d+)\{([^\}]+)\k<nb>\}/gm,
+    return str.replace(/\n{0,1}@(.*?)(?<nb>\d+)\{((?:\n|.)+?)\k<nb>\}/gm,
         (...a) => {
             const [, expr, br, body] = a;
             return expr ? `<~${expr}{${body}}~>` : `<~${body}~>`
@@ -69,21 +72,32 @@ function prepareExpressions(str) {
 function prepareSyntax(input) {
     let tpl = input.replace(/^\n/, '');
 
-    tpl = indexBrackets(tpl); //console.log(tpl)
-    tpl = prepareTemplates(tpl); //console.log(tpl)
-    tpl = prepareOutputs(tpl); //console.log(tpl)
-    tpl = prepareExpressions(tpl); console.log(tpl)
+    tpl = indexBrackets(tpl);
+    tpl = prepareTemplates(tpl);
+    tpl = prepareOutputs(tpl);
+    tpl = prepareExpressions(tpl);
     tpl = removeBracketIndeces(tpl);
 
     return tpl;
 }
 
 const methods = {
-    echo(value) {
-        return value;
+    clear() {
+        this.__output__ = '';
+    },
+    output() {
+        return this.__output__;
+    },
+    echo(value, trim) {
+        this.__output__ += trim ? value.trim() : value;
     },
     join(list, tpl, sp = ', ') {
-        return list.map(tpl).join(sp);
+        let i = 0;
+        while (i < list.length) {
+            tpl(list[i]);
+            if (i < list.length) this.__output__ += sp;
+            i++;
+        }
     }
 }
 
@@ -99,20 +113,21 @@ function create(str, args) {
     }
 
     body += `const {${Object.keys(methods)}}=this;\n`;
-    body += `let __output__='';\n`;
 
     tokens.forEach((token) => {
         if (!token) return;
-        body += token[0] == "#" ? token.slice(1) + ';\n' : `echo(\`${token}\`)\n`;
+        body += token[0] == "#"
+            ? token.slice(1) + ';\n' : `echo(\`${token}\`)\n`;
     });
 
-    body += ' return __output__';
+    body += ' return output()';
     console.log(body)
 
     let template = () => {};
     try {
+        const scope = { ...methods, __output__: '' };
         const render = new Function('data', body);
-        template = tpl => render.apply(methods, [tpl]);
+        template = tpl => render.apply(scope, [tpl]);
     } catch (e) {
         throw new Error(`template error - ${e.message}`);
     }
@@ -123,7 +138,7 @@ function create(str, args) {
 const tpl = `
 %name
 
-%{async ? name : name + 2}
+%{async ? name : name + 2 }
 
 @if (async) {
     console.log('is async')
@@ -136,7 +151,7 @@ const tpl = `
 }
 
 @for (let arg of args) {.
-    ***%arg.name*** : *%arg.type*
+    ***%arg.name*** : *%arg.type*#
 }
 
 ( %join(args, arg => {. **%arg.name** : *%arg.type* }) ) => %{ async ?. Promise(%returns[0]) : %returns[0] }
