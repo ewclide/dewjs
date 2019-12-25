@@ -35,29 +35,35 @@ function indexBrackets(str, brackets = ['()', '{}', '[]']) {
 }
 
 function removeBracketIndeces(str) {
-    return str.replace(/\d+(\(|\)|\{|\})/gm, '$1')
+    return str.replace(/\d+(\(|\)|\{|\}|\[|\])/gm, '$1')
 }
 
 function prepareTemplates(str) {
     return str
+        .replace(/%(?<nb>\d+)\{(.+?)\?(\:|\.)(.+?):(.+?)\k<nb>\}/gm,
+            (...a) => {
+                const trim = a[3] === '.';
+                const expr = a[2].trim();
+                return `<~if (${expr}) echo(\`${a[4]}\`,${trim}) else echo(\`${a[5]}\`,${trim});~>`;
+            })
         .replace(/(?<nb>\d+)\{(\:|\.)((?:\n|.)*?)\k<nb>\}/gm,
-            (...args) => `echo(\`${args[3]}\`,${args[2] === '.'});`);
-}
-
-function prepareExpressions(str) {
-    return str.replace(/\n{0,1}@(.*?)(?<nb>\d+)\{([^\}]+)\k<nb>\}/gm,
-        (...args) => {
-            const [, expr, br, body] = args;
-            return expr ? `<~${expr}{${body}}~>` : `<~${body}~>`
-        })
+            (...a) => `${a[1]}{echo(\`${a[3]}\`,${a[2] === '.'});${a[1]}}`);
 }
 
 function prepareOutputs(str) {
     return str
         .replace(/%((?:\w|\.)+)(?<nb>\d+)\((.*?)\k<nb>\)/g, '\${$1($3)}')
         .replace(/%(?<nb>\d+)\{(.*?)\k<nb>\}/g, '\${$2}')
-        .replace(/%((?:\w|\.)+)((?<nb>\d+)\[(\d+)\k<nb>\])+?/g, (...a) => console.log(a),'\${$1$2}')
+        .replace(/%((?:\w|\.)+)((?<nb>\d+)\[\d+\k<nb>\])+/g, (a) => `\${${a.slice(1)}}`)
         .replace(/%((?:\w|\.)+)\b/g, '\${$1}')
+}
+
+function prepareExpressions(str) {
+    return str.replace(/\n{0,1}@(.*?)(?<nb>\d+)\{([^\}]+)\k<nb>\}/gm,
+        (...a) => {
+            const [, expr, br, body] = a;
+            return expr ? `<~${expr}{${body}}~>` : `<~${body}~>`
+        })
 }
 
 function prepareSyntax(input) {
@@ -97,9 +103,7 @@ function create(str, args) {
 
     tokens.forEach((token) => {
         if (!token) return;
-        body += token[0] == "#"
-            ? token.slice(1).replace(/:=/g, '__output__+=') + ';\n'
-            : `echo(\`${token}\`)`;
+        body += token[0] == "#" ? token.slice(1) + ';\n' : `echo(\`${token}\`)\n`;
     });
 
     body += ' return __output__';
@@ -118,7 +122,6 @@ function create(str, args) {
 
 const tpl = `
 %name
-%returns[0][1]
 
 %{async ? name : name + 2}
 
