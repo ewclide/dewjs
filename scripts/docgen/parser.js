@@ -1,28 +1,3 @@
-const _tpl = `
-@function>
-
-#name someAction
-
-#description
-some desc some desc some desc some desc some desc some desc some desc
-some desc some desc some desc some desc some desc some desc some desc some desc some desc
-some desc some desc some desc some desc
-
-#arguments
-value <String|Number> ! - some desc some desc some desc so
-options <Object> ? 2 - some desc some desc some desc so
-
-#return <String>
-
-#example-js
-// array of types
-const other = 'hello';
-if (isType(other, ['string', 'number']) {
-    // ...code
-}
-
-@function<`;
-
 function getChunks(str) {
     const chunkType = ['function', 'class', 'method'];
     const result = [];
@@ -143,5 +118,4 @@ function parse(str) {
     return result;
 }
 
-const res = parse(_tpl);
-console.log(res);
+module.exports = { parse };
