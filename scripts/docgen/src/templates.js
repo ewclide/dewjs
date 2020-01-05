@@ -1,4 +1,5 @@
 module.exports = [{
+    targetType: 'md',
     type: 'function',
     vars: ['name', 'description', 'async', 'args', 'desc', 'returns', 'example'],
     body: `
@@ -9,7 +10,7 @@ module.exports = [{
         %description
 
         @for (let arg of args) {:
-        - *%arg.name* %{arg.required ?.  : } - %arg.description
+        - *%arg.name* %{arg.required ?. * : [%arg.defValue] } - %arg.description
         }
 
         @if (example) {.
