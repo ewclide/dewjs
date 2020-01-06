@@ -1,4 +1,4 @@
-const { getFiles, readFile, createFile } = require('./utils');
+const { getFiles, readFile, createFile, removeSpaces } = require('./utils');
 const renderer = require('./renderer');
 const parser = require('./parser');
 const templates = require('./templates');
@@ -13,7 +13,7 @@ class DocumentGenerator {
         const tpls = [...templates, ...userTemplates];
 
         for (const { type, name, body, vars } of tpls) {
-            const tpl = renderer.create(body, { vars, debug: false });
+            const tpl = renderer.create(removeSpaces(body), { vars });
             const key = name + '_' + type;
 
             this._templates.set(key, tpl);

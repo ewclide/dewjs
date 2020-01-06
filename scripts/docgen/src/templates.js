@@ -3,20 +3,20 @@ module.exports = [{
     name: 'function',
     vars: ['name', 'description', 'async', 'arguments: args', 'desc', 'returns', 'example'],
     body: `
-##
-### %name
-( %join(args, arg => {. ***%arg.name*** : *%arg.type* }) ) => %{ async ?. Promise(%returns[0]) : %returns[0] }
+        ##
+        ### %name
+        ( %join(args, arg => {. ***%arg.name*** : *%arg.type* }) ) => %{ async ?. Promise(%returns[0]) : %returns[0] }
 
-%description
+        %description
 
-@for (let arg of args) {:
-- *%arg.name* %{arg.required ?. * : [%arg.defValue] } - %arg.description
-}
+        @for (let arg of args) {:
+        - *%arg.name* %{arg.required ?. * : [%arg.defValue] } - %arg.description
+        }
 
-@if (example) {.
-\`\`\`%example.type
-%example.content
-\`\`\`
-}
-`
+        @if (example) {.
+        \`\`\`%example.type
+        %example.content
+        \`\`\`
+        }
+    `
 }];

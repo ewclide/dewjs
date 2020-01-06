@@ -134,11 +134,19 @@ function bind(context, proto, list) {
     }
 }
 
+function removeSpaces(str, depth) {
+    return !depth
+        ? str.replace(/\n( |\t)+/gm, '\n')
+        : str.replace(/\n\t/gm, '\n    ')
+             .replace(new RegExp(`\\n( ){1,${depth}}`, 'gm'), '\n');
+}
+
 module.exports = {
     getFiles,
     readFile,
     writeFile,
     createFile,
     createFolder,
+    removeSpaces,
     bind
 };
