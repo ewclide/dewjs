@@ -1,7 +1,7 @@
 module.exports = [{
-    targetType: 'md',
-    type: 'function',
-    vars: ['name', 'description', 'async', 'args', 'desc', 'returns', 'example'],
+    type: 'md',
+    name: 'function',
+    vars: ['name', 'description', 'async', 'arguments: args', 'desc', 'returns', 'example'],
     body: `
         ##
         ### %name
@@ -14,9 +14,8 @@ module.exports = [{
         }
 
         @if (example) {.
-        \`\`\`%example.type
+        %example.type
         %example.content
-        \`\`\`
         }
     `
 }];

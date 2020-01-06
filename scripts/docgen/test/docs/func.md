@@ -1,23 +1,21 @@
-@function>
+##
+### someAction
+( ***options*** : *Object* ) =>
 
-#name someAction
 
-#description
 some desc some desc some desc some desc some desc some desc some desc
 some desc some desc some desc some desc some desc some desc some desc some desc some desc
 some desc some desc some desc some desc
 
-#arguments
-value <String|Number> ! - some desc some desc some desc so
-options <Object> ? 2 - some desc some desc some desc so
 
-#return <String>
 
-#example-js
+- *options* [2] - some desc some desc some desc so
+
+```js
+
 // array of types
 const other = 'hello';
 if (isType(other, ['string', 'number']) {
     // ...code
 }
-
-@function<
+```

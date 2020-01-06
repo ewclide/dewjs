@@ -1,37 +1,37 @@
-const { getFiles, getFileData, createFile } = require('./utils');
+const { getFiles, readFile, createFile } = require('./utils');
 const renderer = require('./renderer');
 const parser = require('./parser');
 const templates = require('./templates');
 
 class DocumentGenerator {
-    _templates = new Map();
-
-    constructor(templates) {
-        this._createTemplates(templates);
+    constructor(userTemplates = []) {
+        this._templates = new Map();
+        this._createTemplates(userTemplates);
     }
 
-    _createTemplates(templates) {
-        for (const { targetType, type, body, vars } of templates) {
-            const tpl = renderer.create(body, { vars });
-            const key = type + '_' + targetType;
+    _createTemplates(userTemplates) {
+        const tpls = [...templates, ...userTemplates];
+
+        for (const { type, name, body, vars } of tpls) {
+            const tpl = renderer.create(body, { vars, debug: false });
+            const key = name + '_' + type;
 
             this._templates.set(key, tpl);
         }
     }
 
-    translate(src, targetType = 'md') {
+    translate(src, type = 'md') {
         const [json] = parser.parse(src);
-        const key = json.type + '_' + targetType;
+        const key = json.type + '_' + type;
 
         if (!this._templates.has(key)) return;
 
         const tpl = this._templates.get(key);
-
-        return tpl.render(json);
+        return tpl(json);
     }
 
-    genereate({ input, output, targetType }) {
-        const files = getFiles(input, { sync: true });
+    genereate(input, output, type = 'md') {
+        const files = getFiles(input, { sync: true, type: 'dg' });
 
         let src;
         let result;
@@ -39,16 +39,15 @@ class DocumentGenerator {
         let targetPath;
 
         for (const file of files) {
-            src = getFileData(file.path, { sync: true });
-            result = this.translate(src, targetType);
+            src = readFile(file.path, { sync: true });
+            result = this.translate(src, type);
 
-            targetName = file.name + '.' + targetType;
+            targetName = file.name + '.' + type;
             targetPath = `${(input || output)}/${targetName}`;
 
-            createFile(targetPath, result);
+            createFile(targetPath, result, { resolve: false, cast: false });
         }
     }
 }
 
-const docgen = new DocumentGenerator(templates);
-module.exports = { docgen };
+module.exports = DocumentGenerator;

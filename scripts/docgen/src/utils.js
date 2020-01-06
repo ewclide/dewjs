@@ -1,7 +1,7 @@
 const fs = require('fs');
 const nodePath = require('path');
 
-function resolvePath(path) {
+function joinPath(path) {
     return nodePath.resolve(...[].concat(path));
 }
 
@@ -9,33 +9,42 @@ const isFile = name => fs.lstatSync(name).isFile();
 const isExists = name => fs.existsSync(name);
 
 function normalizeOptions(path_, options_) {
-    const path = resolvePath(path_);
+    const path = joinPath(path_);
     const options = Object.assign({ encoding: 'utf8', sync: false }, options_);
 
     return { path, options };
 }
 
-function prepareFileList(fileList) {
+function prepareFileList(folder, fileList, type = []) {
+    const types = [].concat(type);
     let path;
-    return fileList
+    let ext;
+    let result;
+
+    result = fileList
         .map(file => {
             path = nodePath.resolve(folder, file);
-            return { ...nodePath.parse(path), path };
+            ext = nodePath.extname(path).slice(1);
+            return { ...nodePath.parse(path), path, ext };
         })
         .filter(file => isFile(file.path));
+
+    return types.length
+        ? result.filter(({ ext }) => types.includes(ext))
+        : result;
 }
 
 function getFiles(folder_, options_) {
     const { path: folder, options } = normalizeOptions(folder_, options_);
 
     if (options.sync) {
-        return prepareFileList(fs.readdirSync(folder, options));
+        return prepareFileList(folder, fs.readdirSync(folder, options), options.type);
     }
 
     return new Promise((resolve, reject) => {
         fs.readdir(folder, options, (error, items) => {
             if (error) reject(error);
-            const files = prepareFileList(items);
+            const files = prepareFileList(folder, items, options.type);
             resolve(files);
         });
     });
@@ -78,23 +87,28 @@ function resolveName(name) {
     return str + `(${parseInt(num.slice(1)) + 1})` + ext;
 }
 
-function createFile(file_, data = '', resolve = true) {
-    const file = resolvePath(file_);
+function resolvePath(path, cast = true) {
+    if (!isExists(path)) return path;
 
-    if (!isExists(file)) {
-        fs.writeFileSync(file, data);
-        return file;
+    if (cast) {
+        throw new Error(`file or folder "${path}" is already exists`);
     }
 
-    if (!resolve) {
-        throw new Error(`file "${file}" is already exists`);
-    }
+    return resolvePath(resolveName(path), cast);
+}
 
-    return createFile(resolveName(file));
+function createFile(file_, data = '', options = {}) {
+    const { resolve = true, cast = true } = options;
+    const file = joinPath(file_);
+    const path = resolve ? resolvePath(file, cast) : file;
+
+    fs.writeFileSync(path, data);
+
+    return path;
 }
 
 function createFolder(folder_, resolve = true) {
-    const folder = resolvePath(folder_);
+    const folder = joinPath(folder_);
 
     if (!isExists(folder)) {
         fs.mkdirSync(folder);
@@ -108,11 +122,23 @@ function createFolder(folder_, resolve = true) {
     return createFolder(resolveName(folder));
 }
 
+function bind(context, proto, list) {
+    const methods = [...Object.getOwnPropertyNames(proto)]
+        .filter(name => {
+            if (name === 'constructor') return;
+            return list ? list.includes(name) : name;
+        });
+
+    for (const name of methods) {
+        context[name] = proto[name].bind(context);
+    }
+}
+
 module.exports = {
     getFiles,
     readFile,
     writeFile,
     createFile,
     createFolder,
-    removeFolder
+    bind
 };

@@ -9,7 +9,7 @@
     "dev": "npm run gather && webpack-dev-server --mode development",
     "build": "npm run gather && webpack --mode production",
     "gather": "node scripts/gather.js",
-    "test-lib": "webpack --config ./test/npm/wp.config.js --mode production"
+    "test-doc": "node scripts/docgen/test/index.js"
   },
   "bugs": {
     "url": "https://github.com/ewclide/dewjs/issues"
@@ -33,6 +33,7 @@
     "@babel/preset-env": "^7.4.2",
     "@babel/runtime": "^7.4.2",
     "babel-loader": "^8.0.5",
+    "commander": "^4.0.1",
     "eslint": "^6.7.2",
     "eslint-config-airbnb-base": "^14.0.0",
     "eslint-loader": "^3.0.3",
