@@ -1,11 +1,11 @@
 import randi from './rand-i';
 
-export default function randKey(length = 15, types = ['all']) {
-	const lower = 'abcdefghijklmnopqrstuvwxyz';
-	const upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-	const numbers = '1234567890';
-	const specials = "!?@#$%^&*()*-_+=[]{}<>.,;:/'\"\\";
+const lower = 'abcdefghijklmnopqrstuvwxyz';
+const upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+const numbers = '1234567890';
+const specials = "!?@#$%^&*()*-_+=[]{}<>.,;:/'\"\\";
 
+export default function randKey(length = 15, types = ['all']) {
 	let chars = '';
 
 	if (types.indexOf('all') != -1 ) {
