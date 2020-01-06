@@ -42,7 +42,7 @@ function getArguments(str) {
         type: '<((?:\\w|\\|)+)>\\s*',
         required: '(\\!|\\?)?\\s*',
         defValue: '("[^"]+"|\\d+|true|false|null|Instance)?\\s*',
-        description: '-\\s*(.*)$'
+        description: '-\\s*((?:\r|.)+?)$'
     };
 
     const regexp = new RegExp(Object.values(regParts).join(''), 'g');
