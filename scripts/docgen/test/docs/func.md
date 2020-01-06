@@ -1,4 +1,4 @@
- ##
+##
 ### someAction
 ( ***options*** : *Object* ) => Promise(String)
 
