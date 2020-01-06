@@ -72,7 +72,7 @@ function getExample(name, value) {
     return { type, content: value };
 }
 
-function getReturn(str) {
+function getReturns(str) {
     const [,types] = /<((?:\w|\|)+)>/g.exec(str);
     return types.split('|');
 }
@@ -83,10 +83,14 @@ function getTokens(chunk) {
     for (const token of tokens) {
         let { name, value } = token;
 
-        if (name === 'name') value = value.trim();
-        else if (name === 'arguments') value = getArguments(value);
-        else if (name === 'return') value = getReturn(value);
-        else if (name.search(/^example/) !== -1) {
+        switch (name) {
+            case 'async': value = true; break;
+            case 'name': value = value.trim(); break;
+            case 'arguments': value = getArguments(value); break;
+            case 'returns': value = getReturns(value); break;
+        }
+
+        if (name.search(/^example/) !== -1) {
             name = 'example';
             value = getExample(name, value);
         }

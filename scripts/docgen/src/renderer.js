@@ -68,7 +68,7 @@ function prepareExpressions(str) {
 }
 
 function prepareSyntax(input) {
-    let tpl = input;
+    let tpl = input.replace(/`/g, '\\`');
 
     tpl = indexBrackets(tpl);
     tpl = prepareTemplates(tpl);

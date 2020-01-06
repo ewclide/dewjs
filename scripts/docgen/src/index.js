@@ -22,6 +22,7 @@ class DocumentGenerator {
 
     translate(src, type = 'md') {
         const [json] = parser.parse(src);
+        // console.log(JSON.stringify(json, null, 4))
         const key = json.type + '_' + type;
 
         if (!this._templates.has(key)) return;

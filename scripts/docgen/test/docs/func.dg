@@ -1,6 +1,6 @@
 @function>
 
-#name someAction
+#async #name someAction
 
 #description
 some desc some desc some desc some desc some desc some desc some desc

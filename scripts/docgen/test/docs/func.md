@@ -1,6 +1,6 @@
 ##
 ### someAction
-( ***options*** : *Object* ) =>
+( ***options*** : *Object* ) => Promise(String)
 
 
 some desc some desc some desc some desc some desc some desc some desc
@@ -18,4 +18,6 @@ const other = 'hello';
 if (isType(other, ['string', 'number']) {
     // ...code
 }
+
+
 ```
