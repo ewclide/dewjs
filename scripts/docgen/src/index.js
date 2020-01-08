@@ -40,7 +40,7 @@ class DocumentGenerator {
         let targetName;
         let targetPath;
 
-        log('#6{Document generation} started:');
+        log(`#6{Docgen} started at #12{"${input || output}"}`);
 
         for (const file of files) {
             src = readFile(file.path, { sync: true });
@@ -50,10 +50,10 @@ class DocumentGenerator {
             targetPath = `${(input || output)}/${targetName}`;
 
             createFile(targetPath, result, { resolve: false, cast: false });
-            log(`file #12{"${targetName}"} created at #12{"${input || output}"}`);
+            log(`file #12{"${targetName}"} successful created`);
         }
 
-        log('#6{Document generation} completed!\n');
+        log('#6{Docgen} completed!\n');
     }
 }
 

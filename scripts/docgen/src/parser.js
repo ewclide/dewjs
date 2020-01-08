@@ -69,7 +69,7 @@ function getArguments(str) {
 
 function getExample(name, value) {
     const [, type = 'js'] = name.split('-');
-    return { type, content: value };
+    return { type, content: value.trim() };
 }
 
 function getReturns(str) {
@@ -86,6 +86,7 @@ function getTokens(chunk) {
         switch (name) {
             case 'async': value = true; break;
             case 'name': value = value.trim(); break;
+            case 'description': value = value.trim(); break;
             case 'arguments': value = getArguments(value); break;
             case 'returns': value = getReturns(value); break;
         }

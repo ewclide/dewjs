@@ -40,12 +40,6 @@ function removeBracketIndeces(str) {
 
 function prepareTemplates(str) {
     return str
-        .replace(/(\d+)\{(\:|\.)((?:\n|.)*?)\1\}/gm,
-            (...a) => `${a[1]}{echo(\`${a[3]}\`,${a[2] === '.'});${a[1]}}`);
-}
-
-function prepareOutputs(str) {
-    return str
         .replace(/%(\d+)\{(.+?)\?(\:|\.)(.+?):(.+?)\1\}/gm,
             (...a) => {
                 const trim = a[3] === '.';
@@ -53,6 +47,12 @@ function prepareOutputs(str) {
                 const out2 = prepareValue(a[5], trim);
                 return `\${${a[2].trim()}?\`${out1}\`:\`${out2}\`}`;
             }) // %{ a ?. b : c}
+        .replace(/(\d+)\{(\:|\.)((?:\n|.)*?)\1\}/gm,
+            (...a) => `${a[1]}{echo(\`${a[3]}\`,${a[2] === '.'});${a[1]}}`); // @exp {. }
+}
+
+function prepareOutputs(str) {
+    return str
         .replace(/%(\d+)\{(.*?)\1\}/g, '\${$2}') // %{}
         .replace(/%((?:\w|\.)+)(\d+)\((.*?)\2\)/g, '\${$1($3)}') // %func()
         .replace(/%((?:\w|\.)+)((\d+)\[\d+\2\])+/g, (a) => `\${${a.slice(1)}}`) // %elem[]
