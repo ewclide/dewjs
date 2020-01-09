@@ -5,23 +5,23 @@ function prepareValue(value, trim) {
 }
 
 function indexBrackets(str, brackets = ['()', '{}', '[]']) {
-    const bracketData = new Map();
-    const regbody = [];
+    const bracketStore = new Map();
+    const bracketTypes = [];
 
     for (const bracket of brackets) {
         const [open, close] = bracket.split('');
         const data = { open, close, depth: 0 };
 
-        bracketData.set(open, data);
-        bracketData.set(close, data);
-        regbody.push('\\' + open, '\\' + close);
+        bracketStore.set(open, data);
+        bracketStore.set(close, data);
+        bracketTypes.push('\\' + open, '\\' + close);
     }
 
-    const regexp = new RegExp(`(${regbody.join('|')})`, 'gm');
+    const regexp = new RegExp(`(${bracketTypes.join('|')})`, 'gm');
     let result = '';
 
     return str.replace(regexp, (type) => {
-        const bracket = bracketData.get(type);
+        const bracket = bracketStore.get(type);
 
         if (type === bracket.close) bracket.depth--;
         result = bracket.depth + type;
@@ -38,25 +38,53 @@ function removeBracketIndeces(str) {
         .replace(/(\d+)\{((?:\n|.)*?)\1\}/gm, '{$2}')
 }
 
-function prepareTemplates(str) {
-    return str
-        .replace(/%(\d+)\{(.+?)\?(\:|\.)(.+?):(.+?)\1\}/gm,
-            (...a) => {
-                const trim = a[3] === '.';
-                const out1 = prepareValue(a[4], trim);
-                const out2 = prepareValue(a[5], trim);
-                return `\${${a[2].trim()}?\`${out1}\`:\`${out2}\`}`;
-            }) // %{ a ?. b : c}
-        .replace(/(\d+)\{(\:|\.)((?:\n|.)*?)\1\}/gm,
-            (...a) => `${a[1]}{echo(\`${a[3]}\`,${a[2] === '.'});${a[1]}}`); // @exp {. }
+const findTemplates = (() => {
+    let id = 0;
+    let store = new Map();
+
+    const anchor = (tpl, trim) => {
+        store.set(id, trim ? tpl.trim() : tpl);
+        return `<!${id++}!>`;
+    };
+
+    return (str) => {
+        store.clear();
+
+        const result = str
+            // %{ a ?. b : c}
+            .replace(/%(\d+)\{(.+?)\?(\:|\.)(.+?):(.+?)\1\}/gm,
+                (...a) => {
+                    const cond = a[2].trim();
+                    const trim = a[3] === '.';
+                    return `\${${cond}?${anchor(a[4], trim)}:${anchor(a[5], trim)}}`;
+                })
+
+            // @exp {. }
+            .replace(/(\d+)\{(\:|\.)((?:\n|.)*?)\1\}/gm,
+                // (...a) => `${a[1]}{echo(\`${a[3]}\`,${a[2] === '.'});${a[1]}}`);
+                (...a) => `${a[1]}{${anchor(a[3], a[2] === '.')}${a[1]}}`);
+
+        return { result, store };
+    }
+})();
+
+function prepareTemplates(store, str) {
+    const deanchor = (id, tpl) => {
+        return tpl.replace(//g, );
+    };
+
+    for (const { id, } of store) {
+        result = prepareOutputs(str);
+    }
 }
 
 function prepareOutputs(str) {
     return str
         .replace(/%(\d+)\{(.*?)\1\}/g, '\${$2}') // %{}
-        .replace(/%((?:\w|\.)+)(\d+)\((.*?)\2\)/g, '\${$1($3)}') // %func()
-        .replace(/%((?:\w|\.)+)((\d+)\[\d+\2\])+/g, (a) => `\${${a.slice(1)}}`) // %elem[]
-        .replace(/%((?:[a-z]|\.)+)([^a-z])/gi, '\${$1}$2') // %prop.prop
+        .replace(/%((?:[a-z]|\.)+)(\d+)\((.*?)\2\)/g, (a) => `\${${a.slice(1)}}`) // %exp()[]
+        // .replace(/%((?:\w|\.)+)(\d+)\((.*?)\2\)/g, (a) => '\${$1($3)}') // %func()
+        // .replace(/%((?:\w|\.)+)((\d+)\[\d+\2\])+/g, (a) => `\${${a.slice(1)}}`) // %elem[]
+        // .replace(/%((?:[a-z]|\.)+)([^a-z])/gi, '\${$1}$2') // %prop.prop
 }
 
 function prepareExpressions(str) {
@@ -71,8 +99,11 @@ function prepareSyntax(input) {
     let tpl = input.replace(/`/g, '\\`');
 
     tpl = indexBrackets(tpl);
-    tpl = prepareTemplates(tpl);
-    tpl = prepareOutputs(tpl);
+
+    const { store, result } = findTemplates(tpl); console.log(tpl)
+
+    // tpl = prepareTemplates(tpl); console.log(tpl)
+    tpl = prepareOutputs(result); console.log(tpl)
     tpl = prepareExpressions(tpl);
     tpl = removeBracketIndeces(tpl);
 

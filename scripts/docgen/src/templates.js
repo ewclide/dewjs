@@ -5,7 +5,7 @@ module.exports = [{
     body: `
         ##
         ### %name
-        ( %join(args, arg => {. ***%arg.name*** : *%arg.type* }) ) => %{ async ?. Promise(%returns[0]) : %returns[0] }
+        ( %join(args, arg => {. ***%arg.name*** : *%arg.type.join('|')* }) ) => %{ async ?. Promise(%returns[0]) : %returns[0] }
 
         %description
 

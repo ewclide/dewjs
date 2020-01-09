@@ -1,6 +1,6 @@
 ##
 ### someAction
-( ***value*** : *String,Number*, ***options*** : *Object* ) => Promise(String)
+( ***value*** : *function join() { [native code] }2('|'2)*, ***options*** : *function join() { [native code] }2('|'2)* ) => Promise(String)
 
 some desc some desc some desc some desc some desc some desc some desc
 some desc some desc some desc some desc some desc some desc some desc some desc some desc
