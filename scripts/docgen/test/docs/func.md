@@ -1,13 +1,13 @@
-##
+Promise(String)##
 ### someAction
-( ***value*** : *function join() { [native code] }2('|'2)*, ***options*** : *function join() { [native code] }2('|'2)* ) => Promise(String)
+( ***value*** : *String|Number*, ***options*** : *Object* ) => Promise(String)
 
 some desc some desc some desc some desc some desc some desc some desc
 some desc some desc some desc some desc some desc some desc some desc some desc some desc
 some desc some desc some desc some desc
 
-- *value* * - some desc some desc some desc so
-- *options* [2] - some desc some desc some desc so
+*- *value* * - some desc some desc some desc so
+[2]- *options* [2] - some desc some desc some desc so
 
 ```js
 // array of types
