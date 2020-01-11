@@ -62,7 +62,7 @@ function findTemplates(str, tplStore) {
             (...a) => {
                 const cond = a[2].trim();
                 const trim = a[3] === '.';
-                return `\${${cond}?${anchor(a[4], trim)}:${anchor(a[5], trim)}}`;
+                return `<~if (${cond}){${anchor(a[4], trim)}}else{${anchor(a[5], trim)}}~>`;
             })
 }
 
@@ -71,19 +71,18 @@ function prepareTemplates(str, tplStore) {
 
     return str.replace(/\<!(\d+)!\>/g, (...a) => {
         const tpl = tplStore.get(+a[1]);
-        return `echo(\`${prepareSyntax(tpl, false)}\`)`;
+        return `~>${prepareSyntax(tpl, false)}<~`;
     });
 }
 
 function prepareOutputs(str) {
-    // const replacer = (a) => `<~echo(${a.slice(1)})~>`;
-    const replacer = (a) => `\${${a.slice(1)}}`;
+    const replacer = (token) => `<~echo(${token.slice(1)})~>`;
+
     return str
         .replace(/%(\d+)\{(.*?)\1\}/g, '\${$2}') // %{}
         .replace(/%((?:\w|\.)+)(\d+)\((.*?)\2\)/g, replacer) // %func()
         .replace(/%((?:\w|\.)+)((\d+)\[\d+\2\])+/g, replacer) // %elem[]
-        // .replace(/%((?:[a-z]|\.)+)([^a-z])/gi, replacer) // %prop.prop
-        .replace(/%((?:[a-z]|\.)+)([^a-z])/gi, '\${$1}$2') // %prop.prop
+        .replace(/%((?:[a-z]|\.)+)([^a-z])/gi, '<~echo($1)~>$2') // %prop.prop
 }
 
 function prepareExpressions(str) {

@@ -19,11 +19,11 @@ function create(str, { vars, debug = true }) {
     tokens.forEach((token) => {
         if (!token) return;
         body += token[0] == "#"
-            ? token.slice(1) + ';\n'
-            : `echo(\`${token.replace(/\n/g, '\\n')}\`)\n`;
+            ? token.slice(1) + '\n'
+            : `echo(\`${token.replace(/\n/g, '\\n')}\`);\n`;
     });
 
-    body += ' return output()';
+    body += 'return output();';
     if (debug) console.log(body);
 
     let template = () => {};

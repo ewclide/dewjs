@@ -31,20 +31,18 @@ class Scope {
     }
 
     echo(value) {
-        const result = value.replace(/^\n?/g, '');
-        this[$output].push(result);
-        return result;
+        this[$output].push(String(value));
+        return '';
     }
 
     join(list, tpl, sp = ', ') {
-        const saved = this[$output];
-        this[$output] = [];
+        let i = 0;
+        for (const item of list) {
+            tpl(item);
+            this.echo(++i < list.length ? sp : '');
+        }
 
-        list.forEach(item => tpl(item));
-        const result = this[$output].join(sp);
-
-        this[$output] = saved;
-        return result;
+        return '';
     }
 
     when(cond, str) {
