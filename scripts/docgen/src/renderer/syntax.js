@@ -82,14 +82,14 @@ function prepareOutputs(str) {
         .replace(/%(\d+)\{(.*?)\1\}/g, '\${$2}') // %{}
         .replace(/%((?:\w|\.)+)(\d+)\((.*?)\2\)/g, replacer) // %func()
         .replace(/%((?:\w|\.)+)((\d+)\[\d+\2\])+/g, replacer) // %elem[]
-        .replace(/%((?:[a-z]|\.)+)([^a-z])/gi, '<~echo($1)~>$2') // %prop.prop
+        .replace(/%((?:[a-z]|\.)+)([^a-z]|$)/gi, '<~echo($1)~>$2') // %prop.prop
 }
 
 function prepareExpressions(str) {
-    return str.replace(/@(.*?)(\d+)\{((?:\n|.)+?)\2\}/gm,
+    return str.replace(/@(.*?)(\d+)\{((?:\n|.)+?)\3\}(\n?)/gm,
         (...tokens) => {
-            const [, expr,, body] = tokens;
-            return expr ? `<~${expr}{${body}}~>` : `<~${body}~>`
+            let [, expr, br, body, nle] = tokens;
+            return `<~expr(() => {${expr}{${body}}})~>`;
         });
 }
 
@@ -112,7 +112,7 @@ function prepareSyntax(src, primary = true) {
         tpl = removeBracketIndeces(tpl, bracketStore);
     }
 
-    return tpl;
+    return tpl.replace(/\n/g, '\\n');
 }
 
 module.exports = { prepareSyntax };

@@ -125,7 +125,6 @@ function createFolder(folder_, resolve = true) {
 function bind(context, proto, list) {
     const methods = [...Object.getOwnPropertyNames(proto)]
         .filter(name => {
-            console.log('bind', name, name[0])
             if (name === 'constructor' || name[0] === '_') return;
             return list ? list.includes(name) : name;
         });

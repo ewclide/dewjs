@@ -7,9 +7,9 @@ module.exports = [{
         ### %name
         ( %join(args, arg => {. ***%arg.name*** : *%arg.type.join('|')* }) ) => %{ async ?. Promise(%returns[0]) : %returns[0] }
 
-        %description
+        %?description
 
-        @for (let arg of args) {:
+        @for (let arg of args) {.
         - *%arg.name* %{arg.required ?. * : [%arg.defValue] } - %arg.description
         }
 

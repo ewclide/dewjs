@@ -30,8 +30,8 @@ class Scope {
         return (this[$saved] || this[$output]).join('');
     }
 
-    echo(value) {
-        this[$output].push(String(value));
+    echo(value, trim) {
+        this[$output].push(trim ? String(value).trim() : String(value));
         return '';
     }
 
@@ -47,6 +47,22 @@ class Scope {
 
     when(cond, str) {
         return cond ? str : '';
+    }
+
+    expr(expression, trim) {
+        let output = this[$output];
+        const lastSymbol = output[output.length - 1];
+        const tmpOutput = [];
+
+        this[$output] = tmpOutput;
+        expression();
+
+        if (tmpOutput.length) {
+            if (lastSymbol === '\n') output.splice();
+            output = output.concat(tmpOutput);
+        }
+
+        this[$output] = output;
     }
 }
 

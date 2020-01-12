@@ -4,7 +4,6 @@ const Scope = require('./scope');
 function create(str, { vars, debug = true }) {
     const scope = new Scope();
     const prep = prepareSyntax(str);
-    console.log('prepared: ', prep)
     const tokens = prep
         .replace(/\<~/gm, '<~#')
         .split(/\<~|~\>/gm);
@@ -20,7 +19,7 @@ function create(str, { vars, debug = true }) {
         if (!token) return;
         body += token[0] == "#"
             ? token.slice(1) + '\n'
-            : `echo(\`${token.replace(/\n/g, '\\n')}\`);\n`;
+            : `echo(\`${token}\`);\n`;
     });
 
     body += 'return output();';

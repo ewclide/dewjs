@@ -3,15 +3,9 @@
 ### someAction
 ( ***value*** : *String|Number*, ***options*** : *Object* ) => Promise(String)
 
-some desc some desc some desc some desc some desc some desc some desc
-some desc some desc some desc some desc some desc some desc some desc some desc some desc
-some desc some desc some desc some desc
+%?description
 
-
-- *value* * - some desc some desc some desc so
-
-- *options* [2] - some desc some desc some desc so
-
+- *value* * - some desc some desc some desc so- *options* [2] - some desc some desc some desc so
 
 ```js
 // array of types
