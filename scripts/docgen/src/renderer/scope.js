@@ -7,6 +7,7 @@ class Scope {
     constructor() {
         this[$saved] = null;
         this[$output] = [];
+        this._consumeNL = false;
         bind(this, Scope.prototype);
     }
 
@@ -30,8 +31,20 @@ class Scope {
         return (this[$saved] || this[$output]).join('');
     }
 
-    echo(value, trim) {
-        this[$output].push(trim ? String(value).trim() : String(value));
+    echo(value) {
+        if (typeof value === 'function') {
+            this._expr(value);
+            return '';
+        }
+
+        let result = String(value);
+        if (this._consumeNL && result[0] === '\n') {
+            result = result.slice(1);
+            this._consumeNL = false;
+        }
+
+        this[$output].push(result);
+
         return '';
     }
 
@@ -49,18 +62,22 @@ class Scope {
         return cond ? str : '';
     }
 
-    expr(expression, trim) {
+    _expr(expression) {
         let output = this[$output];
-        const lastSymbol = output[output.length - 1];
-        const tmpOutput = [];
+        let lastOutput = output.pop().split('');
+        let lastIndex = lastOutput.length - 1;
 
-        this[$output] = tmpOutput;
+        const expOutput = [];
+        this[$output] = expOutput;
+
         expression();
 
-        if (tmpOutput.length) {
-            if (lastSymbol === '\n') output.splice();
-            output = output.concat(tmpOutput);
+        if (!expOutput.length && lastOutput[lastIndex] === '\n') {
+            lastOutput.pop();
+            this._consumeNL = true;
         }
+
+        output = output.concat([lastOutput.join(''), ...expOutput]);
 
         this[$output] = output;
     }

@@ -1,6 +1,10 @@
 const { prepareSyntax } = require('./syntax');
 const Scope = require('./scope');
 
+function getPropsList(object) {
+    return Object.keys(object).filter(p => p[0] !== '_');
+}
+
 function create(str, { vars, debug = true }) {
     const scope = new Scope();
     const prep = prepareSyntax(str);
@@ -10,10 +14,10 @@ function create(str, { vars, debug = true }) {
 
     let body = 'const {';
     if (Array.isArray(vars)) {
-        body += `${vars.join(', ')}}=data;\n`;
+        body += `${vars}}=data;\n`;
     }
 
-    body += `const {${Object.keys(scope)}}=this;\n`;
+    body += `const {${getPropsList(scope)}}=this;\n`;
 
     tokens.forEach((token) => {
         if (!token) return;

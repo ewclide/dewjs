@@ -76,20 +76,27 @@ function prepareTemplates(str, tplStore) {
 }
 
 function prepareOutputs(str) {
-    const replacer = (token) => `<~echo(${token.slice(1)})~>`;
+    const replacer = (token) => {
+        return `<~echo(${token.slice(1)})~>`;
+    }
 
     return str
         .replace(/%(\d+)\{(.*?)\1\}/g, '\${$2}') // %{}
         .replace(/%((?:\w|\.)+)(\d+)\((.*?)\2\)/g, replacer) // %func()
         .replace(/%((?:\w|\.)+)((\d+)\[\d+\2\])+/g, replacer) // %elem[]
         .replace(/%((?:[a-z]|\.)+)([^a-z]|$)/gi, '<~echo($1)~>$2') // %prop.prop
+    // return str
+    //     .replace(/%(\??)(\d+)\{(.*?)\2\}/g, '\${$2}') // %{}
+    //     .replace(/%(\??)((?:\w|\.)+)(\d+)\((.*?)\3\)/g, replacer) // %func()
+    //     .replace(/%(\??)((?:\w|\.)+)((\d+)\[\d+\3\])+/g, replacer) // %elem[]
+    //     .replace(/%(\??)((?:[a-z]|\.)+)([^a-z]|$)/gi, '<~echo($2)~>$3') // %prop.prop
 }
 
 function prepareExpressions(str) {
-    return str.replace(/@(.*?)(\d+)\{((?:\n|.)+?)\3\}(\n?)/gm,
+    return str.replace(/@(.*?)(\d+)\{((?:\n|.)+?)\2\}/gm,
         (...tokens) => {
-            let [, expr, br, body, nle] = tokens;
-            return `<~expr(() => {${expr}{${body}}})~>`;
+            let [, expr, br, body] = tokens;
+            return `<~echo(() => {${expr}{${body}}})~>`;
         });
 }
 
