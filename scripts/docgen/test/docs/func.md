@@ -3,7 +3,9 @@
 ### someAction
 ( ***value*** : *String|Number*, ***options*** : *Object* ) => Promise(String)
 
-%?description
+some desc some desc some desc some desc some desc some desc some desc
+some desc some desc some desc some desc some desc some desc some desc some desc some desc
+some desc some desc some desc some desc
 
 - *value* * - some desc some desc some desc so- *options* [2] - some desc some desc some desc so
 

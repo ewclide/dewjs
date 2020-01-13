@@ -32,6 +32,7 @@ class Scope {
     }
 
     echo(value) {
+        if (value === undefined) return '';
         if (typeof value === 'function') {
             this._expr(value);
             return '';
@@ -40,9 +41,9 @@ class Scope {
         let result = String(value);
         if (this._consumeNL && result[0] === '\n') {
             result = result.slice(1);
-            this._consumeNL = false;
         }
 
+        this._consumeNL = false;
         this[$output].push(result);
 
         return '';

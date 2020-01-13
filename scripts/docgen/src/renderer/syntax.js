@@ -76,20 +76,25 @@ function prepareTemplates(str, tplStore) {
 }
 
 function prepareOutputs(str) {
-    const replacer = (token) => {
-        return `<~echo(${token.slice(1)})~>`;
-    }
+    const prepare = (token, consume) => {
+        return consume
+            ? `<~echo(() => echo(${token}))~>`
+            : `<~echo(${token})~>`;
+    };
+
+    const replacer = (...args) => {
+        const [, consume, token] = args;
+        return prepare(token, consume);
+    };
 
     return str
-        .replace(/%(\d+)\{(.*?)\1\}/g, '\${$2}') // %{}
-        .replace(/%((?:\w|\.)+)(\d+)\((.*?)\2\)/g, replacer) // %func()
-        .replace(/%((?:\w|\.)+)((\d+)\[\d+\2\])+/g, replacer) // %elem[]
-        .replace(/%((?:[a-z]|\.)+)([^a-z]|$)/gi, '<~echo($1)~>$2') // %prop.prop
-    // return str
-    //     .replace(/%(\??)(\d+)\{(.*?)\2\}/g, '\${$2}') // %{}
-    //     .replace(/%(\??)((?:\w|\.)+)(\d+)\((.*?)\3\)/g, replacer) // %func()
-    //     .replace(/%(\??)((?:\w|\.)+)((\d+)\[\d+\3\])+/g, replacer) // %elem[]
-    //     .replace(/%(\??)((?:[a-z]|\.)+)([^a-z]|$)/gi, '<~echo($2)~>$3') // %prop.prop
+        .replace(/%(\??)(\d+)\{(.*?)\2\}/g, replacer) // %{}
+        .replace(/%(\??)((?:\w|\.)+(?:(\d+)\(.*?\3\))+)/g, replacer) // %func()
+        .replace(/%(\??)((?:\w|\.)+(?:(\d+)\[\d+\3\])+)/g, replacer) // %elem[]
+        .replace(/%(\??)((?:[a-z]|\.)+)([^a-z]|$)/gi, (...args) => {
+            const [, consume, token, postfix] = args;
+            return prepare(token, consume) + postfix;
+        }) // %prop.prop
 }
 
 function prepareExpressions(str) {
