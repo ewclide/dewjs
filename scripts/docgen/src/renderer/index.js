@@ -5,7 +5,7 @@ function getPropsList(object) {
     return Object.keys(object).filter(p => p[0] !== '_');
 }
 
-function create(str, { vars, debug = true }) {
+function create(str, { vars, debug }) {
     const scope = new Scope();
     const prep = prepareSyntax(str);
     const tokens = prep

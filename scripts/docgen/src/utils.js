@@ -141,6 +141,19 @@ function removeSpaces(str, depth) {
              .replace(new RegExp(`\\n( ){1,${depth}}`, 'gm'), '\n');
 }
 
+function countNewLines(str, end) {
+    const splited = str.split('');
+    if (end) splited.reverse();
+
+    let count = 0;
+    for (let nl of splited) {
+        if (nl !== '\n') return count;
+        count++;
+    }
+
+    return count;
+}
+
 module.exports = {
     getFiles,
     readFile,
@@ -148,5 +161,6 @@ module.exports = {
     createFile,
     createFolder,
     removeSpaces,
+    countNewLines,
     bind
 };

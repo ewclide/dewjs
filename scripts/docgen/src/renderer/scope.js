@@ -1,7 +1,18 @@
-const { bind } = require('../utils');
+const { bind, countNewLines } = require('../utils');
 
 const $saved = Symbol('saved');
 const $output = Symbol('output');
+
+function consumeNewLine(value, end) {
+    const rate = end ? [0, -1] : [1];
+    let result = value;
+
+    if (countNewLines(result, end) > 1) {
+        result = result.slice(...rate);
+    }
+
+    return result;
+}
 
 class Scope {
     constructor() {
@@ -39,9 +50,7 @@ class Scope {
         }
 
         let result = String(value);
-        if (this._consumeNL && result[0] === '\n') {
-            result = result.slice(1);
-        }
+        if (this._consumeNL) result = consumeNewLine(result);
 
         this._consumeNL = false;
         this[$output].push(result);
@@ -65,22 +74,19 @@ class Scope {
 
     _expr(expression) {
         let output = this[$output];
-        let lastOutput = output.pop().split('');
-        let lastIndex = lastOutput.length - 1;
+        let lastOutput = output.pop();
 
         const expOutput = [];
         this[$output] = expOutput;
 
         expression();
 
-        if (!expOutput.length && lastOutput[lastIndex] === '\n') {
-            lastOutput.pop();
+        if (!expOutput.length) {
             this._consumeNL = true;
+            lastOutput = consumeNewLine(lastOutput, true);
         }
 
-        output = output.concat([lastOutput.join(''), ...expOutput]);
-
-        this[$output] = output;
+        this[$output] = output.concat([lastOutput, ...expOutput]);
     }
 }
 
