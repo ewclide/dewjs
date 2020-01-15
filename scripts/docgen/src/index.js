@@ -22,14 +22,20 @@ class DocumentGenerator {
     }
 
     translate(src, type = 'md') {
-        const [json] = parser.parse(src);
-        // console.log(JSON.stringify(json, null, 4))
-        const key = json.type + '_' + type;
+        const data = parser.parse(src);
+        console.log(JSON.stringify(data, null, 4))
 
-        if (!this._templates.has(key)) return;
+        let result = [];
+        for (const json of data) {
+            const key = json.type + '_' + type;
 
-        const tpl = this._templates.get(key);
-        return tpl(json);
+            if (!this._templates.has(key)) continue;
+
+            const tpl = this._templates.get(key);
+            result.push(tpl(json));
+        }
+
+        return result.join('\n');
     }
 
     genereate(input, output, type = 'md') {

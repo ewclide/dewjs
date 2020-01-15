@@ -1,4 +1,4 @@
-@class>
+@class
 
 #name ClassName
 
@@ -17,7 +17,7 @@ options <Object> ? 2 - some desc some desc some desc so
 
 #methods
 
-@method>
+@method
     #name play
 
     #arguments
@@ -28,7 +28,7 @@ options <Object> ? 2 - some desc some desc some desc so
     some desc some desc some desc some desc some desc some desc some desc
 
     #return <Boolean> - desc of returns
-@method<
+@>
 
 #example-js
 // array of types
@@ -37,4 +37,4 @@ if (isType(other, ['string', 'number']) {
     // ...code
 }
 
-@class<
+@>

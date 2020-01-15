@@ -3,12 +3,11 @@ function getChunks(str) {
     const result = [];
 
     for (const type of chunkType) {
-        let chunks = new RegExp(`@${type}>([^@]+)@${type}<`, 'gm').exec(str);
-        if (!chunks) continue;
+        const regExp = new RegExp(`@${type}([^@]+)@>`, 'gm');
 
-        chunks = chunks.slice(1);
-        for (const body of chunks) {
-            result.push({ type, body });
+        let chunk;
+        while (chunk = regExp.exec(str)) {
+            result.push({ type, body: chunk[1] });
         }
     }
 

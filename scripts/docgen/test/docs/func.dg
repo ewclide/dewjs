@@ -1,4 +1,4 @@
-@function>
+@function
 
 #async #name someAction
 
@@ -14,10 +14,27 @@ options <Object> ? 2 - some desc some desc some desc so
 #returns <String>
 
 #example-js
-// array of types
-const other = 'hello';
-if (isType(other, ['string', 'number']) {
+if (someAction(values) {
     // ...code
 }
 
-@function<
+@>
+
+@function
+
+#name doSomething
+
+#description
+some desc some desc some desc some desc
+
+#arguments
+value <String|Number> ! - some desc some desc some desc so
+
+#returns <String|Number>
+
+#example-js
+if (doSomething(values) {
+    // ...code
+}
+
+@>
