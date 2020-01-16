@@ -1,5 +1,5 @@
 const log = require('node-con-color');
-const { getFiles, readFile, createFile, removeSpaces } = require('./utils');
+const { logJson, getFiles, readFile, createFile, removeSpaces } = require('./utils');
 const renderer = require('./renderer');
 const parser = require('./parser');
 const templates = require('./templates');
@@ -23,7 +23,6 @@ class DocumentGenerator {
 
     translate(src, type = 'md') {
         const data = parser.parse(src);
-        console.log(JSON.stringify(data, null, 4))
 
         let result = [];
         for (const json of data) {

@@ -39,7 +39,10 @@ class Scope {
     }
 
     output() {
-        return (this[$saved] || this[$output]).join('');
+        const output = (this[$saved] || this[$output]).join('');
+        this[$saved] = null;
+        this[$output] = [];
+        return output;
     }
 
     echo(value) {

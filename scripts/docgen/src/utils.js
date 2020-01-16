@@ -154,6 +154,8 @@ function countNewLines(str, end) {
     return count;
 }
 
+const logJson = (json) => console.log(JSON.stringify(json, null, 4));
+
 module.exports = {
     getFiles,
     readFile,
@@ -162,5 +164,6 @@ module.exports = {
     createFolder,
     removeSpaces,
     countNewLines,
-    bind
+    bind,
+    logJson
 };

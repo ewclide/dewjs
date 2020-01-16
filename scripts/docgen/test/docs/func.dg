@@ -18,7 +18,7 @@ if (someAction(values) {
     // ...code
 }
 
-@>
+@end
 
 @function
 
@@ -37,4 +37,4 @@ if (doSomething(values) {
     // ...code
 }
 
-@>
+@end

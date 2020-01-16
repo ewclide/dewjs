@@ -1,13 +1,24 @@
-function getChunks(str) {
-    const chunkType = ['function', 'class', 'method'];
+const { logJson } = require('./utils');
+
+function getChunks(str, chunkTypes_ = ['function', 'class']) {
+    console.log(str)
+    const chunkTypes = [].concat(chunkTypes_);
     const result = [];
 
-    for (const type of chunkType) {
-        const regExp = new RegExp(`@${type}([^@]+)@>`, 'gm');
+    for (const type of chunkTypes) {
+        const regExp = new RegExp(`@${type}((?:\\n|.)+?)@end`, 'gm');
+        console.log(type, regExp)
 
-        let chunk;
-        while (chunk = regExp.exec(str)) {
-            result.push({ type, body: chunk[1] });
+        let rawChunk;
+        while (rawChunk = regExp.exec(str)) {
+            const body = rawChunk[1];
+            const chunk = { type, body };
+
+            if (type === 'class') {
+                chunk.childs = getChunks(body, 'method');
+            }
+
+            result.push(chunk);
         }
     }
 
@@ -112,6 +123,7 @@ function gatherTokens(type, tokens) {
 
 function parse(str) {
     const chunks = getChunks(str);
+    console.log(chunks)
     const result = [];
 
     for (const { type, body } of chunks) {
