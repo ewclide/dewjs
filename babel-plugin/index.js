@@ -1,12 +1,18 @@
-module.exports = function({ types: t }) {
-    let x = 0;
+module.exports = function({ types }) {
     return {
         visitor: {
-            Identifier(path) {
-                console.log(x++)
-                if (path.hub.file.code) console.log(path.hub.file.code)
-                let name = path.node.name; // reverse the name: JavaScript -> tpircSavaJ
-                path.node.name = name.split('').reverse().join('');
+            // Identifier(path) {
+            //     console.log(path)
+            // },
+            Program(path, opts) {
+                const { body } = path.hub.file.ast.program;
+
+                for (const node of body) {
+                    if (node.type !== 'ImportDeclaration') continue;
+                    const { source } = node;
+
+                    source.value = 'asd';
+                }
             }
         }
     };
