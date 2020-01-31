@@ -11,7 +11,7 @@
   "license": "MIT",
   "scripts": {
     "test-prep": "npm link && cd test && npm link babel-plugin-dewjs",
-    "test": "npx babel ./test/src.js -o ./test/res.js"
+    "test": "npx babel ./test/source.js -o ./test/result.js"
   },
   "dependencies": {
     "@babel/core": "^7.2.2"
