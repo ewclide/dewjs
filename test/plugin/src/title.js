@@ -3,7 +3,8 @@ import { randi, idGetter } from 'dewjs/function';
 
 const getUniqTitle = idGetter('title_');
 const title = html
-    .create('h2', { fontSize: randi(30, 50) + 'px' })
-    .text(getUniqTitle());
+    .create('h2')
+    .text(getUniqTitle())
+    .style('font-size', randi(30, 50) + 'px');
 
 export default title;

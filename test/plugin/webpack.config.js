@@ -1,10 +1,11 @@
 const path = require('path');
+const resolve = (target) => path.resolve(__dirname, target);
 
 module.exports = {
-	entry: path.resolve(__dirname, './src/index.js'),
+	entry: resolve('./src/index.js'),
 	output: {
-		path: path.resolve(__dirname, './dist'),
-		filename: 'test-app.js'
+		path: resolve('./dist'),
+		filename: 'app.js'
 	},
 	module: { rules: [{
 		test: /\.js$/,
@@ -12,8 +13,7 @@ module.exports = {
 		use: {
 			loader: 'babel-loader',
 			options: {
-				// presets: ['@babel/preset-env'],
-				plugins: ['babel-plugin-dewjs']
+				plugins: ['dewjs/babel-plugin']
 			}
 		}
 	}] }

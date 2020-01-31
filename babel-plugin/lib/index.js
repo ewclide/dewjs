@@ -1,9 +1,16 @@
-function camelCaseToDash(str, up = false) {
+function camelCaseToDash(str) {
 	return str.replace(/[A-Z]/g, s => '-' + s.toLowerCase());
 }
 
+const rules = new Map(Object.entries({
+    'randi': 'rand-i',
+    'randf': 'rand-f'
+}));
+
 function createImportNode(t, name, path) {
-    const source = t.stringLiteral(`${path}/${camelCaseToDash(name)}`);
+    const [lib, namespace] = path.split('/');
+    const target = rules.has(name) ? rules.get(name) : camelCaseToDash(name);
+    const source = t.stringLiteral(`${lib}/core/${namespace}/${target}`);
     const specifier = t.importDefaultSpecifier({ type: 'Identifier', name });
 
     return t.importDeclaration([specifier], source);

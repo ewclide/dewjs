@@ -9,6 +9,12 @@
   ],
   "author": "ewclide",
   "license": "MIT",
+  "scripts": {
+    "test-prep": "npm ci && cd ../.. && npm ln && cd ./test/plugin && npm ln dewjs",
+    "test-babel": "npx babel ./src/hello.js -o ./src/hello-after.js --plugins=dewjs/babel-plugin",
+    "test-build": "webpack --mode production",
+    "test": "npm run test-prep && webpack --mode production"
+  },
   "dependencies": {},
   "devDependencies": {
     "@babel/cli": "^7.7.7",

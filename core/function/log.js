@@ -1,5 +1,3 @@
-export const browser = _getBrowser();
-
 export const LOG_IGNORE = [];
 
 function _getSourceLog() {
