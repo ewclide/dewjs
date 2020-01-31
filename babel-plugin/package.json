@@ -2,7 +2,7 @@
   "name": "babel-plugin-dewjs",
   "version": "1.0.0",
   "description": "dewjs imports",
-  "main": "index.js",
+  "main": "lib/index.js",
   "keywords": [
     "babel-plugin",
     "dewjs"
@@ -10,13 +10,19 @@
   "author": "ewclide",
   "license": "MIT",
   "scripts": {
-    "test-prep": "npm link && cd test && npm link babel-plugin-dewjs",
-    "test": "npx babel ./test/source.js -o ./test/result.js"
+    "plugin-prep": "npm link && cd test && npm link babel-plugin-dewjs",
+    "dewjs-prep": "cd .. && npm link && cd babel-plugin/test && npm link dewjs",
+    "test-babel": "npx babel ./test/source.js -o ./test/result.js",
+    "test": "webpack --config test/wpconfig.js --mode production"
   },
   "dependencies": {
     "@babel/core": "^7.2.2"
   },
   "devDependencies": {
-    "@babel/cli": "^7.7.7"
+    "@babel/cli": "^7.7.7",
+    "@babel/preset-env": "^7.8.4",
+    "babel-loader": "^8.0.6",
+    "webpack": "^4.29.6",
+    "webpack-cli": "^3.3.0"
   }
 }
