@@ -33,6 +33,33 @@ For creating your projects use npm
 
 	npm install dewjs --save-dev
 
+And setup your webpack config, for working with dewjs babel plugin.
+
+```js
+const rule = {
+	test: /\.js$/,
+	exclude: /node_modules/,
+	use: {
+		loader: 'babel-loader',
+		options: {
+			plugins: ['dewjs/babel-plugin']
+		}
+	}
+}
+```
+
+This plugin allows you to write short import paths with imports only specified functions to your final bundle
+
+```js
+/* using with babel plugin */
+import { randi, idGetter, capitalize } from 'dewjs/helper';
+
+/* using without babel plugin */
+import randi from 'dewjs/core/helper/rand-i';
+import idGetter from 'dewjs/core/helper/id-getter';
+import capitalize from 'dewjs/core/helper/capitalize';
+```
+
 ### Usage
 
 ```js
