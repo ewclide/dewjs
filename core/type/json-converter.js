@@ -1,4 +1,4 @@
-import { HTMLTools, eventList, genElementId } from '../singleton/html/html-tools';
+import { HTMLTools, eventList, genElementId } from '../common/html/html-tools';
 import Callback from './callback';
 
 export default class JSONConverter {

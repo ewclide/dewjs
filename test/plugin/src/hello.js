@@ -1,5 +1,5 @@
-import { html } from 'dewjs/singleton';
-import { randKey, capitalize } from 'dewjs/function';
+import { html } from 'dewjs/common';
+import { randKey, capitalize } from 'dewjs/helper';
 
 const text = capitalize('hello ' + randKey(10, ['lower', 'upper']));
 const hello = html.create('p').text(text);

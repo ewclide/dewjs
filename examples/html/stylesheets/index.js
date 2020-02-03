@@ -1,4 +1,6 @@
-const cascad = $html.createStyleSheet();
+const { html } = Dew.common;
+
+const cascad = html.createStyleSheet();
 
 const fade = cascad.keyFrames('fade', [
     { opacity: 0 },
@@ -10,23 +12,23 @@ cascad.add('.test', {
 });
 
 const anim = cascad.animation()
-.add([
-    { opacity: 0 },
-    { opacity: 1 }
-],  { duration: 2000 })
-.add([
-    { color: 'black' },
-    { color: 'red' }
-])
-.and([
-    { fontSize: '24px' },
-    { fontSize: '32px' }
-])
-.add([
-    { color: 'red' },
-    { color: 'blue' }
-],  { delay: 1000 })
-.init();
+    .add([
+        { opacity: 0 },
+        { opacity: 1 }
+    ],  { duration: 2000 })
+    .add([
+        { color: 'black' },
+        { color: 'red' }
+    ])
+    .and([
+        { fontSize: '24px' },
+        { fontSize: '32px' }
+    ])
+    .add([
+        { color: 'red' },
+        { color: 'blue' }
+    ],  { delay: 1000 })
+    .init();
 
 console.log(anim)
 
@@ -50,6 +52,7 @@ const media = cascad.media({
 // cascad.remove(fade);
 // cascad.remove(media);
 
-const h1 = $html.create('h1', 'test').text('Test');
-const h2 = $html.create('h2', anim.className).text('Test');
-$html.body.append([h1, h2]);
+const h1 = html.create('h1', 'test').text('Test');
+const h2 = html.create('h2', anim.className).text('Test');
+
+html.body.append([h1, h2]);

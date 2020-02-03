@@ -1,4 +1,4 @@
-const { makeIterable } = DewFunc;
+const { makeIterable } = Dew.helper;
 
 class List {
     constructor() {

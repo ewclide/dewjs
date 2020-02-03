@@ -1,4 +1,4 @@
-import log from '../function/log';
+import log from '../helper/log';
 import Callback from './callback';
 
 export default class Async {

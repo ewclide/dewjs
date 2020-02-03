@@ -28,10 +28,10 @@ function gather(folder, options = {}) {
 
 log('#6{prebuild gathering} started:\n');
 
-gather('./core/function', { excp: ['rand-i', 'rand-f'] });
+gather('./core/helper', { excp: ['rand-i', 'rand-f'] });
 gather('./core/object');
 gather('./core/array');
-gather('./core/class', { caps: true });
-gather('./core/singleton');
+gather('./core/type', { caps: true });
+gather('./core/common');
 
 log('\n#6{prebuild gathering} completed!\n');

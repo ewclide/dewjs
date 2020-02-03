@@ -1,4 +1,4 @@
-import log from '../function/log';
+import log from '../helper/log';
 
 const CSSTransformer = {
 	apply(element, actions, settings = {}) {

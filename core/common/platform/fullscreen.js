@@ -1,4 +1,4 @@
-import capitalize from '../../function/capitalize';
+import capitalize from '../../helper/capitalize';
 
 const prefices = ['webkit', 'moz', 'ms'];
 

@@ -1,5 +1,7 @@
-let p = $html.select(".app, .and").select("p, a");
+const { html } = Dew.common;
+
+const p = html.select(".app, .and").select("p, a");
 log(p)
 
-let single = $html.select(".single");
+const single = html.select(".single");
 log(single)

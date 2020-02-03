@@ -1,7 +1,7 @@
-import log from '../function/log';
+import log from '../helper/log';
 import innerAssign from '../object/inner-assign';
 import url from './url';
-import Async from '../class/async';
+import Async from '../type/async';
 
 class HTTP {
 	constructor() {

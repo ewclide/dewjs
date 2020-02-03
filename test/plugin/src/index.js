@@ -1,4 +1,4 @@
-import { html } from 'dewjs/singleton';
+import { html } from 'dewjs/common';
 import title from './title';
 import hello from './hello';
 

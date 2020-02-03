@@ -1,5 +1,5 @@
-const { ProgressReducer } = DEW;
-const { randf, randi } = DEW.funcs;
+const { ProgressReducer } = Dew.type;
+const { randf, randi } = Dew.helper;
 
 const progressEmulator = (handler, total = 1) => {
     let factor = 0;

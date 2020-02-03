@@ -1,5 +1,5 @@
-import { html } from 'dewjs/singleton';
-import { randi, idGetter } from 'dewjs/function';
+import { html } from 'dewjs/common';
+import { randi, idGetter } from 'dewjs/helper';
 
 const getUniqTitle = idGetter('title_');
 const title = html

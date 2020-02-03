@@ -1,4 +1,7 @@
-let jsForm = {
+const { log } = Dew.helper;
+const { html } = Dew.common;
+
+const jsForm = {
     tag : "form",
     value : "test",
     attrs : {
@@ -35,15 +38,15 @@ let jsForm = {
     ]
 }
 
-let form = $html.createFromJSON(jsForm);
-let h1 = $html.create("h1").text("Test JSON converter");
+const form = html.createFromJSON(jsForm);
+const h1 = html.create("h1").text("Test JSON converter");
 
-$html.body.prepend(h1);
-$html.select(".app").append(form);
+html.body.prepend(h1);
+html.select(".app").append(form);
 
 form.node.phone.value("one");
 
-$html.select(".more").append(form);
+html.select(".more").append(form);
 
 form.node.phone.value("two");
 

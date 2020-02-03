@@ -1,5 +1,5 @@
-import log from '../function/log';
-import idGetter from '../function/id-getter';
+import log from '../helper/log';
+import idGetter from '../helper/id-getter';
 import define from '../object/define';
 
 const getId = idGetter();

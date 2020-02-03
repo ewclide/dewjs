@@ -1,5 +1,5 @@
-const { html } = DEW;
-const { Clock, Time } = DEW.clock;
+const { html } = Dew.common;
+const { Clock, Time } = Dew.type;
 
 const clock = new Clock({
     // count: 5,

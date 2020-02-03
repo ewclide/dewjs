@@ -1,19 +1,19 @@
-import functions from './function';
+import common from './common';
+import helper from './helper';
 import object from './object';
 import array from './array';
-import classes from './class';
-import singleton from './singleton';
+import type from './type';
 
 const Dew = {
-	functions,
-	array,
+	common,
+	helper,
 	object,
-	classes,
-	singleton
+	array,
+	type,
 };
 
 object.define(window, 'log', {
-	value : functions.log,
+	value : helper.log,
 	config: false,
 	write : false
 });

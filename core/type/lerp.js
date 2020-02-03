@@ -1,4 +1,4 @@
-import log from '../function/log';
+import log from '../helper/log';
 import Clock from './clock';
 import Callback from './callback';
 

@@ -1,6 +1,8 @@
-DewFunc.LOG_IGNORE.push('index');
+const { log } = Dew.helper;
+
+log.IGNORE.push('index');
 
 function doSomeThingImportant() {
 	// ...code
-	DewFunc.log('something important action is completed!');
+	log('something important action is completed!');
 }

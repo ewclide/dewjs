@@ -1,8 +1,8 @@
-const { html } = DEW;
-const { Lerp, EASING } = DEW.lerp;
+const { html } = Dew.common;
+const { Lerp } = Dew.type;
 
 const lerp = new Lerp({
-    timing: EASING.InOutQuad
+    timing: Lerp.EASING.InOutQuad
 });
 
 const box = html.create('div').styles({
@@ -29,8 +29,8 @@ const box = html.create('div').styles({
 
 async function animate(box) {
     lerp.setAction((offset) => box.translate(offset));
-    await lerp.run(0, 500, 1, EASING.linear);
-    await lerp.run(500, 250, 0.5, EASING.InOutQuad);
+    await lerp.run(0, 500, 1, Lerp.EASING.linear);
+    await lerp.run(500, 250, 0.5, Lerp.EASING.InOutQuad);
     await lerp.sleep(1);
     await lerp.run(250, 700, 1.5);
 }

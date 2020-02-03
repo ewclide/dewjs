@@ -1,8 +1,12 @@
-class Loader extends DEW.Async {
+const { http } = Dew.common;
+const { Async } = Dew.type;
+const { log } = Dew.helper;
+
+class Loader extends Async {
     constructor(list) {
         super();
 
-        list = list.map((item) => DEW.http.get(item, null, { progress : true }));
+        list = list.map((item) => http.get(item, null, { progress : true }));
 
         this._createBar();
         this.load(list);
@@ -35,7 +39,7 @@ class Loader extends DEW.Async {
     load(list) {
         this.wait(list, true)
         .then(() => log('loaded!'))
-        .catch((e) => DEW.funcs.log.error(e));
+        .catch((e) => log.error(e));
     }
 }
 

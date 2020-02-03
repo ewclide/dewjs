@@ -1,8 +1,10 @@
-let main  = new DEW.Async(),
-    one   = new DEW.Async(),
-    two   = new DEW.Async(),
-    three = new DEW.Async(),
-    other = new DEW.Async();
+const { Async } = Dew.type;
+
+const main  = new Async();
+const one   = new Async();
+const two   = new Async();
+const three = new Async();
+const other = new Async();
 
 three.catch((e) => log("three rejected!"));
 

@@ -1,6 +1,6 @@
-import log from '../../function/log';
+import log from '../../helper/log';
 import { HTMLTools, eventList }  from './html-tools';
-import StyleSheet from '../../class/stylesheet';
+import StyleSheet from '../../type/stylesheet';
 
 const proto = HTMLTools.prototype;
 const html = new HTMLTools(document);

@@ -7,6 +7,7 @@ import Lerp from './lerp';
 import ProgressReducer from './progress-reducer';
 import Stylesheet from './stylesheet';
 import Template from './template';
+import Time from './time';
 
 export default {
    Async,
@@ -17,5 +18,6 @@ export default {
    Lerp,
    ProgressReducer,
    Stylesheet,
-   Template
+   Template,
+   Time
 }

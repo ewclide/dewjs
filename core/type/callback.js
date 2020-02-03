@@ -1,4 +1,4 @@
-import log from '../function/log';
+import log from '../helper/log';
 
 export default class Callback {
 	constructor(...handlers) {

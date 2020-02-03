@@ -1,10 +1,10 @@
-import log from '../../function/log';
-import idGetter from '../../function/id-getter';
-import aggregateCalls from '../../function/aggregate-calls';
-import JsonConverter from '../../class/json-converter';
+import log from '../../helper/log';
+import idGetter from '../../helper/id-getter';
+import aggregateCalls from '../../helper/aggregate-calls';
+import JsonConverter from '../../type/json-converter';
 import removeValue from '../../array/remove-value';
 import cssTransformer from '../css-transformer';
-import Callback from '../../class/callback';
+import Callback from '../../type/callback';
 
 export const genElementId = idGetter('__elem__');
 export const eventList = new Map();

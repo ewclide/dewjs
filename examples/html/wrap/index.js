@@ -1,6 +1,8 @@
-let h1 = $html.select("h1");
+const { log } = Dew.helper;
+const { html } = Dew.common;
 
-// let wrap = h1.wrap("first-wrap");
-let wrap = h1.wrap(["first-wrap", "second-wrap", "third-wrap"]);
+const h1 = html.select("h1");
+// const wrap = h1.wrap("first-wrap");
+const wrap = h1.wrap(["first-wrap", "second-wrap", "third-wrap"]);
 
 log(wrap)

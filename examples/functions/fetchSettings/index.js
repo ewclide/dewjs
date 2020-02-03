@@ -1,4 +1,4 @@
-const { fetchSettings } = DewFunc;
+const { fetchSettings } = Dew.helper;
 
 class A {};
 

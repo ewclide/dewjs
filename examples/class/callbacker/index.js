@@ -1,4 +1,6 @@
-const cb = new DEW.Callback();
+const { Callback } = Dew.type;
+
+const cb = new Callback();
 
 cb.push(function first(v){
 	return v + 1;
@@ -19,6 +21,6 @@ const a = (x) => new Promise((r) => setTimeout(() => r(x + 1), 1000));
 const b = (x) => new Promise((r) => setTimeout(() => r(x + 2), 2000));
 const c = (x) => Promise.resolve(x);
 
-const cb2 = new DEW.Callback(a, b, c);
+const cb2 = new Callback(a, b, c);
 
 Promise.all(cb2.call(2)).then((e) => log(e, 'completed'));

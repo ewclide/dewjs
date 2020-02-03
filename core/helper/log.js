@@ -31,6 +31,7 @@ export default function log() {
 	console.log.apply(null, args);
 }
 
+log.IGNORE = LOG_IGNORE;
 log.json = (json, spaces = 4) => log(JSON.stringify(json, null, spaces));
 log.time = (name) => console.time(name);
 log.timeEnd = (name) => console.timeEnd(name);
