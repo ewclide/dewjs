@@ -42,9 +42,10 @@ class Loader extends Async {
     }
 }
 
-let loader = new Loader([
+const loader = new Loader([
     '/examples/assets/img.png',
     '/examples/assets/img.png',
     // '/examples/assets/empty.jpg'
 ]);
 
+console.log(loader)

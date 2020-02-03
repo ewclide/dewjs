@@ -1,20 +1,55 @@
 import log from '../helper/log';
 import Callback from './callback';
 
+const createSymbols = (names) => {
+    return names.reduce((namespace, name) => {
+        namespace[name] = Symbol(name);
+        return namespace;
+    }, {});
+}
+
+const symbol = createSymbols([
+    'status',
+    'list',
+    'progress',
+    'refresh',
+    'ready',
+    'permit',
+    'promise',
+    'resolve',
+    'reject',
+    'init',
+    'calcReady'
+]);
+
 export default class Async {
+    [symbol.status] = 0;
+    [symbol.list] = [];
+    [symbol.progress] = null;
+    [symbol.refresh] = null;
+    [symbol.ready] = 0;
+    [symbol.permit] = true;
+    [symbol.promise] = null;
+    [symbol.resolve] = null;
+    [symbol.reject] = null;
+
     constructor() {
-        this.__asyncStatus = 0;
-        this.__asyncList = [];
-        this.__asyncProgress = null;
-        this.__asyncRefresh = null;
-        this.__asyncReady = 0;
-        this.__asyncPermit = true;
+        this[symbol.init]();
+    }
 
-        this.__nativePromise = null;
-        this.__nativeResolve = null;
-        this.__nativeReject = null;
+    [symbol.init]() {
+        this[symbol.resolve] = null;
+        this[symbol.reject] = null;
+        this[symbol.permit] = true;
 
-        this.__asyncInit();
+        this[symbol.promise] = new Promise((resolve, reject) => {
+            this[symbol.resolve] = resolve;
+            this[symbol.reject] = reject;
+        });
+
+        this[symbol.promise]
+            .then(() => this[symbol.status] = 1)
+            .catch(() => this[symbol.status] = -1);
     }
 
     get isAsync() {
@@ -22,60 +57,45 @@ export default class Async {
 	}
 
     get promise() {
-        return this.__nativePromise;
+        return this[symbol.promise];
     }
 
     get ready () {
-        return this.__asyncReady;
+        return this[symbol.ready];
     }
 
     get pending() {
-        return this.__asyncStatus === 0;
+        return this[symbol.status] === 0;
     }
 
     get fulfilled() {
-		return this.__asyncStatus === 1;
+		return this[symbol.status] === 1;
 	}
 
 	get rejected() {
-		return this.__asyncStatus === -1;
+		return this[symbol.status] === -1;
 	}
 
-    __asyncInit() {
-        this.__nativeResolve = null;
-        this.__nativeReject = null;
-        this.__asyncPermit = true;
-
-        this.__nativePromise = new Promise((resolve, reject) => {
-            this.__nativeResolve = resolve;
-            this.__nativeReject = reject;
-        });
-
-        this.__nativePromise
-            .then(() => this.__asyncStatus = 1)
-            .catch(() => this.__asyncStatus = -1);
-    }
-
     then(handler) {
-        return this.__nativePromise.then(handler);
+        return this[symbol.promise].then(handler);
     }
 
     catch(handler) {
-        return this.__nativePromise.catch(handler);
+        return this[symbol.promise].catch(handler);
     }
 
     resolve(e) {
-        if (this.__asyncPermit) {
-            if (this.__asyncProgress) this.progress(1);
-            this.__nativeResolve(e);
+        if (this[symbol.permit]) {
+            if (this[symbol.progress]) this.progress(1);
+            this[symbol.resolve](e);
         } else {
             log.warn("Can't use resolve after use wait!");
         }
     }
 
     reject(e) {
-        if (this.__asyncPermit) {
-            this.__nativeReject(e);
+        if (this[symbol.permit]) {
+            this[symbol.reject](e);
         } else {
             log.warn("Can't use reject after use wait!");
         }
@@ -84,77 +104,77 @@ export default class Async {
     wait(asyncList, progress) {
         const promises = [];
 
-        this.__asyncList = Array.isArray(asyncList) ? asyncList : [asyncList];
-        this.__asyncList.forEach((async) => {
+        this[symbol.list] = Array.isArray(asyncList) ? asyncList : [asyncList];
+        this[symbol.list].forEach((async) => {
             const promise = async.isAsync ? async.promise : async;
             promises.push(promise);
 
             if (progress) {
                 async.progress(() => {
-                    this.shift(this.__calcReady());
+                    this.shift(this[symbol.calcReady]());
                 });
             }
         });
 
-        this.__asyncPermit = false;
+        this[symbol.permit] = false;
 
         const wait = Promise.all(promises);
         wait.then((e) => {
-            this.__asyncPermit = true;
-            this.__nativeResolve(e);
+            this[symbol.permit] = true;
+            this[symbol.resolve](e);
         }).catch((e) => {
-            this.__asyncPermit = true;
-            this.__nativeReject(e);
+            this[symbol.permit] = true;
+            this[symbol.reject](e);
         });
 
         return wait;
     }
 
-    __calcReady() {
-        const rate = 1 / this.__asyncList.length;
+    [symbol.calcReady]() {
+        const rate = 1 / this[symbol.list].length;
         let ready = 0;
 
-        this.__asyncList.forEach((async) => ready += async.ready * rate);
+        this[symbol.list].forEach((async) => ready += async.ready * rate);
 
 		return ready;
 	}
 
     reset() {
-        this.__asyncInit();
+        this[symbol.init]();
     }
 
     refresh(handler) {
-		if (!this.__asyncRefresh) {
-            this.__asyncRefresh  = new Callback();
+		if (!this[symbol.refresh]) {
+            this[symbol.refresh]  = new Callback();
         }
 
-		this.__asyncRefresh.push(handler);
+		this[symbol.refresh].push(handler);
 	}
 
 	again() {
 		this.reset();
 
-		if (this.__asyncRefresh) {
-            this.__asyncRefresh.call();
+		if (this[symbol.refresh]) {
+            this[symbol.refresh].call();
         }
 
-		this.__asyncList.forEach((async) => {
+		this[symbol.list].forEach((async) => {
 			if (async.rejected) async.refresh();
 		});
 	}
 
     progress(handler) {
-		if (!this.__asyncProgress) {
-            this.__asyncProgress = new Callback();
+		if (!this[symbol.progress]) {
+            this[symbol.progress] = new Callback();
         }
 
-		this.__asyncProgress.push(handler);
+		this[symbol.progress].push(handler);
 
 		return this;
 	}
 
 	shift(loaded, total = 1) {
-        if (this.__asyncReady == 1) return;
+        if (this[symbol.ready] == 1) return;
 
         if (typeof loaded != 'number' && typeof total != 'number') {
             log.warn('Shift method must to receive numeric arguments');
@@ -164,10 +184,10 @@ export default class Async {
         const ready = loaded / total;
 
 		if (this.pending && ready >= 0 && ready <= 1) {
-            this.__asyncReady = ready;
+            this[symbol.ready] = ready;
 
-			if (this.__asyncProgress) {
-                this.__asyncProgress.call({ loaded, total });
+			if (this[symbol.progress]) {
+                this[symbol.progress].call({ loaded, total });
             }
 		}
     }
