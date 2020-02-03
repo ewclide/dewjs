@@ -1,4 +1,3 @@
-const { log } = Dew.helper;
 const { html } = Dew.common;
 
 const h1 = html.select("h1");

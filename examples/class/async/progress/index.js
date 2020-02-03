@@ -1,6 +1,5 @@
-const { http } = Dew.common;
+const { http, html } = Dew.common;
 const { Async } = Dew.type;
-const { log } = Dew.helper;
 
 class Loader extends Async {
     constructor(list) {
@@ -13,7 +12,7 @@ class Loader extends Async {
     }
 
     _createBar() {
-        this._bar = $html.create('div', 'loadbar');
+        this._bar = html.create('div', 'loadbar');
         this._bar.styles({
             height: '5px',
             width: '100%',
@@ -27,7 +26,7 @@ class Loader extends Async {
         //     origin: [0, 0]
         // })
 
-        $html.ready.then(() => $html.body.append(this._bar));
+        html.ready.then(() => html.body.append(this._bar));
 
         this.progress(({ loaded, total }) => {
             // this._bar.transform({ scaleX: loaded / total })
@@ -38,14 +37,14 @@ class Loader extends Async {
 
     load(list) {
         this.wait(list, true)
-        .then(() => log('loaded!'))
-        .catch((e) => log.error(e));
+            .then(() => log('loaded!'))
+            .catch((e) => log.error(e));
     }
 }
 
 let loader = new Loader([
-    '/test/assets/img.png',
-    '/test/assets/img.png',
-    // '/test/assets/empty.jpg'
+    '/examples/assets/img.png',
+    '/examples/assets/img.png',
+    // '/examples/assets/empty.jpg'
 ]);
 

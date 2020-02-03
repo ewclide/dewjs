@@ -2,7 +2,7 @@ import log from '../helper/log';
 import Clock from './clock';
 import Callback from './callback';
 
-export const EASING = {
+const EASING = {
     linear     : (t) => t,
     InQuad     : (t) => t*t,
     OutQuad    : (t) => t*(2-t),
@@ -19,6 +19,8 @@ export const EASING = {
 }
 
 export default class Lerp {
+    static EASING = EASING;
+
     constructor(settings = {}) {
         const { timing = EASING.linear, duration = 500 } = settings;
 

@@ -1,4 +1,4 @@
-export const LOG_IGNORE = [];
+const LOG_IGNORE = [];
 
 function _getSourceLog() {
 	let stack = (new Error()).stack;

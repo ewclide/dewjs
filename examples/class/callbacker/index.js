@@ -24,3 +24,4 @@ const c = (x) => Promise.resolve(x);
 const cb2 = new Callback(a, b, c);
 
 Promise.all(cb2.call(2)).then((e) => log(e, 'completed'));
+// 3, 4, 2

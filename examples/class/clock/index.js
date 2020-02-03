@@ -24,7 +24,7 @@ const duration = 140;
 const p = html.create('p');
 p.styles({
     fontSize: '50px',
-    fontFamily: 'Consolas',
+    fontFamily: 'Consolas, Ubuntu',
     fontWeight: 'bold',
     margin: 0,
     padding: '15px'

@@ -1,4 +1,3 @@
-const { log } = Dew.helper;
 const { html } = Dew.common;
 
 const place = html.create('div', 'place').html('<span></span>');

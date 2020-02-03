@@ -1,5 +1,3 @@
-const { log } = Dew.helper;
-
 log.IGNORE.push('index');
 
 function doSomeThingImportant() {

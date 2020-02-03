@@ -1,9 +1,23 @@
-export default function unique(arr) {
-    if (window.Set) return [...new Set(arr)];
+export default function unique(arr, mutate = false) {
+	if (!mutate) {
+		if (window.Set) return [...new Set(arr)];
 
-    const hash = {};
+		const values = new Set();
+		return arr.filter(v => {
+			if (values.has(v)) return;
+			values.add(v);
+			return v;
+		});
+	}
+
+	// mutation
+	const values = new Set();
 	for (let i = 0; i < arr.length; i++) {
-		if (!(arr[i] in hash)) hash[arr[i]] = true
-		else arr.splice(i--, 1);
+		if (values.has(arr[i])) {
+			arr.splice(i--, 1);
+			continue;
+		}
+
+		values.add(arr[i]);
 	}
 }

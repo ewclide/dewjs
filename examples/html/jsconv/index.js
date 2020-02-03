@@ -1,4 +1,3 @@
-const { log } = Dew.helper;
 const { html } = Dew.common;
 
 const jsForm = {
