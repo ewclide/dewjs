@@ -1,6 +1,6 @@
 {
   "name": "dewjs",
-  "version": "3.0.0",
+  "version": "4.0.0",
   "description": "Experimental JavaScript library for UI programming",
   "author": "ewclide",
   "license": "MIT",
@@ -9,7 +9,8 @@
     "dev": "npm run gather && webpack-dev-server --mode development",
     "build": "npm run gather && webpack --mode production",
     "gather": "node scripts/gather.js",
-    "test-plugin": "cd ./test/plugin && npm run-script test"
+    "test-plugin": "cd ./test/plugin && npm run-script test",
+    "test-unit": "jest --watch"
   },
   "bugs": {
     "url": "https://github.com/ewclide/dewjs/issues"
@@ -28,20 +29,30 @@
     "@babel/cli": "^7.7.7",
     "@babel/core": "^7.4.0",
     "@babel/plugin-proposal-class-properties": "^7.4.0",
+    "@babel/plugin-proposal-decorators": "^7.8.3",
     "@babel/plugin-proposal-export-default-from": "^7.2.0",
-    "@babel/plugin-transform-runtime": "^7.4.0",
-    "@babel/preset-env": "^7.4.2",
-    "@babel/runtime": "^7.4.2",
+    "@babel/plugin-transform-runtime": "^7.8.3",
+    "@babel/preset-env": "^7.8.4",
+    "@babel/runtime": "^7.8.4",
+    "babel-jest": "^25.1.0",
     "babel-loader": "^8.0.5",
     "commander": "^4.0.1",
     "eslint": "^6.7.2",
     "eslint-config-airbnb-base": "^14.0.0",
     "eslint-loader": "^3.0.3",
     "eslint-plugin-import": "^2.19.1",
+    "jest": "^25.1.0",
     "node-con-color": "^1.0.1",
     "uglifyjs-webpack-plugin": "^1.2.7",
     "webpack": "^4.29.6",
     "webpack-cli": "^3.3.0",
     "webpack-dev-server": "^3.2.1"
+  },
+  "jest": {
+    "verbose": true,
+    "testMatch": [
+      "**/test/unit/**/*.js"
+    ],
+    "transformIgnorePatterns": []
   }
 }

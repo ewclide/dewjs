@@ -1,5 +1,5 @@
-export default function camelCaseMerge(...list) {
-	return list.reduce((res, cur, index) => {
-		return res + (index ? cur.charAt(0).toUpperCase() + cur.slice(1) : cur)
+export default function camelCaseMerge(words) {
+	return words.reduce((result, word, index) => {
+		return result + (index ? word.charAt(0).toUpperCase() + word.slice(1) : word)
 	}, '');
 }
