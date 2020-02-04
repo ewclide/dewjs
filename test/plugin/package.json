@@ -1,12 +1,6 @@
 {
-  "name": "babel-plugin-dewjs",
+  "name": "test-app",
   "version": "1.0.0",
-  "description": "dewjs imports",
-  "main": "lib/index.js",
-  "keywords": [
-    "babel-plugin",
-    "dewjs"
-  ],
   "author": "ewclide",
   "license": "MIT",
   "scripts": {

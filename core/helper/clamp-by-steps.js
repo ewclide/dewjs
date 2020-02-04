@@ -1,3 +1,5 @@
+import roundBetween from './round-between';
+
 export default function clampBySteps(value, steps) {
     if (steps.length < 2) return value;
 

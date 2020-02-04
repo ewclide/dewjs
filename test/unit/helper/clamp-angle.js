@@ -8,7 +8,7 @@ test('clampAngle', () => {
     expect(clampAngle(-30, true)).toBe(330);
 
     // radians
-    expect(clampAngle(390 * degToRad)).toBe(30 * degToRad);
+    expect(clampAngle(390 * degToRad)).toBeCloseTo(30 * degToRad);
     expect(clampAngle(350 * degToRad)).toBe(350 * degToRad);
     expect(clampAngle(-30 * degToRad)).toBe(330 * degToRad);
 });

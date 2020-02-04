@@ -11,4 +11,6 @@ export default function getProbFromMap(probs) {
 
         prev += value;
     }
+
+    return probs.keys().next().value;
 }
