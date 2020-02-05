@@ -1,8 +1,5 @@
 export default function setPropByPath(obj, srcPath, val) {
-    if (!Array.isArray(srcPath)) {
-		log.error(`setPropByPath - path ${srcPath} must be an array`);
-		return;
-	}
+    if (!Array.isArray(srcPath) || !srcPath.length) return;
 
     const path = srcPath.slice();
     const propName = path.pop();

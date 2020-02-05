@@ -14,7 +14,7 @@ test('getProbFromMap', () => {
         results[getProbFromMap(probs)]++;
     }
 
-    expect(results.hello  / 100).toBeCloseTo(0.2, 0.7);
-    expect(results.world / 100).toBeCloseTo(0.3, 0.7);
-    expect(results.man  / 100).toBeCloseTo(0.5, 0.7);
+    expect(results.hello  / 100).toBeWithin(0.10, 0.3);
+    expect(results.world / 100).toBeWithin(0.2, 0.4);
+    expect(results.man  / 100).toBeWithin(0.4, 0.6);
 });

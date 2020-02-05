@@ -43,7 +43,7 @@ log.errors = function(title, messages) {
 	if (!messageList.length) return;
 
 	let error = `Errors: ${title}\n`;
-	messageList.forEach((message) => error += `  --> ${message}\n` );
+	messageList.forEach((message) => error += `  └─> ${message}\n` );
 	if (source) error += `(src: ${source})`;
 
 	console.error(error);
