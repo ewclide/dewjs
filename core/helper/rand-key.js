@@ -20,7 +20,7 @@ export default function randKey(length = 15, types = ['all']) {
 	const limit = chars.length - 1;
 	let result = '';
 
-	for (let i = 1; i < length; i++) {
+	for (let i = 1; i < length + 1; i++) {
 		let char = chars[randi(0, limit)];
 		if (char != result[i - 1]) result += char;
 	}

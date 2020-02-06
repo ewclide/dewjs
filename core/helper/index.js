@@ -1,5 +1,6 @@
 import accuracy from './accuracy';
 import aggregateCalls from './aggregate-calls';
+import booleanParse from './boolean-parse';
 import camelCaseMerge from './camel-case-merge';
 import camelCaseToDash from './camel-case-to-dash';
 import camelCaseToLine from './camel-case-to-line';
@@ -46,6 +47,7 @@ import zeroPad from './zero-pad';
 export default {
    accuracy,
    aggregateCalls,
+   booleanParse,
    camelCaseMerge,
    camelCaseToDash,
    camelCaseToLine,

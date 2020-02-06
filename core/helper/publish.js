@@ -1,3 +1,5 @@
+import idGetter from './id-getter';
+
 const $id = Symbol('instance_id');
 
 export default function publish(Input, methods, props) {

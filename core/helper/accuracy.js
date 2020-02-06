@@ -1,3 +1,5 @@
 export default function accuracy(num) {
-    return num.toString().split('.')[1].length;
+    if (typeof num !== 'number') return;
+    const [, fraction] = num.toString().split('.');
+    return fraction ? fraction.length : 0;
 }
