@@ -1,4 +1,6 @@
 import log from './log';
+import camelCaseToDash from './camel-case-to-dash';
+import strParse from './str-parse'
 
 function showMessage(message, cast) {
     if (!cast) {
@@ -73,9 +75,22 @@ function checkoutArrayTypes(array, types, maxCheckLength, data = {}) {
     return true;
 }
 
-export default function fetchSettings(inputObject, description = {}, common = {}) {
-    const { strict = true, cast = false } = common;
-    const propNames = [...Object.keys(inputObject), ...Object.keys(description)];
+function getValue(name, desc, input, element) {
+    let value = input[name];
+
+    if (value === undefined && element instanceof Element) {
+        const { attribute } = desc;
+        const attr = (attribute || 'data-' + camelCaseToDash(name));
+        value = element.getAttribute(attr);
+        value = value === '' ? true : strParse(value);
+    }
+
+    return value;
+}
+
+export default function fetchSettings(input, description = {}, common = {}) {
+    const { strict = true, cast = false, element } = common;
+    const propNames = [...Object.keys(input), ...Object.keys(description)];
     const result = {};
 
     for (const name of propNames) {
@@ -83,7 +98,7 @@ export default function fetchSettings(inputObject, description = {}, common = {}
 
         if (!desc) {
             if (strict) showMessage(`Unexpected property "${name}"`, cast);
-            else result[name] = inputObject[name];
+            else result[name] = input[name];
             continue;
         }
 
@@ -92,23 +107,22 @@ export default function fetchSettings(inputObject, description = {}, common = {}
         }
 
         const { defaultValue, required, filter, type, oneofTypes = [], arrayof, maxCheckLength = 20, oneof = [] } = desc;
-        const haveProp = inputObject[name] !== undefined;
+        const value = getValue(name, desc, input, element);
+        const haveProp = value !== undefined;
 
-        // checkout required
+        /* checkout required */
         if (required && !haveProp) {
             showMessage(`Property "${name}" is expected in settings object`, cast);
             continue;
         }
 
-        // use default
+        /* use default */
         if (!haveProp) {
             result[name] = defaultValue;
             continue;
         }
 
-        const value = inputObject[name];
-
-        // checkout types
+        /* checkout types */
         const types = type ? [...oneofTypes, type] : oneofTypes;
 
         if (types.length && !checkoutTypes(value, types)) {
@@ -126,13 +140,13 @@ export default function fetchSettings(inputObject, description = {}, common = {}
             continue;
         }
 
-        // checkout available values
+        /* checkout available values */
         if (Array.isArray(oneof) && oneof.length && !oneof.includes(value)) {
             showMessage(`Value "${value}" of property "${name}" is unacceptable, it must be one of [${oneof.join()}]`, cast);
             continue;
         }
 
-        // pass throught filter
+        /* pass throught filter */
         if (typeof filter === 'function' && !filter(value)) {
             showMessage(`Value "${value}" of property "${name}" can't be passed throught filter`, cast);
             continue;

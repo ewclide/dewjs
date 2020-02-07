@@ -16,6 +16,11 @@ test('fetchSettings', () => {
     const prop8 = { oneof: ['red', 'blue', 'green'], type: String };
     const prop9 = { required: true, filter: v => v < 5, oneof: [1, 2, 3, 6], oneofTypes: [Number], defaultValue: 1 };
 
+    const prop10 = { required: true, type: Number };
+    const prop11 = { required: true, attribute: 'some', type: Number };
+    const prop12 = { attribute: 'flag', type: Boolean };
+    const prop13 = { attribute: 'list', arrayof: [Number, String] };
+
     // type
     expect(fetchSettings({ prop1: 12 }, { prop1 })).toEqual({ prop1: 12 });
     expect(fetchSettings({ prop1: '12' }, { prop1 })).toEqual({});
@@ -72,4 +77,15 @@ test('fetchSettings', () => {
 
     // throw error
     expect(() => fetchSettings({}, { prop4 }, { cast: true })).toThrowError('Property "prop4" is expected in settings object');
+
+    // get from attribute
+    const element = document.createElement('div');
+    element.setAttribute('data-prop10', 4);
+    element.setAttribute('some', 5);
+    element.setAttribute('flag', '');
+    element.setAttribute('list', '[1, "a", 2]');
+    expect(fetchSettings({}, { prop10 }, { element })).toEqual({ prop10: 4 });
+    expect(fetchSettings({}, { prop11 }, { element })).toEqual({ prop11: 5 });
+    expect(fetchSettings({}, { prop12 }, { element })).toEqual({ prop12: true });
+    expect(fetchSettings({}, { prop13 }, { element })).toEqual({ prop13: [1, 'a', 2] });
 });
