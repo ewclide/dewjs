@@ -10,11 +10,11 @@ test('getProbFromMap', () => {
     expect(getProbFromMap(probs)).toMatch(/hello|world|man/);
 
     const results = Object.seal({ hello: 0, world: 0, man: 0 });
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < 1500; i++) {
         results[getProbFromMap(probs)]++;
     }
 
-    expect(results.hello  / 100).toBeWithin(0.10, 0.3);
-    expect(results.world / 100).toBeWithin(0.2, 0.4);
-    expect(results.man  / 100).toBeWithin(0.4, 0.6);
+    expect(results.hello  / 1500).toBeWithin(0.17, 0.23);
+    expect(results.world / 1500).toBeWithin(0.27, 0.33);
+    expect(results.man  / 1500).toBeWithin(0.47, 0.53);
 });

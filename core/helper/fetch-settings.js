@@ -55,16 +55,22 @@ function checkoutTypes(value, types) {
     return false;
 }
 
-function checkoutArrayTypes(array, types) {
-    if (!Array.isArray(array)) return false;
-
-    for (const value of array) {
-        if (!checkoutTypes(value, types))
-        const isType = getTypeHandler(type);
-        if (isType(value)) return true;
+function checkoutArrayTypes(array, types, maxCheckLength, data = {}) {
+    if (!Array.isArray(array)) {
+        data.value = `"${array}"`;
+        return false;
     }
 
-    return false;
+    let index = 0;
+    for (const value of array) {
+        if (index++ >= maxCheckLength) break;
+        if (!checkoutTypes(value, types)) {
+            data.value = `of element[${index}] "${value}"`;
+            return false;
+        }
+    }
+
+    return true;
 }
 
 export default function fetchSettings(inputObject, description = {}, common = {}) {
@@ -75,8 +81,9 @@ export default function fetchSettings(inputObject, description = {}, common = {}
     for (const name of propNames) {
         let desc = name in description ? description[name] : null;
 
-        if (!desc && strict) {
-            showMessage(`Unexpected property "${name}"`, cast);
+        if (!desc) {
+            if (strict) showMessage(`Unexpected property "${name}"`, cast);
+            else result[name] = inputObject[name];
             continue;
         }
 
@@ -84,7 +91,7 @@ export default function fetchSettings(inputObject, description = {}, common = {}
             desc = { defaultValue: desc };
         }
 
-        const { defaultValue, required, filter, type, oneOfTypes = [], arrayOf, oneOf = [] } = desc;
+        const { defaultValue, required, filter, type, oneofTypes = [], arrayof, maxCheckLength = 20, oneof = [] } = desc;
         const haveProp = inputObject[name] !== undefined;
 
         // checkout required
@@ -102,24 +109,26 @@ export default function fetchSettings(inputObject, description = {}, common = {}
         const value = inputObject[name];
 
         // checkout types
-        const types = type ? [...oneOfTypes, type] : oneOfTypes;
+        const types = type ? [...oneofTypes, type] : oneofTypes;
 
         if (types.length && !checkoutTypes(value, types)) {
             const typeMessage = types.length > 1
                 ? `one of types ${printType(types)}`
-                : `a type ${printType(types[0])}`
+                : `a type ${printType(types[0])}`;
 
             showMessage(`Value "${printValue(value)}" of property "${name}" must be ${typeMessage}`, cast);
             continue;
         }
 
-        if (arrayOf && Array.isArray(value) && !checkoutTypes()) {
-
+        const output = {};
+        if (arrayof && !checkoutArrayTypes(value, arrayof, maxCheckLength, output)) {
+            showMessage(`Value ${output.value} of property "${name}" must be an array of types ${printType(arrayof)}`, cast);
+            continue;
         }
 
         // checkout available values
-        if (Array.isArray(oneOf) && oneOf.length && !oneOf.includes(value)) {
-            showMessage(`Invalid value "${value}" of property "${name}", it must be one of [${oneOf.join()}]`, cast);
+        if (Array.isArray(oneof) && oneof.length && !oneof.includes(value)) {
+            showMessage(`Value "${value}" of property "${name}" is unacceptable, it must be one of [${oneof.join()}]`, cast);
             continue;
         }
 
