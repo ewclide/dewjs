@@ -15,7 +15,6 @@ import entry from './entry';
 import fetchSettings from './fetch-settings';
 import floatParse from './float-parse';
 import formatNumber from './format-number';
-import getElementData from './get-element-data';
 import getProbFromMap from './get-prob-from-map';
 import getProbability from './get-probability';
 import getPropByPath from './get-prop-by-path';
@@ -62,7 +61,6 @@ export default {
    fetchSettings,
    floatParse,
    formatNumber,
-   getElementData,
    getProbFromMap,
    getProbability,
    getPropByPath,
