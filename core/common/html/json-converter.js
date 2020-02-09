@@ -1,5 +1,5 @@
-import { HTMLTools, eventList, genElementId } from '../common/html/html-tools';
-import Callback from './callback';
+import { HTMLTools, eventList, genElementId } from './html-tools';
+import Callback from '../../type/callback';
 
 export default class JSONConverter {
 	constructor(json) {

@@ -1,9 +1,9 @@
 import log from '../../helper/log';
 import idGetter from '../../helper/id-getter';
 import aggregateCalls from '../../helper/aggregate-calls';
-import JsonConverter from '../../type/json-converter';
 import removeValue from '../../array/remove-value';
-import cssTransformer from '../css-transformer';
+import cssTransformer from './css-transformer';
+import JsonConverter from './json-converter';
 import Callback from '../../type/callback';
 
 export const genElementId = idGetter('__elem__');
