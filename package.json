@@ -11,8 +11,9 @@
     "gather": "node scripts/gather.js",
     "test-plugin": "cd ./test/plugin && npm run-script test",
     "test-unit-all": "jest --watchAll",
-    "prepare-tests": "node scripts/prepare-tests.js",
-    "test-unit": "jest --watch"
+    "test-unit": "jest --watch",
+    "test-html": "testcafe chrome --live",
+    "test-html:gen": "testcafe chrome"
   },
   "bugs": {
     "url": "https://github.com/ewclide/dewjs/issues"
@@ -46,6 +47,7 @@
     "jest": "^25.1.0",
     "jest-extended": "^0.11.5",
     "node-con-color": "^1.0.1",
+    "testcafe": "^1.8.1",
     "uglifyjs-webpack-plugin": "^1.2.7",
     "webpack": "^4.29.6",
     "webpack-cli": "^3.3.0",
@@ -56,8 +58,13 @@
     "testMatch": [
       "**/test/unit/**/*.js"
     ],
-    "setupFilesAfterEnv": ["jest-extended"],
-    "watchPathIgnorePatterns": ["_(\\w|-)+\\.js", "(\\w|-)+\\.(ignore)\\.js"],
+    "setupFilesAfterEnv": [
+      "jest-extended"
+    ],
+    "watchPathIgnorePatterns": [
+      "_(\\w|-)+\\.js",
+      "(\\w|-)+\\.(ignore)\\.js"
+    ],
     "transformIgnorePatterns": []
   }
 }
