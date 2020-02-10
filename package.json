@@ -57,7 +57,7 @@
       "**/test/unit/**/*.js"
     ],
     "setupFilesAfterEnv": ["jest-extended"],
-    "watchPathIgnorePatterns": ["_(\\w|-)+\\.js", "(\\w|-)+\\.(ignore|chunk)\\.js"],
+    "watchPathIgnorePatterns": ["_(\\w|-)+\\.js", "(\\w|-)+\\.(ignore)\\.js"],
     "transformIgnorePatterns": []
   }
 }

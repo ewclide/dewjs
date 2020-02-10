@@ -1,6 +1,6 @@
 import html from '../../../../core/common/html';
 
-describe('html', () => {
+describe('htmlTools.getters', () => {
     test('isHTMLTools', () => {
         const div = html.create('div');
         expect(div.isHTMLTools).toBe(true);
@@ -24,6 +24,9 @@ describe('html', () => {
     });
 
     test('ready', () => {
-        expect(html.ready).toBeInstanceOf(Promise);
+        const images = html.select('.images');
+        // const src = images.elements[0].querySelectorAll('img');
+        console.log(images.elements)
+        expect(images.ready).toBeInstanceOf(Promise);
     });
 });
