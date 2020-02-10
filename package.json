@@ -10,7 +10,9 @@
     "build": "npm run gather && webpack --mode production",
     "gather": "node scripts/gather.js",
     "test-plugin": "cd ./test/plugin && npm run-script test",
-    "test-unit": "jest --watchAll"
+    "test-unit-all": "jest --watchAll",
+    "prepare-tests": "node scripts/prepare-tests.js",
+    "test-unit": "jest --watch"
   },
   "bugs": {
     "url": "https://github.com/ewclide/dewjs/issues"
@@ -55,6 +57,7 @@
       "**/test/unit/**/*.js"
     ],
     "setupFilesAfterEnv": ["jest-extended"],
+    "watchPathIgnorePatterns": ["_(\\w|-)+\\.js", "(\\w|-)+\\.(ignore|chunk)\\.js"],
     "transformIgnorePatterns": []
   }
 }

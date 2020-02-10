@@ -37,7 +37,7 @@ export class HTMLTools {
         return this.elements[0].tagName.toLowerCase();
     }
 
-    get sindex() {
+    get selectedIndex() {
         return this.elements[0].selectedIndex;
     }
 

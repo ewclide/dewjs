@@ -15,7 +15,7 @@ export default function strParse(input) {
 
 	let value = input.trim();
 
-	if (+value) return +value;
+	if (!isNaN(+value)) return +value;
 	if (value === 'true' || value === 'TRUE') return true;
 	if (value === 'false' || value === 'FALSE') return false;
 	if (value.search(/\[.+\]/g) != -1) {

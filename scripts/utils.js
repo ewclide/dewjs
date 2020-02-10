@@ -83,7 +83,38 @@ function capitalize(str) {
 	return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
+function parseStr(value) {
+    if (value === 'true') return true;
+    if (value === 'false') return false;
+    return isNaN(+value) ? value : +value;
+}
+
+function getScriptOptions(argv = process.argv) {
+    const [,, ...params] = argv;
+    const options = {};
+    let i = 0;
+
+    while (i < params.length) {
+        const name = params[i];
+        let value = params[i + 1];
+
+        if (name[0] === '-') {
+            const sub = name.split(/^-|!/g);
+            value = sub.length < 3;
+            options[sub.reverse()[0]] = value;
+            i++;
+            continue;
+        }
+
+        options[name] = parseStr(value);
+        i += 2;
+    }
+
+    return options;
+}
+
 module.exports = {
+    getScriptOptions,
     dashToCamelCase,
     capitalize,
     relative,
