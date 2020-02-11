@@ -1,5 +1,5 @@
 import clampAngle from '../../../core/helper/clamp-angle';
-import { degToRad } from '../../utils';
+import { degToRad } from '../utils';
 
 test('clampAngle', () => {
     // degrees

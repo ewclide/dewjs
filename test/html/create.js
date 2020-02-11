@@ -1,4 +1,4 @@
-import { setFixture, compareScreenshots, html, useHtml } from './utils';
+import { setFixture, compareScreenshot, html, useHtml } from './utils';
 
 setFixture('html', {
     before: (t) => {}

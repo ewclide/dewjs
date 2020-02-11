@@ -1,4 +1,4 @@
-const log = require('node-con-color');
+const { log } = require('node-con-color');
 const { getFolderContent, writeFile, dashToCamelCase, capitalize } = require('./utils');
 
 function gather(folder, options = {}) {

@@ -1,5 +1,5 @@
 import mirrAngle from '../../../core/helper/mirr-angle';
-import { degToRad } from '../../utils';
+import { degToRad } from '../utils';
 
 test('mirrAngle', () => {
     expect(mirrAngle(390, true)).toEqual(30);

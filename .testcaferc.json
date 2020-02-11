@@ -1,6 +1,6 @@
 {
     "src": "test/html/*.js",
     "screenshots": {
-        "path": "test/screenshots/work"
+        "path": "test/screenshots"
     }
 }

@@ -251,24 +251,29 @@ export class HTMLTools {
         return this;
     }
 
-    visible(maxDepth = 3) {
-        const element = this._searchHidden(this.elements[0], maxDepth, 0)
-        return element ? { element } : {}
+    visible(maxDepth = Infinity) {
+        const [selfElement] = this.elements;
+        const elements = this._searchHidden(selfElement, maxDepth);
+
+        return {
+            elements,
+            self: elements.includes(selfElement)
+        }
     }
 
-    _searchHidden(element, maxDepth, depth) {
-        if (depth >= maxDepth) return false;
+    _searchHidden(element, maxDepth, elements = [], depth = 0) {
+        if (depth >= maxDepth) return elements;
+
+        if (!this.display(element)) {
+            elements.push(element);
+        }
 
         const { parentElement, parentNode } = element;
         const parent = parentElement || parentNode;
 
-        if (parent && parent !== document) {
-            return this.display(parent)
-                ? this._searchHidden(parent, maxDepth, ++depth)
-                : parent;
-        }
+        if (!parent || parent === document) return elements;
 
-        return false;
+        return this._searchHidden(parent, maxDepth, elements, ++depth);
     }
 
     display(element) {

@@ -1,5 +1,5 @@
 import fetchSettings from '../../../core/helper/fetch-settings';
-import { swapConsole, getConsoleMessage } from '../../utils';
+import { swapConsole, getConsoleMessage } from '../utils';
 
 test('fetchSettings', () => {
     swapConsole();

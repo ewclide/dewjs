@@ -1,6 +1,4 @@
 node_modules
-lib/package-lock.json
-test/npm/index.js
-temp
-diff.txt
-log.txt
+*/screenshots/work
+*/screenshots/diff
+*/screenshots/**/thumbnails

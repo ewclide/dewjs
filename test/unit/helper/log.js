@@ -1,5 +1,5 @@
 import log from '../../../core/helper/log';
-import { swapConsole } from '../../utils';
+import { swapConsole } from '../utils';
 
 test('log', () => {
     swapConsole();
