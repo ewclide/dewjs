@@ -13,8 +13,8 @@ test('length', async (t) => {
     const div = await html('create', 'div');
     await t.expect(await useHtml(div, 'length')).eql(1);
 
-    const blocks = await html('select', '.block');
-    await t.expect(await useHtml(blocks, 'length')).eql(3);
+    const twins = await html('select', '.twins');
+    await t.expect(await useHtml(twins, 'length')).eql(3);
 });
 
 test('tag', async (t) => {

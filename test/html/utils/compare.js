@@ -48,11 +48,13 @@ export default function compareImages({ etalon, work, diff, ...options }, callba
         matchOptions
     );
 
-    writeImage(diff, diffImage);
-
     const difference = diffPixels / (width * height) * 100;
     const compatibility = 100 - difference;
     const equal = difference < matchOptions.threshold * 100;
+
+    if (!equal) {
+        writeImage(diff, diffImage);
+    }
 
     callback({
         difference,

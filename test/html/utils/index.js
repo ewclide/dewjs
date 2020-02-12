@@ -49,11 +49,21 @@ const prepareHtml = ClientFunction(() => {
         return instances[instance.index];
     }
 
-    window.__instances = instances;
-    window.__shells = shells;
-    window.__prepareArgs = prepareArgs;
-    window.__getResult = getResult;
-    window.__getInstance = getInstance;
+    const useClientHtml = (instance, propName, args) => {
+        const prop = instance[propName];
+        const result = typeof prop === 'function'
+            ? prop.bind(instance)(...prepareArgs(args)) : prop;
+
+        return getResult(result);
+    };
+
+    window.__global = {
+        shells,
+        instances,
+        getInstance,
+        useClientHtml,
+        getResult
+    };
 });
 
 function setFixture(name, options = {}) {
@@ -106,28 +116,21 @@ async function compareScreenshot(t, name, threshold = 0.001) {
 }
 
 const html = ClientFunction((propName, ...args) => {
-    const prepareArgs = window.__prepareArgs;
-    const getResult = window.__getResult;
-
+    const { useClientHtml } = window.__global;
     const { html } = window.Dew.common;
-    const prop = html[propName].bind(html);
-    const result = typeof prop === 'function'
-        ? prop(...prepareArgs(args)) : prop;
+    return useClientHtml(html, propName, args);
+});
 
-    return getResult(result);
+const htmlBody = ClientFunction((propName, ...args) => {
+    const { useClientHtml } = window.__global;
+    const { html } = window.Dew.common;
+    return useClientHtml(html.body, propName, args);
 });
 
 const useHtml = ClientFunction((target, propName, ...args) => {
-    const prepareArgs = window.__prepareArgs;
-    const getInstance = window.__getInstance;
-    const getResult = window.__getResult;
-
+    const { useClientHtml, getInstance } = window.__global;
     const instance = getInstance(target);
-    const prop = instance[propName].bind(instance);
-    const result = typeof prop === 'function'
-        ? prop(...prepareArgs(args)) : prop;
-
-    return getResult(result);
+    return useClientHtml(instance, propName, args);
 });
 
 const createImages = ClientFunction((path, target = 'body', count = 1) => {
@@ -157,7 +160,7 @@ const checkImagesReady = ClientFunction(() => {
 });
 
 const getElements = ClientFunction((selector) => {
-    const getResult = window.__getResult;
+    const { getResult } = window.__global;
     const elements = document.querySelectorAll(selector);
     const result = [];
 
@@ -178,6 +181,7 @@ async function createSquare(size = 100, background = 'red') {
 
 export {
     html,
+    htmlBody,
     useHtml,
     getElements,
     createSquare,

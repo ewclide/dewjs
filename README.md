@@ -63,7 +63,7 @@ import capitalize from 'dewjs/core/helper/capitalize';
 ### Usage
 
 ```js
-import { html } from 'dewjs';
+import { html } from 'dewjs/common';
 
 (async () => {
 	await html.ready;
