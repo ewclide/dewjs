@@ -3,9 +3,11 @@ import { ColoredError } from 'node-con-color';
 import testcafeConfig from '../../../.testcaferc.json';
 import compareImages from './compare';
 
+const clientWindow = { index: 0, get isInstance() { return true; } };
+
 const prepareHtml = ClientFunction(() => {
-    const shells = [];
-    const instances = [];
+    const shells = [clientWindow];
+    const instances = [window];
 
     const prepareArgs = (args) => {
         return args.map(arg => arg && arg.isInstance ? instances[arg.index] : arg);
@@ -64,7 +66,7 @@ const prepareHtml = ClientFunction(() => {
         useClientHtml,
         getResult
     };
-});
+}, { dependencies: { clientWindow } });
 
 function setFixture(name, options = {}) {
     const { only, before = () => {}, size = {} } = options;
@@ -94,8 +96,7 @@ async function compareScreenshot(t, name, threshold = 0.001) {
     const diff = `diff/${fixtureName}/${scrName}.png`;
 
     await t.takeScreenshot({
-        path: generate ? etalon : work,
-        fullPage: true
+        path: generate ? etalon : work
     });
 
     if (generate) return;
@@ -176,6 +177,27 @@ const getElementStyle = ClientFunction((element, styleProp) => {
     return getInstance(element).style[styleProp];
 });
 
+const setElementStyle = ClientFunction((element, prop, value) => {
+    const { getInstance } = window.__global;
+    getInstance(element).style[prop] = value;
+});
+
+const setElementProperty = ClientFunction((element, prop, value) => {
+    const { getInstance } = window.__global;
+    getInstance(element)[prop] = value;
+});
+
+const getElementProperty = ClientFunction((element, prop) => {
+    const { getInstance, getResult } = window.__global;
+    const instance = getInstance(element);
+    return getResult(instance[prop]);
+});
+
+const callElementMethod = ClientFunction((element, method, args) => {
+    const { getInstance } = window.__global;
+    getInstance(element)[method](...args);
+});
+
 const sleep = (time) => new Promise(resolve => setTimeout(resolve, time));
 
 async function createSquare(size = 100, background = 'red') {
@@ -188,8 +210,13 @@ export {
     html,
     htmlBody,
     useHtml,
+    clientWindow,
     getElements,
     getElementStyle,
+    setElementStyle,
+    getElementProperty,
+    setElementProperty,
+    callElementMethod,
     createSquare,
     createImages,
     checkImagesReady,

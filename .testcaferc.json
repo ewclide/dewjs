@@ -1,6 +1,7 @@
 {
     "src": "test/html/*.js",
     "screenshots": {
-        "path": "test/screenshots"
+        "path": "test/screenshots",
+        "fullPage": false
     }
 }
