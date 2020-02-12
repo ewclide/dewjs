@@ -171,11 +171,16 @@ const getElements = ClientFunction((selector) => {
     return getResult(result);
 });
 
+const getElementStyle = ClientFunction((element, styleProp) => {
+    const { getInstance } = window.__global;
+    return getInstance(element).style[styleProp];
+});
+
 const sleep = (time) => new Promise(resolve => setTimeout(resolve, time));
 
 async function createSquare(size = 100, background = 'red') {
     const styles = { width: `${size}px`, height: `${size}px`, background };
-    const square = await html('create', 'div', null, styles);
+    const square = await html('create', 'div', { id: 'red-square' }, styles);
     return square;
 }
 
@@ -184,6 +189,7 @@ export {
     htmlBody,
     useHtml,
     getElements,
+    getElementStyle,
     createSquare,
     createImages,
     checkImagesReady,
