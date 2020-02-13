@@ -7,7 +7,7 @@ test('visible', async (t) => {
     const divElement = await useHtml(div, 'native');
     const targetVisible = await html('getById', 'target');
     const targetHidden = await html('getById', 'target-hidden');
-    const [hiddenParent] = await getElements('.hidden');
+    const [hiddenParent] = await getElements('#tree');
 
     // visible
     await useHtml(targetVisible, 'append', div);

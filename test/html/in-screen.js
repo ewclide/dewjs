@@ -12,7 +12,7 @@ import {
 
 setFixture('inScreen');
 
-test.only('visible', async (t) => {
+test('inScreen', async (t) => {
     const redSquare = await createSquare(150);
     await htmlBody('append', redSquare);
     const [bodyElement] = await getElements('body');

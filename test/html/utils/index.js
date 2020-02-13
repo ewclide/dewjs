@@ -198,6 +198,20 @@ const callElementMethod = ClientFunction((element, method, args) => {
     getInstance(element)[method](...args);
 });
 
+const showElements = ClientFunction((elements) => {
+    const { getInstance } = window.__global;
+    for (const element of elements) {
+        getInstance(element).classList.remove('hidden');
+    }
+});
+
+const hideElements = ClientFunction((elements) => {
+    const { getInstance } = window.__global;
+    for (const element of elements) {
+        getInstance(element).classList.add('hidden');
+    }
+});
+
 const sleep = (time) => new Promise(resolve => setTimeout(resolve, time));
 
 async function createSquare(size = 100, background = 'rgb(255, 0, 0)') {
@@ -205,6 +219,30 @@ async function createSquare(size = 100, background = 'rgb(255, 0, 0)') {
     const square = await html('create', 'div', { id: 'red-square' }, styles);
     return square;
 }
+
+class Stopwatch {
+    constructor() {
+        this._startTime = 0;
+        this._time = 0;
+        this._active = 0;
+    }
+
+    get time() {
+        return this._time;
+    }
+
+    start() {
+        this._startTime = Date.now();
+    }
+
+    stop() {
+        this._time = Date.now() - this._startTime;
+        this._startTime = 0;
+        return this;
+    }
+}
+
+const stopwatch = new Stopwatch();
 
 export {
     html,
@@ -217,10 +255,13 @@ export {
     getElementProperty,
     setElementProperty,
     callElementMethod,
+    showElements,
+    hideElements,
     createSquare,
     createImages,
     checkImagesReady,
     setFixture,
     compareScreenshot,
+    stopwatch,
     sleep
 }

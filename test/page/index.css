@@ -14,3 +14,17 @@ h1 {
 .hidden {
     display: none;
 }
+
+#insert {
+    padding: 15px;
+    border: 1px solid blue;
+}
+
+#insert .middle {
+    height: 20px;
+    background: blue;
+}
+
+.twins {
+    margin-bottom: 15px;
+}
