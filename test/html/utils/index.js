@@ -200,7 +200,7 @@ const callElementMethod = ClientFunction((element, method, args) => {
 
 const sleep = (time) => new Promise(resolve => setTimeout(resolve, time));
 
-async function createSquare(size = 100, background = 'red') {
+async function createSquare(size = 100, background = 'rgb(255, 0, 0)') {
     const styles = { width: `${size}px`, height: `${size}px`, background };
     const square = await html('create', 'div', { id: 'red-square' }, styles);
     return square;
