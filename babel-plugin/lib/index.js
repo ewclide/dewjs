@@ -7,11 +7,11 @@ const rules = new Map(Object.entries({
     'randf': 'rand-f'
 }));
 
-function createImportNode(t, name, path) {
+function createImportNode(t, name, alias, path) {
     const [lib, namespace] = path.split('/');
     const target = rules.has(name) ? rules.get(name) : camelCaseToDash(name);
     const source = t.stringLiteral(`${lib}/core/${namespace}/${target}`);
-    const importName = t.identifier(name);
+    const importName = t.identifier(alias);
     const specifier = t.importDefaultSpecifier(importName);
 
     return t.importDeclaration([specifier], source);
@@ -27,10 +27,10 @@ function createMemberExpression(t, names, index) {
     return t.memberExpression(object, property);
 }
 
-function createVariableNode(t, name, path) {
+function createVariableNode(t, name, alias, path) {
     const [, namespace] = path.split('/');
 
-    const varName = t.identifier(name);
+    const varName = t.identifier(alias);
     const expression = createMemberExpression(t, ['Dew', namespace, name]);
     const variable = t.variableDeclarator(varName, expression);
 
@@ -48,10 +48,11 @@ function prepareImportNode(t, node, scriptMode) {
     for (const specifier of specifiers) {
         if (!t.isImportSpecifier(specifier)) return;
 
-        const { name } = specifier.imported;
+        const alias = specifier.local.name;
+        const name = specifier.imported.name;
         const libNode = scriptMode
-            ? createVariableNode(t, name, source.value)
-            : createImportNode(t, name, source.value);
+            ? createVariableNode(t, name, alias, source.value)
+            : createImportNode(t, name, alias, source.value);
 
         nodes.push(libNode);
     }
