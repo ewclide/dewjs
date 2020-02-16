@@ -13,7 +13,9 @@ module.exports = {
 		use: {
 			loader: 'babel-loader',
 			options: {
-				plugins: ['dewjs/babel-plugin']
+				plugins: [
+					['dewjs/babel-plugin', { scriptMode: true }]
+				]
 			}
 		}
 	}] }

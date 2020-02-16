@@ -11,60 +11,64 @@ function createImportNode(t, name, path) {
     const [lib, namespace] = path.split('/');
     const target = rules.has(name) ? rules.get(name) : camelCaseToDash(name);
     const source = t.stringLiteral(`${lib}/core/${namespace}/${target}`);
-    const specifier = t.importDefaultSpecifier({ type: 'Identifier', name });
+    const importName = t.identifier(name);
+    const specifier = t.importDefaultSpecifier(importName);
 
     return t.importDeclaration([specifier], source);
 }
 
-function prepareImportNode(t, node) {
-    const { source, specifiers } = node;
-    if (!/dewjs/g.test(source.value)) return node;
+function createMemberExpression(t, names, index) {
+    const idx = index || names.length - 1;
+    const property = t.identifier(names[idx]);
+    const object = idx > 1
+        ? createMemberExpression(t, names, idx - 1)
+        : t.identifier(names[idx - 1]);
 
+    return t.memberExpression(object, property);
+}
+
+function createVariableNode(t, name, path) {
+    const [, namespace] = path.split('/');
+
+    const varName = t.identifier(name);
+    const expression = createMemberExpression(t, ['Dew', namespace, name]);
+    const variable = t.variableDeclarator(varName, expression);
+
+    return t.variableDeclaration('const', [variable]);
+}
+
+const isLibraryNode = (node) => /dewjs/g.test(node.source.value);
+
+function prepareImportNode(t, node, scriptMode) {
+    if (!t.isImportDeclaration(node) || !isLibraryNode(node)) return;
+
+    const { source, specifiers } = node;
     const nodes = [];
 
     for (const specifier of specifiers) {
-        const { name } = specifier.imported;
-        const node = createImportNode(t, name, source.value);
+        if (!t.isImportSpecifier(specifier)) return;
 
-        nodes.push(node);
+        const { name } = specifier.imported;
+        const libNode = scriptMode
+            ? createVariableNode(t, name, source.value)
+            : createImportNode(t, name, source.value);
+
+        nodes.push(libNode);
     }
 
     return nodes;
 }
 
-function extractImports(body) {
-    let lastImportIndex = 0;
-    for (const node of body) {
-        if (node.type !== 'ImportDeclaration') break;
-        lastImportIndex++;
-    }
-
-    return body.splice(0, lastImportIndex);
-}
-
-function pushToArray(array, element) {
-    if (Array.isArray(element)) {
-        array.push(...element);
-        return;
-    }
-
-    array.push(element);
-}
-
 module.exports = function({ types: t }) {
     return {
         visitor: {
-            Program(path, opts) {
-                const { body } = path.hub.file.ast.program;
+            ImportDeclaration(path, state) {
+                const { scriptMode } = state.opts;
+                const importNode = prepareImportNode(t, path.node, scriptMode);
 
-                const imports = extractImports(body);
-                const newImports = [];
-
-                for (const importNode of imports) {
-                    pushToArray(newImports, prepareImportNode(t, importNode))
+                if (importNode) {
+                    path.replaceWithMultiple(importNode);
                 }
-
-                body.unshift(...newImports);
             }
         }
     };
