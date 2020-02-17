@@ -33,5 +33,6 @@ gather('./core/object');
 gather('./core/array');
 gather('./core/type', { caps: true });
 gather('./core/common');
+gather('./core/decorator');
 
 log('\n#6{prebuild gathering} completed!\n');

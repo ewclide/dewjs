@@ -1,3 +1,4 @@
+import decorator from './decorator';
 import common from './common';
 import helper from './helper';
 import object from './object';
@@ -5,6 +6,7 @@ import array from './array';
 import type from './type';
 
 const Dew = {
+	decorator,
 	common,
 	helper,
 	object,
