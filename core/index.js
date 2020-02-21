@@ -20,4 +20,19 @@ object.define(window, 'log', {
 	write : false
 });
 
+const { bind } = decorator;
+
+class B {
+	@bind.beforeChange(() => {}) // or afterChange
+	y = 10;
+
+	@bind.with(A, 'x', v => v * 2) // a.x * 2 => b.x
+	x = 10
+}
+
+class A {
+	@bind.with(B) // b.x => a.x
+	x = 10;
+}
+
 object.define(window, { Dew })

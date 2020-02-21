@@ -23,10 +23,6 @@ const bind = {
 		});
 	},
 
-	context(fn, context) {
-		return () => fn.apply(context, arguments);
-	},
-
 	trigger(object, field, trigger) {
 		this._createNode(object, field, trigger);
 	},
