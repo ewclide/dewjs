@@ -22,17 +22,22 @@ object.define(window, 'log', {
 
 const { bind } = decorator;
 
+@bind.observer
 class B {
-	@bind.beforeChange(() => {}) // or afterChange
+	// @bind.beforeChange(() => {}) // or afterChange
 	y = 10;
-
-	@bind.with(A, 'x', v => v * 2) // a.x * 2 => b.x
-	x = 10
-}
-
-class A {
-	@bind.with(B) // b.x => a.x
 	x = 10;
 }
+
+@bind.observer
+class A {
+	@bind.left(B) // b.x => a.x
+	x = 10;
+}
+
+const a = new A();
+const b = new B();
+
+console.log(a, b)
 
 object.define(window, { Dew })
